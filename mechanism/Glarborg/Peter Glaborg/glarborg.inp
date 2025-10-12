@@ -1,0 +1,1915 @@
+!
+! ************************************************************************
+! ************************************************************************
+! ******************* Master mechanism C/H/O/N       ********************
+! ************************************************************************
+! ************************************************************************
+!
+!
+! GLA/MIL98:  P. Glarborg, M.U. Alzueta, K. Dam-Johansen, and J.A. Miller; 
+!             “Kinetic Modeling of Hydrocarbon/Nitric Oxide Interactions 
+!             in a Flow Reactor”, Combust. Flame 115, 1-27 (1998)
+!
+! GLA/MIL99:  P. Glarborg, A.B. Bendtsen, and J.A. Miller; “Nitromethane 
+!             Dissociation.  Implications for the CH3+NO2 Reaction”, 
+!             Int. J. Chem. Kinet. 31, 591-602 (1999)
+!
+! SKJ/CHR02:  M.S. Skjøth-Rasmussen, P. Glarborg, M. Østberg, M.B. Larsen, 
+!             S.W. Sørensen, J.E. Johnsson, A.D. Jensen, and T.S. Christensen; 
+!             “A Study of Benzene Formation in a Laminar Flow Reactor”, 
+!             Proc. Combust. Inst. 29, 1329-1336 (2002)
+!
+! SKR/GLA04:  Ø. Skreiberg, P. Kilpinen and P. Glarborg; “Ammonia Chemistry 
+!             under Fuel-Rich Conditions in a Flow Reactor”, Combust. Flame
+!             136, 501-508 (2004)
+!
+! DAG/ALZ08:  P. Dagaut, P. Glarborg and M.U. Alzueta; “The oxidation of 
+!             hydrogen cyanide and related chemistry”, Prog. Energy 
+!             Combust. Sci. 34, 1-46 (2008)
+!
+! GLA/BEN08:  P. Glarborg and L.L.B. Bentzen; “Chemical effects of a high 
+!             CO2 concentration in oxy-fuel combustion of methane”, 
+!             Energy Fuels, 22, 291-296 (2008) 
+!
+! RAS/GLA08a: C.L. Rasmussen, J. Hansen, P. Marshall, and P. Glarborg; 
+!             “Experimental Measurements and Kinetic Modeling of CO/H2/O2/NOx 
+!             Conversion at High Pressure”, Int. J. Chem. Kin. 40, 454-480 (2008)
+!
+! RAS/GLA08b: C.L. Rasmussen and P. Glarborg; “Measurements and Kinetic Modeling 
+!             of CH4/O2 and CH4/C2H6/O2 Conversion at High Pressure”, 
+!             Int. J. Chem. Kinet., in press (2008)
+!
+! RAS/GLA08c: C.L. Rasmussen, K.H. Andersen, K. Dam-Johansen, and P. Glarborg; 
+!             “Methanol oxidation in a flow reactor: implications for the 
+!             branching ratio of the CH3OH+OH reaction”, Int. J. Chem. Kinet.
+!             40, 423-441 (2008)
+!
+! RAS/GLA08d: C.L. Rasmussen and P. Glarborg; “Sensitizing Effects of NOx on 
+!             CH4 Oxidation at High Pressure”, Combust. Flame, in press (2008)
+!
+! GIM/GLA08:  J. Gimenez, C.L. Rasmussen, M.U. Alzueta, Y. Gao, P. Marshall 
+!             and P. Glarborg; “Experimental and Kinetic Modeling Study of 
+!             C2H4 Oxidation at High Pressure”, Proc. Combust. Inst., accepted (2008)
+!
+!
+ ELEMENTS
+    O  H  C  N  AR
+ END  
+!
+ SPECIES    
+H  O  OH  H2  O2  HO2  H2O  H2O2            
+CO CO2 HOCO 
+!
+CH4 CH3 CH2 CH2(S) CH C
+CH3OH CH3O CH2OH CH2O HCO 
+CH3OOH CH3OO CH2OOH 
+C2H6 C2H5 C2H4 C2H3 C2H2 H2CC C2H C2
+CH3CH2OH CH3CH2O CH3CHOH CH2CH2OH CH3CHO cC2H4O 
+CH2CHOH CHCHOH cC2H3O HCCOH CH3CO CH2CHO CH2CO HCCO C2O OCHCHO
+!
+NO NO2 NO3 N2O HNO HON HONO HNO2 H2NO HNOH HONO2  
+CH3NO CH3NO2 CH2NO2 CH3ONO CH3ONO2 C2H5NO2 CH3CH2ONO CH3CH2ONO2 
+!
+NH3 NH2 NH N N2H4 N2H3 N2H2 H2NN NNH NH2OH
+HCN HNC CN HNCO HOCN HCNO NCO H2CN HCNH CH3NH2 CH3NH CH2NH2 CH2NH
+CH3CN CH2CN NCCN NCN  
+AR N2
+ END
+
+!
+ REACTIONS
+!
+! *****************************************************************************
+!    H2/O2 subset                                                             *
+! *****************************************************************************
+!
+   H+O2=O+OH                            3.6E15  -0.410   16600 ! RAS/GLA08a HES98
+   H+H+M=H2+M                           7.0E17  -1.000       0 ! RAS/GLA08a COH/WES83
+     N2/0/ H2O/0/ H2/0/                                        !
+   H+H+N2=H2+N2                         5.4E18  -1.300       0 ! RAS/GLA08a COH/WES83
+   H+H+H2=H2+H2                         1.0E17  -0.600       0 ! RAS/GLA08a COH/WES83
+   H+H+H2O=H2+H2O                       1.0E19  -1.000       0 ! RAS/GLA08a COH/WES83
+   H+O+M=OH+M                           6.2E16  -0.600       0 ! RAS/GLA08a MIL/BOW89
+     H2O/5/                                                    ! 
+   H+O2(+M)=HO2(+M)                     1.5E12   0.600       0 ! RAS/GLA08a MUE/DRY98
+     LOW  / 3.5E16 -0.41 -1116 /                               !
+     TROE / 0.5 1.0E-30 1.0E30 /                               !
+     N2/0/ AR/0/ H2O/11/ H2/2/ O2/0.78/                        !
+   H+O2(+AR)=HO2(+AR)                   1.5E12   0.600       0 ! RAS/GLA08a MUE/DRY98 
+     LOW  / 9.04E19 -1.500 490 /                               !
+     TROE / 0.5 1.0E-30 1.0E30 /                               !
+   H+O2(+N2)=HO2(+N2)                   1.5E12   0.600       0 ! RAS/GLA08a LI/DRY04
+     LOW  / 6.37E20 -1.720 520 /                               !
+     TROE / 0.8 1.0E-30 1.0E30 /                               !
+   O+O+M=O2+M                           1.9E13   0.000   -1788 ! RAS/GLA08a NBS86
+     N2/1.5/ O2/1.5/ H2O/10/                                   !
+   O+H2=OH+H                            3.8E12   0.000    7948 ! RAS/GLA08a CEC05
+     DUPLICATE                                                 !
+   O+H2=OH+H                            8.8E14   0.000   19175 ! RAS/GLA08a CEC05
+     DUPLICATE                                                 !
+   OH+OH=O+H2O                          4.3E03   2.700   -1822 ! RAS/GLA08a SRI/MIC06
+   OH+H+M=H2O+M                         4.5E22  -2.000       0 ! RAS/GLA08a CON/WES04
+     AR/0.38/ H2/0.73/ H2O/12/ !HE/0.38/                       !   
+   OH+H2=H+H2O                          2.1E08   1.520    3449 ! RAS/GLA08a MIC92
+   H2+O2=HO2+H                          7.4E05   2.433   53502 ! RAS/GLA08a MIC/WAG00 
+   HO2+H=OH+OH                          8.4E13   0.000     400 ! RAS/GLA08a RAS/GLA08a
+   HO2+H=H2O+O                          1.4E12   0.000       0 ! RAS/GLA08a CEC05
+   HO2+O=OH+O2                          1.6E13   0.000    -445 ! RAS/GLA08a CEC05
+   HO2+OH=H2O+O2                        3.6E21  -2.100    9000 ! RAS/GLA08a RAS/GLA08a
+     DUPLICATE                                                 !
+   HO2+OH=H2O+O2                        2.0E15  -0.600       0 ! 
+     DUPLICATE                                                 !
+   HO2+OH=H2O+O2                       -2.2E96 -24.000   49000 !
+     DUPLICATE                                                 !
+   HO2+HO2=H2O2+O2                      1.9E11   0.000   -1408 ! RAS/GLA08a KAP/TROE02
+     DUPLICATE                                                 !
+   HO2+HO2=H2O2+O2                      1.0E14   0.000   11034 !
+     DUPLICATE                                                 !
+   H2O2(+M)=OH+OH(+M)                   4.0E11   0.000   37137 ! RAS/GLA08a KAP/TRO02
+     LOW  /2.291E16 0.0 43638/                                 !
+     TROE /0.5 1E-30 1E30 1E30/                                !  (Fc=0.5)
+     H2O/12/ H2/2.5/ AR/0.64/                                  !
+   H2O2+H=H2O+OH                        1.0E13   0.000    3580 ! RAS/GLA08a CEC05
+   H2O2+H=HO2+H2                        1.7E12   0.000    3760 ! RAS/GLA08a CEC05
+   H2O2+O=HO2+OH                        9.6E06   2.000    3970 ! RAS/GLA08a NBS86
+   H2O2+OH=H2O+HO2                      1.9E12   0.000     427 ! RAS/GLA08a HIP/TRO95
+     DUPLICATE                                                 !
+   H2O2+OH=H2O+HO2                      1.6E18   0.000   29410 ! RAS/GLA08a HIP/TRO95
+     DUPLICATE                                                 !
+! 
+! *****************************************************************************
+!    CO/CO2 subset                                                            *
+! *****************************************************************************
+!
+   CO+O(+M)=CO2(+M)                     1.8E10   0.000    2384 ! RAS/GLA08a MUL/DRY99
+     LOW  /1.35E24 -2.79 4191/                                 ! 
+     TROE /1.0 1E-30 1E30 1E30/                                ! 
+     H2/2.5/ H2O/12/ CO/1.9/ CO2/3.8/                          !
+   CO+O2=CO2+O                          4.7E12   0.000   60500 ! RAS/GLA08a BAC/MAC05
+   CO+HO2=CO2+OH                        1.6E05   2.180   17943 ! RAS/GLA08a YOU/KLI07
+!L!CO+OH=CO2+H                          9.3E10   0.000       0 ! RAS/GLA08a (0.001 bar, 300<T<2000K)
+!L!  DUPLICATE                                                 !
+!L!CO+OH=CO2+H                          7.1E05   1.800    1133 ! RAS/GLA08a (0.001 bar, 300<T<2000K)
+!L!  DUPLICATE                                                 !
+!L!CO+OH=HOCO                           1.0E25  -6.000    2981 ! RAS/GLA08a (0.001 bar, 300<T<2000K)
+   CO+OH=CO2+H                          8.0E10   0.000       0 ! RAS/GLA08a (1 bar, 300<T<2000K)
+     DUPLICATE                                                 !
+   CO+OH=CO2+H                          8.8E05   1.770     954 ! RAS/GLA08a (1 bar, 300<T<2000K)
+     DUPLICATE                                                 !
+   CO+OH=HOCO                           6.0E26  -5.600    2881 ! RAS/GLA08a (1 bar, 300<T<2000K)
+!X!CO+OH=CO2+H                          7.0E10   0.000       0 ! RAS/GLA08a (3 bar, 300<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=CO2+H                          2.9E05   1.900     397 ! RAS/GLA08a (3 bar, 300<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=HOCO                           2.2E27  -5.600    3239 ! RAS/GLA08a (3 bar, 300<T<2000K)
+!X!CO+OH=CO2+H                          3.7E12   0.000   12518 ! RAS/GLA08a (10 bar, 300<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=CO2+H                          9.3E07   1.100       0 ! RAS/GLA08a (10 bar, 300<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=HOCO                           1.5E25  -5.000    1987 ! RAS/GLA08a (10 bar, 300<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=HOCO                           1.3E37  -8.400    7948 ! RAS/GLA08a (10 bar, 300<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=CO2+H                          2.9E12   0.000   11922 ! RAS/GLA08a (20 bar, 300<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=CO2+H                          4.5E07   1.200       0 ! RAS/GLA08a (20 bar, 300<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=HOCO                           4.2E26  -5.700    1927 ! RAS/GLA08a (20 bar, 300<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=HOCO                           7.5E28  -6.000    3775 ! RAS/GLA08a (20 bar, 300<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=HOCO                           4.0E39  -9.000    9935 ! RAS/GLA08a (20 bar, 300<T<2000K)
+!X!  DUPLICATE                                                 !
+!H!CO+OH=CO2+H                          1.5E12   0.000   13909 ! RAS/GLA08a (50 bar, 150<T<2000K)
+!H!  DUPLICATE                                                 !
+!H!CO+OH=CO2+H                          5.8E06   1.500       0 ! RAS/GLA08a (50 bar, 150<T<2000K)
+!H!  DUPLICATE                                                 !
+!H!CO+OH=HOCO                           4.9E25  -5.200    1987 ! RAS/GLA08a (50 bar, 150<T<2000K)
+!H!  DUPLICATE                                                 !
+!H!CO+OH=HOCO                           4.0E38  -9.000    6955 ! RAS/GLA08a (50 bar, 150<T<2000K)
+!H!  DUPLICATE                                                 !
+!H!CO+OH=HOCO                           5.0E43 -10.000   13015 ! RAS/GLA08a (50 bar, 150<T<2000K)
+!H!  DUPLICATE                                                 !
+!X!CO+OH=CO2+H                          1.5E11   0.000    1987 ! RAS/GLA08a (80 bar, 150<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=CO2+H                          2.5E05   1.900       0 ! RAS/GLA08a (80 bar, 150<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=HOCO                           5.2E25  -5.200    1987 ! RAS/GLA08a (80 bar, 150<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=HOCO                           7.7E35  -8.000    6557 ! RAS/GLA08a (80 bar, 150<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=HOCO                           9.0E47 -11.200   15499 ! RAS/GLA08a (80 bar, 150<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=CO2+H                          1.5E11   0.000    1987 ! RAS/GLA08a (100 bar, 250<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=CO2+H                          1.9E05   1.940       0 ! RAS/GLA08a (100 bar, 250<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=HOCO                           1.1E28  -6.000    2384 ! RAS/GLA08a (100 bar, 250<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=HOCO                           1.8E36  -8.000    7153 ! RAS/GLA08a (100 bar, 250<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!CO+OH=HOCO                           2.0E54 -13.000   19671 ! RAS/GLA08a (100 bar, 250<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!HOCO=CO2+H               3.5E56*P[bar]^0.95 -15.000   46500 ! RAS/GLA08a (1-100 bar, 300<T<2000K)
+!X!  DUPLICATE                                                 !
+!X!HOCO=CO2+H               2.5E69*P[bar]^0.95 -18.000   60000 ! RAS/GLA08a (1-100 bar, 300<T<2000K)
+!X!  DUPLICATE                                                 !
+!L!HOCO=CO2+H                           1.6E55 -15.000   46500 ! RAS/GLA08a (0.04 bar) ¤
+!L!  DUPLICATE                                                 !
+!L!HOCO=CO2+H                           1.2E68 -18.000   60000 !
+!L!  DUPLICATE                                                 !
+   HOCO=CO2+H                           3.5E56 -15.000   46500 ! RAS/GLA08a (1 bar)
+     DUPLICATE                                                 !
+   HOCO=CO2+H                           2.5E69 -18.000   60000 ! RAS/GLA08a (1 bar)
+     DUPLICATE                                                 !
+!X!HOCO=CO2+H                           3.2E57 -15.000   46500 ! RAS/GLA08a (10 bar)
+!X!  DUPLICATE                                                 !
+!X!HOCO=CO2+H                           2.2E70 -18.000   60000 ! RAS/GLA08a (10 bar)
+!X!  DUPLICATE                                                 !
+!X!HOCO=CO2+H                           6.0E57 -15.000   46500 ! RAS/GLA08a (20 bar)
+!X!  DUPLICATE                                                 !
+!X!HOCO=CO2+H                           4.3E70 -18.000   60000 ! RAS/GLA08a (20 bar)
+!X!  DUPLICATE                                                 !
+!H!HOCO=CO2+H                           1.4E58 -15.000   46500 ! RAS/GLA08a (50 bar)
+!H!  DUPLICATE                                                 !
+!H!HOCO=CO2+H                           1.0E71 -18.000   60000 ! RAS/GLA08a (50 bar)
+!H!  DUPLICATE                                                 !
+!X!HOCO=CO2+H                           2.8E58 -15.000   46500 ! RAS/GLA08a (100 bar)
+!X!  DUPLICATE                                                 !
+!X!HOCO=CO2+H                           2.0E71 -18.000   60000 ! RAS/GLA08a (100 bar)
+!X!  DUPLICATE                                                 !
+   HOCO+OH=CO2+H2O                      4.6E12   0.000     -89 ! RAS/GLA08a YU/FRA05
+     DUPLICATE                                                 !
+   HOCO+OH=CO2+H2O                      9.5E06   2.000     -89 ! 
+     DUPLICATE                                                 !
+!  HOCO+OH=CO+H2O2                      1.0E13   0.000       0 ! RAS/GLA08a - omitted/pending 
+   HOCO+O2=CO2+HO2                      9.9E11   0.000       0 ! RAS/GLA08a NOL/WAG93
+!
+! *****************************************************************************
+!    CH2O subset                                                              *
+! *****************************************************************************
+! 
+   CH2O(+M)=HCO+H(+M)                   8.0E15   0.000   87726 ! RAS/GLA08b TRO05
+     LOW  /3.734E15 0.0 73479/                                 !
+   CH2O(+M)=CO+H2(+M)                   3.7E13   0.000   71969 ! RAS/GLA08b TRO05
+     LOW  /5.661E15 0.0 65849/                                 !
+   CH2O+H=HCO+H2                        4.1E08   1.470    2444 ! RAS/GLA08b CEC05
+   CH2O+O=HCO+OH                        4.2E11   0.570    2760 ! RAS/GLA08b CEC05
+   CH2O+O2=HCO+HO2                      2.4E05   2.500   36461 ! RAS/GLA08b CEC05
+   CH2O+OH=HCO+H2O                      7.8E07   1.630   -1055 ! RAS/GLA08b VAS/HAN05
+   CH2O+HO2=HCO+H2O2                    4.1E04   2.500   10206 ! RAS/GLA08b EIT/FRE98
+   CH2O+CH3=HCO+CH4                     3.2E01   3.360    4310 ! RAS/GLA08b CEC05
+!X!HCO=H+CO               9.83E11*P[bar]^0.865  -0.865   16755 ! RAS/GLA08b HIP/STR04 general pressure dependency
+!L!HCO=H+CO                             6.1E10  -0.865   16755 ! RAS/GLA08b HIP/STR04   0.04 bar
+   HCO=H+CO                             9.9E11  -0.865   16755 ! RAS/GLA08b HIP/STR04   1 bar
+!X!HCO=H+CO                             1.3E13  -0.865   16755 ! RAS/GLA08b HIP/STR04  20 bar
+!H!HCO=H+CO                             2.9E13  -0.865   16755 ! RAS/GLA08b HIP/STR04  50 bar
+!X!HCO=H+CO                             5.3E13  -0.865   16755 ! RAS/GLA08b HIP/STR04 100 bar
+   HCO+H=CO+H2                          1.1E14   0.000       0 ! RAS/GLA08b FRI/DAV02
+   HCO+O=CO+OH                          3.0E13   0.000       0 ! RAS/GLA08b CEC92
+   HCO+O=CO2+H                          3.0E13   0.000       0 ! RAS/GLA08b CEC92
+   HCO+OH=CO+H2O                        1.1E14   0.000       0 ! RAS/GLA08b CEC05
+   HCO+O2=CO+HO2                        3.4E12   0.000       0 ! RAS/GLA08b DES/TAT01
+   HCO+HO2=CO2+OH+H                     3.0E13   0.000       0 ! RAS/GLA08b NBS86  
+   HCO+HCO=CO+CH2O                      2.7E13   0.000       0 ! RAS/GLA08b FRI/DAV02
+!
+! *****************************************************************************
+!    CH4 subset                                                               *
+! *****************************************************************************
+!  
+   CH3+H(+M)=CH4(+M)                    2.1E14   0.000       0 ! RAS/GLA08b COB/TRO90
+     LOW  /6.467E23 -1.8 0/                                    ! [He]
+     TROE /0.6376 1E-30 3230 1E30/                             ! 
+     CH4/1.9/ C2H6/4.8/                                        !
+   CH4+H=CH3+H2                         4.1E03   3.156    8755 ! RAS/GLA08b SUT/MIC01
+   CH4+O=CH3+OH                         4.4E05   2.500    6577 ! RAS/GLA08b CEC05
+   CH4+OH=CH3+H2O                       1.0E06   2.182    2506 ! RAS/GLA08b SRI/MIC05
+   CH4+HO2=CH3+H2O2                     4.7E04   2.500   21000 ! RAS/GLA08b CEC05
+!  CH4+O2=CH3+HO2                               see reverse    !
+   CH4+CH2=CH3+CH3                      4.3E12   0.000   10030 ! GLA/MIL98 BOH/WAG85
+   CH4+CH2(S)=CH3+CH3                   4.3E13   0.000       0 ! GLA/MIL98 NBS86
+   CH2+H(+M)=CH3(+M)                    3.8E16  -0.800       0 !           GRI2.11
+    LOW / 4.8E27 -3.14 1230/
+    TROE/ 0.68 78 1995 5590 /
+    N2/1.0/ H2O/6/  AR/0.7/
+   CH3+H=CH2+H2                         9.0E13   0.000   15100 ! GLA/MIL98 GLA/MIL86
+   CH2(S)+H2=CH3+H                      7.2E13   0.000       0 ! GLA/MIL98 CEC92
+   CH3+O=CH2O+H                         6.9E13   0.000       0 ! RAS/GLA08b CEC05,PRE/FLY00 (82%)
+   CH3+O=H2+CO+H                        1.5E13   0.000       0 ! RAS/GLA08b CEC05,PRE/FLY00 (18%)
+   CH3+OH=CH2+H2O                       1.1E03   3.000    2780 !           WIL/BAL98
+   CH3+OH=CH2(S)+H2O                    6.9E14  -0.4884      0 !           KRA/MIC04
+!  CH2(S)+H2O=CH3+OH                    3.0E15  -0.600       0 ! GLA/MIL98 HAC/WAG88,CAR/WAG95
+!  CH3+HO2=CH4+O2                       2.5E08   1.250   -1630 ! RAS/GLA08b ZHU/LIN01b, 300-800K
+   CH3+HO2=CH4+O2                       1.8E03   2.830   -3730 ! RAS/GLA08b ZHU/LIN01b, 800-3000K
+   CH3+HO2=CH3O+OH                      2.0E13   0.000    1075 ! RAS/GLA08b REI/SMI84
+   CH3+O2=CH3O+O                        7.5E12   0.000   28297 ! RAS/GLA08b SRI/MIC05
+   CH3+O2=CH2O+OH                       1.9E11   0.000    9842 ! RAS/GLA08b SRI/MIC05
+!L!CH3+O2+M=CH3OO+M                     6.8E24  -3.000       0 ! RAS/GLA08b FER/TRO06 (k0)
+   CH3+O2=CH3OO                         5.0E22  -3.850    2000 ! RAS/GLA08b fit to FER/TRO06 ( 1 bar)
+!X!CH3+O2=CH3OO                         3.4E21  -3.200    2300 ! RAS/GLA08b fit to FER/TRO06 (10 bar)
+!X!CH3+O2=CH3OO                         4.1E20  -2.940    1900 ! RAS/GLA08b fit to FER/TRO06 (20 bar)
+!X!  DUPLICATE                                                 !
+!X!CH3+O2=CH3OO                         3.3E29  -5.600    6850 ! RAS/GLA08b fit to FER/TRO06 (20 bar)
+!X!  DUPLICATE                                                 !
+!H!CH3+O2=CH3OO                         2.8E18  -2.200    1400 ! RAS/GLA08b fit to FER/TRO06 (50 bar)
+!H!  DUPLICATE                                                 !
+!H!CH3+O2=CH3OO                         5.6E28  -5.250    6850 ! RAS/GLA08b fit to FER/TRO06 (50 bar)
+!H!  DUPLICATE                                                 !
+!X!CH3+O2=CH3OO                         1.1E19  -2.300    1800 ! RAS/GLA08b fit to FER/TRO06 (100bar)
+!X!  DUPLICATE                                                 !
+!X!CH3+O2=CH3OO                         4.1E30  -5.700    8750 ! RAS/GLA08b fit to FER/TRO06 (100bar)
+!X!  DUPLICATE                                                 !
+   CH3+HCO=CH4+CO                       2.8E13   0.000       0 ! RAS/GLA08b CAL/COO89
+   CH3+CH3=C2H5+H                       5.4E13   0.000   16055 ! RAS/GLA08b CEC05
+   CH3+CH3(+M)=C2H6(+M)                 3.6E13   0.000       0 ! RAS/GLA08b CEC05
+     LOW  /1.269E41 -7.0 2762/                                 !
+     TROE /0.62 73 1180 1E30/                                  ! Fc=0.38exp(-T/73)+0.62exp(-T/1180)
+!
+   CH2+M=CH+H+M                         5.6E15  0.000    89000 !           BAU/WAG95
+   CH2+M=C+H2+M                         5.8E12  0.500    68500 !           BAU/WAG95
+   CH2+H=CH+H2                          1.2E14  0.000        0 !           CEC05
+   CH2+O=CO+H+H                         1.2E14  0.000      536 !           CEC05
+   CH2+O=CO+H2                          8.0E13  0.000      536 !           CEC05
+   CH2+OH=CH2O+H                        2.8E13  0.1228    -161 !           JAS/HAR07
+   CH2+OH=CH+H2O                        8.6E05  2.019     6776 !           JAS/HAR07
+   CH2+O2=CO+H2O                        1.8E11  0.000        0 !           CEC05,est 10%
+   CH2+O2=CO2+H+H                       3.8E11  0.000        0 !           CEC05,BLI/SEA03
+   CH2+O2=CH2O+O                        2.9E11  0.000        0 !           CEC05,BLI/SEA03
+   CH2+O2=CO2+H2                        3.4E11  0.000        0 !           CEC05,BLI/SEA03
+   CH2+O2=CO+OH+H                       6.1E11  0.000        0 !           CEC05,BLI/SEA03
+   CH2+CO2=CO+CH2O                      1.0E11  0.000     1000 ! GLA/MIL98 GLA/MIL86
+   CH2(S)+M=CH2+M                       1.0E13  0.000        0 ! GLA/MIL98
+       N2/0/ H2O/0/ AR/0/ H/0/
+   CH2(S)+N2=CH2+N2                     1.3E13  0.000      430 ! GLA/MIL98 HAY/KIN96
+   CH2(S)+AR=CH2+AR                     1.5E13  0.000      884 ! GLA/MIL98 HAY/KIN96
+   CH2(S)+H=CH2+H                       2.0E14  0.000        0 ! GLA/MIL98 JAM est
+   CH2(S)+H=CH+H2                       3.0E13  0.000        0 ! GLA/MIL98 NBS86
+   CH2(S)+O=CO+2H                       3.0E13  0.000        0 ! GLA/MIL98 NBS86
+   CH2(S)+OH=CH2O+H                     3.0E13  0.000        0 ! GLA/MIL98 NBS86
+   CH2(S)+O2=CH2+O2                     3.1E13  0.000        0 !           CEC05 (ISC=100%)
+   CH2(S)+H2O=CH2+H2O                   3.0E13  0.000        0 ! GLA/MIL98 HAC/WAG88,CAR/WAG95
+   CH2(S)+CO2=CH2O+CO                   1.1E13  0.000        0 ! GLA/BEN08 KOC/WAG90
+!
+   CH+H=C+H2                            1.5E14  0.000        0 ! GLA/MIL98 JAM est
+   CH+O=CO+H                            5.7E13  0.000        0 ! GLA/MIL98 MES/CAR81
+   CH+OH=HCO+H                          3.0E13  0.000        0 ! GLA/MIL98 JAM est
+   CH+OH=C+H2O                          4.0E07  2.000     3000 ! GLA/MIL98 JAM est
+   CH+O2=HCO+O                          3.3E13  0.000        0 ! GLA/MIL98 CEC92
+   CH+H2O=CH2O+H                        5.7E12  0.000     -755 ! GLA/MIL98 CEC92
+   CH+CO2=HCO+CO                        8.8E06  1.750    -1040 ! GLA/BEN08 GLA/BEN08
+!
+   C+OH=CO+H                            5.0E13  0.000        0 ! GLA/MIL98 JAM est
+   C+O2=CO+O                            2.0E13  0.000        0 ! GLA/MIL98 HUS/KIR71
+!
+   CH3OH(+M)=CH3+OH(+M)                 2.1E18  -0.6148  92540 ! RAS/GLA08c JAS/RUS07
+     LOW  /2.60E49 -8.80 101500/                               ! RAS/GLA08c fit to LOW from [JAS/RUS07]
+     TROE /0.7656 1910 59.51 9374/                             !
+   CH3OH(+M)=CH2(S)+H2O(+M)             3.1E18  -1.017   91712 !            JAS/RUS07
+     LOW  /5.4E23 -8.3446 99596/                               !            fit to JAS/RUS07    
+     TROE /0.9922 943 47310 47110/                             !
+   CH3OH+H=CH2OH+H2                     2.9E09   1.240    4491 ! RAS/GLA08c CEC05 (~85% est)
+   CH3OH+H=CH3O+H2                      5.1E08   1.240    4491 ! RAS/GLA08c CEC05 (~15% est)
+   CH3OH+O=CH2OH+OH                     2.1E13   0.000    5305 ! RAS/GLA08c CEC05 (~85% est)
+   CH3OH+O=CH3O+OH                      3.7E12   0.000    5305 ! RAS/GLA08c CEC05 (~15% est)
+   CH3OH+OH=CH2OH+H2O                   1.5E08   1.4434    113 ! RAS/GLA08c SRI/MIC07 (85%)
+   CH3OH+OH=CH3O+H2O                    2.7E07   1.4434    113 ! RAS/GLA08c SRI/MIC07 (15%)
+   CH3OH+HO2=CH2OH+H2O2                 2.0E13   0.000   15000 ! RAS/GLA08c est
+   CH3OH+O2=CH2OH+HO2                   6.0E13   0.000   46600 ! RAS/GLA08c est
+   CH3OH+O2=CH3O+HO2                    6.0E13   0.000   54800 ! RAS/GLA08c est
+!
+   CH2OH(+M)=CH2O+H(+M)                 2.8E14  -0.730   32820 ! RAS/GLA08c HEL/DRY98
+     LOW  /6.01E33 -5.39 36200/                                !
+     TROE /0.96 67.6 1855 7543/                                !
+     H2/2/ H2O/5/ CO/2/ CO2/3/                                 !
+   CH2OH+H=CH2O+H2                      4.0E06   1.860     147 !            XU/LIN07
+   CH2OH+H=CH3+OH                       1.8E14   0.160     111 !            XU/LIN07
+   CH2OH+H(+M)=CH3OH(+M)                4.3E15  -0.790       0 ! RAS/GLA08c CH3+OH(+M)
+     LOW  /3.844E37 -6.21 1333/                                !
+     TROE /0.25 210 1434 1E30/                                 !
+   CH2OH+O=CH2O+OH                      6.6E13   0.000    -693 ! RAS/GLA08c SEE/GUT94
+   CH2OH+OH=CH2O+H2O                    2.4E13   0.000       0 ! RAS/GLA08c NBS87
+   CH2OH+HO2=CH2O+H2O2                  1.2E13   0.000       0 ! RAS/GLA08c NBS87
+   CH2OH+O2=CH2O+HO2                    7.2E13   0.000    3736 ! RAS/GLA08c CEC05
+     DUPLICATE                                                 !
+   CH2OH+O2=CH2O+HO2                    2.9E16  -1.500       0 ! RAS/GLA08c CEC05
+     DUPLICATE                                                 !
+   CH2OH+HCO=CH3OH+CO                   1.0E13   0.000       0 ! RAS/GLA08c FRI/HAN04,NBS87
+   CH2OH+HCO=CH2O+CH2O                  1.5E13   0.000       0 ! RAS/GLA08c FRI/HAN04,NBS87
+   CH2OH+CH2O=CH3OH+HCO                 5.5E03   2.810    5862 ! RAS/GLA08c NBS87
+   CH2OH+CH2OH=CH3OH+CH2O               4.8E12   0.000       0 ! RAS/GLA08c NBS87
+   CH2OH+CH3O=CH3OH+CH2O                2.4E12   0.000       0 ! RAS/GLA08c NBS87
+   CH2OH+CH4=CH3OH+CH3                  2.2E01   3.100   16227 ! RAS/GLA08c NBS87
+! 
+   CH3O(+M)=CH2O+H(+M)                  6.8E13   0.000   26154 ! RAS/GLA08c HIP/VIS01
+     LOW  /1.867E25 -3.0 24291/                                !
+     TROE /0.5 1000 2000/                                      ! Fit to Fc=0.97-T/1950 [HIP/VIS01] (1-100bar)
+   CH3O+H=CH2O+H2                       7.6E08   1.500    -519 !           XU/LIN07 (1 atm)
+   CH3O+H=CH3+OH                        4.6E13   0.283      28 !           XU/LIN07 (1 atm)
+   CH3O+H(+M)=CH3OH(+M)                 2.4E12   0.515      50 ! RAS/GLA08c GRI3.0
+     LOW  /4.66E41 -7.44 14080/                                !
+     TROE /0.7 100 90000 10000/                                !
+     N2/1/ H2/2/ H2O/6/ CH4/2/ CO/1.5/ CO2/2/ C2H6/3/          !
+   CH3O+O=CH2O+OH                       3.8E12   0.000       0 ! RAS/GLA08c EWI/ZEL87 (k/ktot=0.25[CEC05])
+   CH3O+OH=CH2O+H2O                     1.8E13   0.000       0 ! RAS/GLA08c NBS86
+   CH3O+HO2=CH2O+H2O2                   3.0E11   0.000       0 ! RAS/GLA08c NBS86
+   CH3O+O2=CH2O+HO2                     2.2E10   0.000    1749 ! RAS/GLA08c WAN/WIN87a 
+   CH3O+CO=CH3+CO2                      9.5E25  -4.930    9080 ! RAS/GLA08c WAN/GU99 1bar,200-1000K
+   CH3O+CH3=CH2O+CH4                    2.4E13   0.000       0 ! RAS/GLA08b NBS86
+   CH3O+CH4=CH3OH+CH3                   1.3E14   0.000   15073 ! RAS/GLA08b WAN/WIN88
+   CH3O+CH2O=CH3OH+HCO                  1.0E11   0.000    2981 ! RAS/GLA08b NBS86
+   CH3O+CH3O=CH3OH+CH2O                 6.0E13   0.000       0 ! RAS/GLA08b NBS86
+!
+!L!CH3OOH=CH3O+OH                       1.3E46 -10.500   50540 ! RAS/GLA08b ZHU/LIN01b (0.03 bar)
+   CH3OOH=CH3O+OH                       2.0E35  -6.700   47450 ! RAS/GLA08b fit to ZHU/LIN01b ( 1 bar)
+!X!CH3OOH=CH3O+OH                       1.1E28  -4.150   46190 ! RAS/GLA08b fit to ZHU/LIN01b (10 bar)
+!H!CH3OOH=CH3O+OH                       2.8E26  -3.500   46340 ! RAS/GLA08b fit to ZHU/LIN01b (50 bar)
+!X!CH3OOH=CH3O+OH                       2.2E17  -0.420   44622 ! RAS/GLA08b fit to ZHU/LIN01b (high P limit)
+   CH3OOH+H=CH2OOH+H2                   5.4E10   0.000    1860 ! RAS/GLA08b SLE/WAR77 (45%)
+   CH3OOH+H=CH3OO+H2                    5.4E10   0.000    1860 ! RAS/GLA08b SLE/WAR77 (45%)
+   CH3OOH+H=CH3O+H2O                    1.2E10   0.000    1860 ! RAS/GLA08b SLE/WAR77 (10%)
+   CH3OOH+O=CH2OOH+OH                   1.6E13   0.000    4750 ! RAS/GLA08b CEC05
+   CH3OOH+O=CH3OO+OH                    8.7E12   0.000    4750 ! RAS/GLA08b CEC05
+   CH3OOH+OH=CH3OO+H2O                  1.1E12   0.000    -437 ! RAS/GLA08b CEC05 
+   CH3OOH+OH=CH2OOH+H2O                 7.2E11   0.000    -258 ! RAS/GLA08b CEC05 
+   CH3OOH+HO2=CH3OO+H2O2                4.1E04   2.500   10206 ! RAS/GLA08b CH2O+HO2=HCO+H2O2
+!
+   CH3OO+H=CH3O+OH                      1.0E14   0.000       0 ! RAS/GLA08b NBS86
+   CH3OO+O=CH3O+O2                      1.6E13   0.000    -445 ! RAS/GLA08b HO2+O
+   CH3OO+OH=CH3OH+O2                    2.0E15  -0.600       0 ! RAS/GLA08b
+   CH3OO+OH=CH3O+HO2                    4.0E11   0.600       0 ! RAS/GLA08b
+   CH3OO+HO2=CH3OOH+O2                  2.5E11   0.000   -1490 ! RAS/GLA08b TYN/WAL01
+   CH3OO+CH3=CH3O+CH3O                  5.1E12   0.000   -1411 ! RAS/GLA08b KEI/PIL88
+   CH3OO+CH4=CH3OOH+CH3                 4.7E04   2.500   21000 ! RAS/GLA08b CH4+HO2=CH3+H2O2
+   CH3OO+HCO=CH3O+H+CO2                 3.0E13   0.000       0 ! RAS/GLA08b HCO+HO2=CO2+OH+H
+   CH3OO+CO=CH3O+CO2                    1.6E05   2.180   17940 ! RAS/GLA08b CO+HO2=CO2+OH
+   CH3OO+CH2O=CH3OOH+HCO                4.1E04   2.500   10206 ! RAS/GLA08b CH2O+HO2=HCO+H2O2
+   CH3OO+CH3O=CH2O+CH3OOH               3.0E11   0.000       0 ! RAS/GLA08b NBS86
+   CH3OO+CH3OH=CH3OOH+CH2OH             4.0E13   0.000   19400 ! RAS/GLA08b CH3OH+HO2=CH2OH+H2O2
+   CH3OO+CH3OO=CH3O+CH3O+O2             1.1E18  -2.400    1800 ! RAS/GLA08b CEC05, fit
+     DUPLICATE                                                 !
+   CH3OO+CH3OO=CH3O+CH3O+O2             7.0E10   0.000     800 !
+     DUPLICATE                                                 !
+   CH3OO+CH3OO=CH3OH+CH2O+O2            2.0E11  -0.550   -1600 ! RAS/GLA08b CEC05 
+   CH3OO+C2H5=CH3O+CH3CH2O              5.1E12   0.000   -1410 ! RAS/GLA08b CH3OO+CH3=CH3O+CH3O
+   CH3OO+C2H6=CH3OOH+C2H5               1.9E01   3.640   17100 ! RAS/GLA08b CAR/DEA05
+!
+!L!CH2OOH=>CH2O+OH                      9.6E10  -0.925    1567 ! RAS/GLA08b ING/BOZ03 0.04 atm extrapolation
+   CH2OOH=>CH2O+OH                      2.4E12  -0.925    1567 ! RAS/GLA08b ING/BOZ03   1 atm
+!X!CH2OOH=>CH2O+OH                      2.5E13  -0.927    1579 ! RAS/GLA08b ING/BOZ03  10 atm
+!H!CH2OOH=>CH2O+OH                      7.0E14  -1.064    1744 ! RAS/GLA08b ING/BOZ03 100 atm
+!
+! *****************************************************************************
+!    C2 subset                                                                *
+! *****************************************************************************
+!
+   C2H6+H=C2H5+H2                       9.8E13   0.000    9220 ! RAS/GLA08b CEC05
+   C2H6+O=C2H5+OH                       1.1E-07  6.500     274 ! RAS/GLA08b MAH/FON88 
+   C2H6+OH=C2H5+H2O                     9.2E06   2.000     990 ! RAS/GLA08b ATK97
+   C2H6+HO2=C2H5+H2O2                   1.1E05   2.500   16850 ! RAS/GLA08b CEC05
+   C2H6+O2=C2H5+HO2                     7.3E05   2.500   49160 ! RAS/GLA08b CEC05
+   C2H6+CH3=C2H5+CH4                    5.6E10   0.000    9418 ! RAS/GLA08b CEC05
+     DUPLICATE                                                 !
+   C2H6+CH3=C2H5+CH4                    8.4E14   0.000   22250 ! 
+     DUPLICATE                                                 !
+   C2H6+CH2(S)=C2H5+CH3                 1.2E14   0.000       0 ! GLA/MIL98 NBS86
+!
+   C2H4+H(+M)=C2H5(+M)                  1.4E09   1.463    1355 ! GIM/GLA08 MIL/KLI04
+     LOW  /2.0E39 -6.642 5769/                                 !
+     TROE /-0.569 299 9147 152.4/                              !
+   C2H5+H(+M)=C2H6(+M)                  5.2E17  -0.990    1580 ! RAS/GLA08b STE/GOL88,GRI3.0
+     LOW  /1.99E41 -7.08 6685/                                 !
+     TROE /0.8422 125 2219 6882/                               !
+     N2/1/ H2/2/ H2O/6/ CH4/2/ CO/1.5/ CO2/2/ C2H6/3/ AR/0.7/  !
+   C2H5+O=CH3+CH2O                      4.2E13   0.000       0 ! RAS/GLA08b SLA/MIL88
+   C2H5+O=CH3CHO+H                      5.3E13   0.000       0 ! RAS/GLA08b SLA/MIL88
+   C2H5+O=C2H4+OH                       3.1E13   0.000       0 ! RAS/GLA08b SLA/MIL88
+   C2H5+OH=C2H4+H2O                     2.4E13   0.000       0 ! RAS/GLA08b NBS86
+   C2H5+HO2=CH3CH2O+OH                  3.1E13   0.000       0 ! RAS/GLA08b LUD/TEM06
+   C2H5+O2=C2H4+HO2                     1.4E07   1.090   -1975 ! RAS/GLA08b MIL/KLI01 (k0)
+!  C2H5+O2(+M)=C2H4+HO2(+M)             6.9E-12  6.530    -834 ! RAS/GLA08b MIL/KLI01 (orig.expression)
+!    LOW  /1.409E07 1.09 -1975/                                !
+!    TROE /0.45 1E-30 1E30 1E30/                               !
+   C2H5+CH2O=C2H6+HCO                   5.5E03   2.810    5860 ! GLA/MIL98 NBS86
+   C2H5+HCO=C2H6+CO                     4.3E13   0.000       0 ! RAS/GLA08b BAG/WAL87 
+   C2H5+CH3=C2H4+CH4                    9.0E11   0.000       0 ! RAS/GLA08b CEC05
+   C2H5+C2H5=C2H6+C2H4                  1.5E12   0.000       0 ! GLA/MIL98 CEC92
+!
+   C2H3+H(+M)=C2H4(+M)                  3.9E13   0.200       0 ! RAS/GLA08 HAR/KLI05b
+     LOW  /2.10E24 -1.3 0/                                     ! RAS/GLA08 MON/SHA95
+     TROE /0.5 1E-30 1E30 1E30/                                ! 
+   C2H4(+M)=H2CC+H2(+M)                 8.0E12   0.440   88800 ! GIM/GLA08 WAN01
+      LOW/7.0E50 -9.31 99900/
+      TROE/0.735 180 1035 5417/
+      H2O/6/ AR/0.7/
+   C2H4+H=C2H3+H2                       2.4E02   3.620   11266 ! RAS/GLA08 CEC05
+   CH4+CH=C2H4+H                        3.0E13   0.000    -400 !           CEC92
+   CH3+CH2=C2H4+H                       1.2E15  -0.3432    153 !           JAS/HAR07
+   CH3+CH2(S)=C2H4+H                    2.0E13   0.000       0 ! GLA/MIL98 NBS86
+   C2H4+O=CH3+HCO                       3.9E12   0.000    1494 ! RAS/GLA08b KLE/YAR90,CEC05
+     DUPLICATE                                                 !
+   C2H4+O=CH3+HCO                       6.2E13   0.000    6855 !
+     DUPLICATE                                                 ! 
+   C2H4+O=CH2CHO+H                      1.7E12   0.000    1494 ! RAS/GLA08 KLE/YAR90,CEC05
+     DUPLICATE                                                 !
+   C2H4+O=CH2CHO+H                      2.8E13   0.000    6855 ! 
+     DUPLICATE                                                 !
+   C2H4+OH=C2H3+H2O                     1.3E-1   4.200    -860 ! GIM/GLA08 SEN/MIL06
+!L!C2H4+OH=CH3+CH2O                     3.2E01   2.710   -1172 ! GIM/GLA08 SEN/MIL06 0.025 atm
+   C2H4+OH=CH3+CH2O                     1.8E06   1.680    2061 ! GIM/GLA08 SEN/MIL06 1 atm
+!X!C2H4+OH=CH3+CH2O                     2.4E09   0.560    6007 ! GIM/GLA08 SEN/MIL06 10 atm
+!H!C2H4+OH=CH3+CH2O                     3.3E11   0.000    9079 ! GIM/GLA08 fit to SEN/MIL06 60 atm,600-900K
+!X!C2H4+OH=CH3+CH2O                     2.8E13  -0.500   11455 ! GIM/GLA08 SEN/MIL06 100 atm
+!L!C2H4+OH=CH3CHO+H                     8.7E-5   4.570    -618 ! GIM/GLA08 SEN/MIL06 0.025 atm
+   C2H4+OH=CH3CHO+H                     2.4E-2   3.910    1723 ! GIM/GLA08 SEN/MIL06 1 atm
+!X!C2H4+OH=CH3CHO+H                     8.2E08   1.010   10507 ! GIM/GLA08 SEN/MIL06 10 atm
+!H!C2H4+OH=CH3CHO+H                     1.4E33  -6.114   24907 ! GIM/GLA08 fit to SEN/MIL06 60 atm,600-900K
+!X!C2H4+OH=CH3CHO+H                     6.8E09   0.810   13867 ! GIM/GLA08 SEN/MIL06 100 atm
+!L!C2H4+OH=CH2CHOH+H                    1.1E04   2.600    4129 ! GIM/GLA08 SEN/MIL06 0.025 atm
+   C2H4+OH=CH2CHOH+H                    3.2E05   2.190    5256 ! GIM/GLA08 SEN/MIL06 1 atm
+!X!C2H4+OH=CH2CHOH+H                    1.9E08   1.430    7829 ! GIM/GLA08 SEN/MIL06 10 atm
+!H!C2H4+OH=CH2CHOH+H                    1.7E13   0.000   11527 ! GIM/GLA08 fit to SEN/MIL06 60 atm,600-900K
+!X!C2H4+OH=CH2CHOH+H                    8.5E10   0.750   11491 ! GIM/GLA08 SEN/MIL06 100 atm
+!L!C2H4+OH=CH2CH2OH                     6.0E37  -9.760    1995 ! GIM/GLA08 SEN/MIL06 0.025 atm
+!L!  DUPLICATE                                                 !
+!L!C2H4+OH=CH2CH2OH                     5.0E37  -7.790    5355 !
+!L!  DUPLICATE                                                 !
+!X!C2H4+OH=CH2CH2OH                     6.0E37  -7.770   10736 ! GIM/GLA08 SEN/MIL06 10 atm
+!X!  DUPLICATE                                                 !
+!X!C2H4+OH=CH2CH2OH                     3.0E26  -4.870    2297 ! GIM/GLA08 SEN/MIL06 10 atm
+!X!  DUPLICATE                                                 !
+!X!C2H4+OH=CH2CH2OH                     6.0E37  -7.440   14269 !
+!X!  DUPLICATE                                                 !
+!H!C2H4+OH=CH2CH2OH                     2.4E20  -2.399    3294 ! GIM/GLA08 fit to SEN/MIL06 60 atm,600-900K
+!X!C2H4+OH=CH2CH2OH                     2.8E19  -2.410    1011 ! GIM/GLA08 SEN/MIL06 100 atm
+!X!  DUPLICATE                                                 !
+   C2H4+HO2=cC2H4O+OH                   2.2E12   0.000   17200 ! GIM/GLA08 CEC05 
+   C2H4+O2=C2H3+HO2                     7.1E13   0.000   60010 ! GIM/GLA08 HUA/WAN05 
+   C2H4+CH3=C2H3+CH4                    6.0E07   1.560   16630 ! RAS/GLA08b CEC05 
+!
+   C2H2+H(+M)=C2H3(+M)                  1.7E10   1.266    2709 ! GIM/GLA08 MIL/KLI04
+     LOW  /6.3E31 -4.664 3780 /                                ! 
+     TROE /0.7878 -10212 1.E30 /                               !
+     H2/2/ CO/2/ CO2/3/ H2O/5/                                 !
+   C2H3+H=C2H2+H2                       4.5E13   0.000       0 ! RAS/GLA08b MON/SHA95
+   CH3+CH=C2H3+H                        3.0E13   0.000       0 ! GLA/MIL98 JAM est
+   C2H3+O=CH2CO+H                       3.0E13   0.000       0 ! RAS/GLA08b CEC05
+   C2H3+OH=C2H2+H2O                     2.0E13   0.000       0 ! RAS/GLA08b GLA/MIL98/JAM est
+   C2H3+HO2=CH2CHO+OH                   3.0E13   0.000       0 ! RAS/GLA08b NBS86
+!L!C2H3+O2=CH2CHOO                      6.6E21  -4.800     703 ! GIM/GLA08 GIM/GLA08 0.03 bar
+!H!C2H3+O2=CH2CHOO                      1.1E12   0.000   -1680 ! GIM/GLA08 GIM/GLA08 60 bar
+!L!C2H3+O2=CH2O+HCO                     1.1E15  -0.823     179 ! GIM/GLA08 GIM/GLA08 0.03 bar
+   C2H3+O2=CH2O+HCO                     4.0E15  -0.959     580 ! GIM/GLA08 GIM/GLA08  1 bar
+!H!C2H3+O2=CH2O+HCO                     6.3E12   0.000    3130 ! GIM/GLA08 GIM/GLA08 60 bar
+!L!C2H3+O2=CH2CHO+O                     6.4E08   1.040    -197 ! GIM/GLA08 GIM/GLA08 0.03 bar
+   C2H3+O2=CH2CHO+O                     2.0E09   0.923     226 ! GIM/GLA08 GIM/GLA08  1 bar
+!H!C2H3+O2=CH2CHO+O                     4.8E12   0.000    4800 ! GIM/GLA08 GIM/GLA08 60 bar
+!L!C2H3+O2=C2H2+HO2                     9.7E00   3.120    -272 ! GIM/GLA08 GIM/GLA08 0.03 bar
+   C2H3+O2=C2H2+HO2                     4.4E01   2.950     186 ! GIM/GLA08 GIM/GLA08  1 bar
+!H!C2H3+O2=C2H2+HO2                     7.6E11   0.000    7930 ! GIM/GLA08 GIM/GLA08 60 bar
+!L!C2H3+O2=CH3O+CO                      5.4E13  -0.823     179 ! GIM/GLA08 GIM/GLA08 0.03 bar
+   C2H3+O2=CH3O+CO                      1.9E14  -0.959     580 ! GIM/GLA08 GIM/GLA08  1 bar
+!H!C2H3+O2=CH3O+CO                      2.8E11   0.000    3130 ! GIM/GLA08 GIM/GLA08 60 bar
+!L!C2H3+O2=CH3+CO2                      6.0E12  -0.823     179 ! GIM/GLA08 GIM/GLA08 0.03 bar
+   C2H3+O2=CH3+CO2                      2.1E13  -0.959     580 ! GIM/GLA08 GIM/GLA08  1 bar
+!H!C2H3+O2=CH3+CO2                      1.3E10   0.000    3130 ! GIM/GLA08 GIM/GLA08 60 bar
+   C2H3+CH2O=C2H4+HCO                   5.4E03   2.810    5860 ! SKJ/CHR02 NBS86
+   C2H3+HCO=C2H4+CO                     9.0E13   0.000       0 ! RAS/GLA08 NBS86
+   C2H3+CH3=C2H2+CH4                    9.0E12   0.000    -765 !           STO/SLA00 
+   C2H3+CH=CH2+C2H2                     5.0E13   0.000       0 ! SKJ/CHR02 JAM est
+   C2H3+C2H3=C2H4+C2H2                  1.5E13   0.000       0 ! GLA/MIL98 FAH/LAU91
+   C2H3+C2H=C2H2+C2H2                   3.0E13   0.000       0 ! SKJ/CHR02 JAM est
+!
+   C2H2+M=C2H+H+M                       9.1E30  -3.700  127138 ! GLA/MIL98 NBS86
+     H2/2/ CO/2/ CO2/3/  H2O/5/
+   CH3+C=C2H2+H                         5.0E13   0.000       0 ! GLA/MIL98 JAM est
+   CH2+CH=C2H2+H                        4.0E13   0.000       0 ! GLA/MIL98 JAM est
+   CH2+CH2=C2H2+H+H                     7.0E13   0.0022      8 !           JAS/HAR07
+   CH2+CH2=C2H2+H2                      1.8E13   0.0022      8 !           JAS/HAR07
+   C2H2+O=HCCO+H                        1.4E07   2.000    1900 ! GLA/MIL98 JAM lr
+   C2H2+O=CH2+CO                        6.1E06   2.000    1900 ! GLA/MIL98 JAM lr
+   C2H2+O=C2H+OH                        3.2E15  -0.600   15000 ! GLA/MIL98 GLA/MIL86
+   C2H2+OH=CH3+CO                       1.3E09   0.730    2579 ! RAS07 SEN/MIL05     1 atm ¤
+!X!C2H2+OH=CH3+CO                       4.3E08   0.920    3736 ! RAS07 SEN/MIL05    10 atm
+!H!C2H2+OH=CH3+CO                       8.3E05   1.770    4697 ! RAS07 SEN/MIL05   100 atm
+   C2H2+OH=HCCOH+H                      2.4E06   2.000   12713 ! RAS07 SEN/MIL05     1 atm
+!X!C2H2+OH=HCCOH+H                      3.2E06   1.970   12810 ! RAS07 SEN/MIL05    10 atm
+!H!C2H2+OH=HCCOH+H                      7.3E06   1.890   13603 ! RAS07 SEN/MIL05   100 atm
+   C2H2+OH=CHCHOH                       1.9E44 -11.380    6299 ! RAS07 SEN/MIL05     1 atm
+     DUPLICATE                                                 !
+   C2H2+OH=CHCHOH                       3.5E31  -6.200    6635 ! RAS07 SEN/MIL05     1 atm
+     DUPLICATE                                                 !
+!X!C2H2+OH=CHCHOH                       1.5E24  -4.060    3261 ! RAS07 SEN/MIL05    10 atm
+!X!  DUPLICATE                                                 !
+!X!C2H2+OH=CHCHOH                       4.5E31  -5.920    8761 ! RAS07 SEN/MIL05    10 atm
+!X!  DUPLICATE                                                 !
+!H!C2H2+OH=CHCHOH                       6.2E20  -2.800    2831 ! RAS07 SEN/MIL05   100 atm
+!H!  DUPLICATE                                                 !
+!H!C2H2+OH=CHCHOH                       1.6E29  -4.910    9734 ! RAS07 SEN/MIL05   100 atm
+!H!  DUPLICATE                                                 !
+!X!C2H2+OH=CHCHOH                       1.1E08   1.340     332 ! RAS07 SEN/MIL05 >>100 atm
+!X!  DUPLICATE                                                 !
+!X!C2H2+OH=CHCHOH                       6.0E07   1.620     240 ! RAS07 SEN/MIL05 >>100 atm
+!X!  DUPLICATE                                                 !
+   C2H2+OH=CH2CO+H                      7.5E06   1.550    2106 ! RAS07 SEN/MIL05     1 atm
+!X!C2H2+OH=CH2CO+H                      5.1E06   1.650    3400 ! RAS07 SEN/MIL05    10 atm
+!H!C2H2+OH=CH2CO+H                      1.5E04   2.450    4477 ! RAS07 SEN/MIL05   100 atm
+   C2H2+HO2=CH2O+HCO                    3.0E12   0.000   10000 ! RAS/GLA08 TRA/BRE05
+   C2H2+HO2=CH2CHO+O                    3.0E12   0.000   10000 ! RAS/GLA08 TRA/BRE05
+   C2H2+O2=HCO+HCO                      2.2E07   1.460   33100 !           SHE/BOZ00 (p=CHOCO+H?)
+   C2H2+CH2(S)=C2H2+CH2                 4.0E13   0.000       0 !           HAC/WAG89
+!
+   H2CC=C2H2                            1.0E07   0.000       0 !           JAM 
+   H2CC+H=C2H2+H                        1.0E14   0.000       0 !           LAS/LAW00
+   H2CC+OH=CH2CO+H                      2.0E13   0.000       0 !           LAS/LAW00
+   H2CC+O2=CH2+CO2                      1.0E13   0.000       0 !           LAS/WAN99,JAM prd
+!
+   C2+H2=C2H+H                          4.0E05   2.40     1000 ! GLA/MIL98 JAM lr
+   CH2+C=C2H+H                          5.0E13   0.000       0 ! GLA/MIL98 JAM est
+   C2H+O=CH+CO                          5.0E13   0.000       0 ! GLA/MIL98 JAM est
+   C2H+OH=HCCO+H                        2.0E13   0.000       0 ! GLA/MIL98 JAM est
+   C2H+OH=C2+H2O                        4.0E07   2.000    8000 ! GLA/MIL98 JAM est
+   C2H+H2=C2H2+H                        4.1E05   2.390     864 ! GLA/MIL98 HAR/CHI82
+   C2H+O2=CO+CO+H                       4.7E13  -0.16        0 !           THI/TAA97
+   C2H+CH4=CH3+C2H2                     7.2E12   0.000     976 ! GLA/MIL98 OPA/LEO96
+!
+   C2+M=C+C+M                           1.5E16   0.000  142300 !           KRU/ROT97
+   C2+O=C+CO                            1.0E14   0.000       0 !           est
+   C2+OH=C2O+H                          5.0E13   0.000       0 ! GLA/MIL98 JAM est
+   C2+O2=CO+CO                          9.0E12   0.000     980 !           BAU/OLD84,JAM prd
+!
+   CH3CHO(+M)=CH3+HCO(+M)               4.3E22  -1.880   85480 ! RAS/GLA08b GUP/HAR06
+     LOW  /2.22E76 -11.81 95040/                               !
+     TROE /0.23 80 7000 1E30/                                  ! RAS/GLA08b fit to Fc=0.601T^(-0.162)exp(-1.07/RT)
+   CH3CHO+H=CH3CO+H2                    4.7E13  -0.350    3000 ! RAS/GLA08b MAR99
+   CH3CHO+H=CH2CHO+H2                   1.9E12   0.400    5359 ! RAS/GLA08b MAR99
+   CH3CHO+O=CH3CO+OH                    1.8E18  -1.900    2975 ! RAS/GLA08b MAR99
+   CH3CHO+O=CH2CHO+OH                   3.7E13  -0.200    3556 ! RAS/GLA08b MAR99
+   CH3CHO+OH=CH3CO+H2O                  2.4E11   0.300   -1000 ! RAS/GLA08b est based on TAY/MAR96,CAM/CRO02
+   CH3CHO+OH=CH2CHO+H2O                 3.0E13  -0.600     800 ! RAS/GLA08b est based on TAY/MAR96,CAM/CRO02
+   CH3CHO+HO2=CH3CO+H2O2                2.4E19  -2.200   14030 ! RAS/GLA08b MAR99
+   CH3CHO+HO2=CH2CHO+H2O2               2.3E11   0.400   14864 ! RAS/GLA08b MAR99
+   CH3CHO+O2=CH3CO+HO2                  1.2E05   2.500   37554 ! RAS/GLA08b CEC05
+   CH3CHO+CH3=CH3CO+CH4                 3.9E-07  5.800    2200 ! RAS/GLA08b MAR99
+   CH3CHO+CH3=CH2CHO+CH4                2.5E01   3.150    5727 ! RAS/GLA08b MAR99
+!
+   CH2CHOH+H=CHCHOH+H2                  2.4E02   3.630   11266 ! GIM/GLA08 C2H4+H
+   CH2CHOH+H=CH2CHO+H2                  1.5E07   1.700    3000 ! RAS/GLA08b CH3CH2OH+H=CH3CH2O+H2    [MAR99])
+   CH2CHOH+O=CH2OH+HCO                  3.9E12   0.000    1494 ! GIM/GLA08 C2H4+O
+     DUPLICATE                                                 !
+   CH2CHOH+O=CH2OH+HCO                  6.2E13   0.000    6855 !
+     DUPLICATE                                                 !
+   CH2CHOH+O=CH2CHO+OH                  1.6E07   2.000    4400 ! RAS/GLA08b CH3CH2OH+O=CH3CH2O+OH    [MAR99])
+   CH2CHOH+OH=CHCHOH+H2O                1.3E-1   4.200    -860 ! GIM/GLA08 C2H4+OH  
+   CH2CHOH+OH=CH2CHO+H2O                7.5E11   0.300    1600 ! RAS/GLA08 CH3CH2OH+OH=CH3CH2O+H2O  [MAR99])
+   CH2CHOH+O2=>CH2O+HCO+OH              3.5E07   1.800   39000 ! GIM/GLA08 C2H4+O2
+!
+!L!CHCHOH=HCCOH+H                       4.4E29  -6.153   51383 ! RAS/GLA08 ING/BOZ03 0.04 extrap
+   CHCHOH=HCCOH+H                       1.1E31  -6.153   51383 ! RAS/GLA08 ING/BOZ03   1 atm
+!X!CHCHOH=HCCOH+H                       1.5E32  -6.168   52239 ! RAS/GLA08 ING/BOZ03  10 atm
+!H!CHCHOH=HCCOH+H                       5.5E29  -5.057   52377 ! RAS/GLA08 ING/BOZ03 100 atm
+   CHCHOH+H=CH2CHO+H                    5.0E13   0.000       0 ! RAS/GLA08 GLA/MIL98/JAM est
+   CHCHOH+O=OCHCHO+H                    5.0E13   0.000       0 ! GLA/MIL98 JAM est
+   CHCHOH+O2=HCCOH+HO2                  1.4E02   3.400    3700 ! RAS/GLA08 (=C2H3+O2=C2H2+HO2[CAR/WES02])
+!# CHCHOH+O2=OCHCHO+OH                  2.5E12   0.000       0 !#          SIE/ZET95
+!
+   cC2H3O=CH2CHO                        8.7E31  -6.900   14994 ! GIM/GLA08 JOS/WAN05 ¤
+   cC2H3O=CH2CO+H                       5.0E13   0.000   14863 ! GIM/GLA08 JOS/WAN05 ¤
+   cC2H3O=CH3+CO                        7.1E12   0.000   14280 ! GIM/GLA08 JOS/WAN05 ¤
+!
+!L!CH2CHO=CH2CO+H                       2.4E25  -4.800   43424 ! RAS/GLA08b SEN/MIL06 (  0.01 bar)
+!X!CH2CHO=CH2CO+H                       2.4E30  -5.860   46114 ! RAS/GLA08b SEN/MIL06 (  0.1 bar) 
+   CH2CHO=CH2CO+H                       1.3E34  -6.570   49454 ! RAS/GLA08b SEN/MIL06 (  1 bar)
+!X!CH2CHO=CH2CO+H                       3.5E36  -6.920   52979 ! RAS/GLA08b SEN/MIL06 ( 10 bar) 
+!H!CH2CHO=CH2CO+H                       1.2E36  -6.480   55171 ! RAS/GLA08b SEN/MIL06 (100 bar)  
+!X!CH2CHO=CH2CO+H                       1.4E15  -0.150   45606 ! RAS/GLA08b SEN/MIL06 (high-PL)
+!L!CH2CHO=CH3+CO                        1.2E30  -6.070   41332 ! RAS/GLA08b SEN/MIL06 (  0.01 bar)
+!X!CH2CHO=CH3+CO                        6.4E32  -6.570   44282 ! RAS/GLA08b SEN/MIL06 (  0.1 bar)  
+   CH2CHO=CH3+CO                        6.5E34  -6.870   47191 ! RAS/GLA08b SEN/MIL06 (  1 bar)
+!X!CH2CHO=CH3+CO                        2.2E35  -6.760   49548 ! RAS/GLA08b SEN/MIL06 ( 10 bar) 
+!H!CH2CHO=CH3+CO                        2.2E33  -5.970   50448 ! RAS/GLA08b SEN/MIL06 (100 bar)  
+!X!CH2CHO=CH3+CO                        2.9E12   0.290   40326 ! RAS/GLA08b SEN/MIL06 (high-PL)  
+   CH2CHO+H=CH3+HCO                     1.0E14   0.000       0 ! RAS/GLA08b GLA/MIL98
+   CH2CHO+H=CH3CO+H                     3.0E13   0.000       0 ! RAS/GLA08b GLA/MIL98
+   CH2CHO+H=CH2CO+H2                    2.0E13   0.000       0 ! RAS/GLA08b (=CH3O+H=CH2O+H2[NBS86])
+   CH2CHO+O=CH2CO+OH                    5.0E13   0.000       0 ! RAS/GLA08b GLA/MIL98
+   CH2CHO+OH=CH2CO+H2O                  2.0E13   0.000       0 ! RAS/GLA08b GLA/MIL98
+   CH2CHO+OH=CH2OH+HCO                  1.0E13   0.000       0 ! RAS/GLA08b GLA/MIL98
+
+!L!CH2CHO+O2=CH2O+CO+OH                 5.7E17  -1.757   11067 ! RAS/GLA08b ING/BOZ03   1 atm ¤
+   CH2CHO+O2=CH2O+CO+OH                 5.7E17  -1.757   11067 ! RAS/GLA08b ING/BOZ03   1 atm
+!X!CH2CHO+O2=CH2O+CO+OH                 1.1E14  -0.610   11422 ! RAS/GLA08b ING/BOZ03  10 atm
+!H!CH2CHO+O2=CH2O+CO+OH                 1.5E-10  6.690    4868 ! RAS/GLA08b ING/BOZ03 100 atm
+   CH2CHO+CH3=C2H5+CO+H                 4.9E14  -0.500       0 ! RAS/GLA08b MAR/SEN96
+   CH2CHO+HO2=CH2O+HCO+OH               7.0E12  -0.500       0 ! RAS/GLA08b MAR99
+   CH2CHO+HO2=CH3CHO+O2                 3.0E12  -0.500       0 ! RAS/GLA08b MAR99
+   CH2CHO+CH2=C2H4+HCO                  5.0E13   0.000       0 !           JAM est
+   CH2CHO+CH=C2H3+HCO                   1.0E14   0.000       0 !           JAM est
+!
+!L!CH3CO=CH3+CO                         6.9E14  -1.970   14584 ! RAS/GLA08b SEN/MIL06   0.01 bar)
+!X!CH3CO=CH3+CO                         2.0E16  -2.090   15197 ! RAS/GLA08b SEN/MIL06   0.1 bar) 
+   CH3CO=CH3+CO                         6.5E18  -2.520   16436 ! RAS/GLA08b SEN/MIL06   1 bar)
+!X!CH3CO=CH3+CO                         8.2E19  -2.550   17263 ! RAS/GLA08b SEN/MIL06  10 bar) 
+!H!CH3CO=CH3+CO                         1.3E20  -2.320   18012 ! RAS/GLA08b SEN/MIL06 100 bar)  
+!X!CH3CO=CH3+CO                         1.1E12   0.630   16895 ! RAS/GLA08b SEN/MIL06 kinf
+   CH2CO+H=CH3CO                        2.3E08   1.610    2627 ! RAS/GLA08b SEN/MIL06 kinf
+   CH3CO+H=CH3+HCO                      2.1E13   0.000       0 ! RAS/GLA08b BAR/HOY91,OHM/WAS90
+   CH3CO+H=CH2CO+H2                     1.2E13   0.000       0 ! RAS/GLA08b BAR/HOY91,OHM/WAS90
+   CH3CO+O=CH3+CO2                      1.6E14   0.000       0 ! RAS/GLA08b CEC05
+   CH3CO+O=CH2CO+OH                     5.3E13   0.000       0 ! RAS/GLA08b CEC05
+   CH3CO+OH=CH2CO+H2O                   1.2E13   0.000       0 ! RAS/GLA08b NBS86
+   CH3CO+CH3OO=CH3+CO2+CH3O             2.4E13   0.000       0 ! RAS/GLA08b NBS86
+   CH3CO+CH3=C2H6+CO                    3.3E13   0.000       0 ! RAS/GLA08b ADA/BAS81
+   CH3CO+CH3=CH2CO+CH4                  5.3E13   0.000       0 ! RAS/GLA08b ADA/BAS81
+   CH3CO+O2=CH2O+CO+OH                  1.9E12   0.000       0 ! RAS/GLA08b CH3CO+O2=OH+PROD
+!
+   CH2+CO(+M)=CH2CO(+M)                 8.1E11   0.500    4510 ! GLA/MIL98 GRI2.11
+     LOW  / 2.69E33 -5.11 7095/
+     TROE/ 0.5907 275 1226 5185 /
+     N2/1.0/ H2O/6/  AR/0.7/
+   CH2CO+H=CH3+CO                       3.3E10   0.851    2840 ! RAS/GLA08b HRA/MIC98        
+   CH2CO+H=HCCO+H2                      3.0E07   2.000   10000 ! RAS/GLA08b GLA/MIL98/JAM est
+   CH+CH2O=CH2CO+H                      9.5E13   0.000    -517 ! GLA/MIL98 CEC92
+   CH2CO+O=CO2+CH2                      1.8E12   0.000    1350 ! GLA/MIL98 WAS/SAT83
+   CH2CO+O=HCCO+OH                      2.0E07   2.000   10000 ! RAS/GLA08b GLA/MIL98/JAM est
+   CH2CO+OH=CH2OH+CO                    1.0E12   0.000   -1013 ! RAS/GLA08b CEC05,GRU/WAG94
+   CH2CO+OH=CH3+CO2                     6.7E11   0.000   -1013 ! RAS/GLA08b CEC05,GRU/WAG94
+   CH2CO+OH=HCCO+H2O                    1.0E07   2.000    3000 ! GLA/MIL98 JAM est
+   CH2CO+CH2(S)=C2H4+CO                 1.6E14   0.000       0 !           HAC/WAG89
+!
+   HCCOH+H=HCCO+H2                      3.0E07   2.000    1000 ! RAS/GLA08b GLA/MIL98/JAM est
+   HCCOH+O=HCCO+OH                      2.0E07   2.000    1900 ! RAS/GLA08b GLA/MIL98/JAM est
+   HCCOH+OH=HCCO+H2O                    1.0E07   2.000    1000 ! RAS/GLA08b GLA/MIL98/JAM est
+!
+   CH+CO(+M)=HCCO(+M)                   5.0E13   0.000       0 ! GLA/MIL98 GRI2.11
+    LOW  / 2.7E28 -3.74 1936/
+    TROE/ 0.5757 237 1652 5069 /
+    N2/1.0/ H2O/6/  AR/0.7/  H2/2.0/ CH4/2.0/ CO/1.5/ CO2/2.0/ C2H6/3.0/
+   HCCO+H=CH2(S)+CO                     1.5E14   0.000       0 !           CEC92
+   HCCO+O=CO+CO+H                       1.0E14   0.000       0 ! GLA/MIL98 CEC92
+   HCCO+OH=HCO+HCO                      1.0E13   0.000       0 ! RAS/GLA08 FIS/CUR00
+   HCCO+OH=C2O+H2O                      6.0E13   0.000       0 ! GLA/MIL98 JAM est
+   HCCO+O2=CO2+CO+H                     4.9E12  -0.142    1150 ! RAS/GLA08 KLI/MIL02
+   HCCO+O2=CO+CO+OH                     1.6E11  -0.020    1020 ! RAS/GLA08 KLI/MIL02
+   HCCO+O2=HCO+CO+O                     2.2E02   2.690    3540 ! RAS/GLA08 KLI/MIL02
+   HCCO+CH2=C2H3+CO                     3.0E13   0.000       0 ! GLA/MIL98 JAM est
+   HCCO+CH=C2H2+CO                      5.0E13   0.000       0 ! GLA/MIL98 JAM est
+   HCCO+HCCO=C2H2+CO+CO                 1.0E13   0.000       0 ! GLA/MIL98 JAM est
+!
+   C2O+M=C+CO+M                         2.0E15   0.000   44200 !           FRI/WAG98 est
+   C2O+H=CH+CO                          1.3E13   0.000       0 !           BAU/MEU85
+   C2O+O=CO+CO                          5.2E13   0.000       0 ! GLA/MIL98 BAU/MEU85
+   C2O+OH=CO+CO+H                       2.0E13   0.000       0 ! GLA/MIL98 JAM est
+   C2O+O2=CO+CO+O                       1.0E13   0.000    2600 !           BEC/BAY92,WIL/BAY67,est
+   C2O+O2=CO+CO2                        1.0E13   0.000    2600 !           BEC/BAY92,WIL/BAY67,est
+   C2O+C=CO+C2                          1.0E14   0.000       0 !           FRI/WAG98 est
+!
+   OCHCHO(+M)=CO+CO+H2(+M)              1.1E14   0.000   55000 !           SAI/MUR84
+     LOW  /2.6E16 0.0 38400/
+   OCHCHO+H=CH2O+HCO                    3.0E13   0.000       0 ! GLA/MIL98 JAM est
+   OCHCHO+OH=>HCO+CO+H2O                4.0E06   2.000   -1630 !           FEI/BUR08, ATK/TRO02 (CHOCO+H2O)
+!
+!
+! ************************************************************************
+!    N subset (oxid.)                                                    *
+! ************************************************************************
+!
+   HNO+H=NO+H2                          4.4E11   0.720     650 ! SKR/GLA04 SOT/PAG92
+   HNO+O=NO+OH                          2.3E13   0.000       0 ! SKR/GLA04 INO/WAS99
+   HNO+OH=NO+H2O                        3.6E13   0.000       0 ! SKR/GLA04 BAU73
+   HNO+O2=HO2+NO                        2.0E13   0.000   16000 ! SKR/GLA04 DEA/BOZ00
+   HNO+HNO=N2O+H2O                      9.0E08   0.000    3100 ! SKR/GLA04 NBS91
+   HNO+NO2=HONO+NO                      4.4E04   2.640    4040 ! RAS/GLA08 MEB/MOR98 
+!
+   NO+H(+M)=HNO(+M)                     1.5E15  -0.410       0 ! RAS/GLA08 NBS91
+     LOW /2.4E14 0.206 -1550/                                  ! RAS/GLA08 RIL/FON03   
+     TROE /0.82 1E-30 1E30 1E30/                               ! RAS/GLA08 Fc=0.82 (NBS91)
+     N2/1.6/                                                   ! RAS/GLA08 RIL/FON03
+   NO+O(+M)=NO2(+M)                     1.3E15  -0.750       0 ! RAS/GLA08 ALL/DRY97,NBS91
+     LOW  /4.72E24 -2.87 1550/                                 ! RAS/GLA08 ALL/DRY97 (Fc=0.95-1E-04*T)
+!X!TROE /0.780 1E-30 1E30 1E30/                                ! RAS/GLA08a (100bar)
+!X!TROE /0.800 1E-30 1E30 1E30/                                ! RAS/GLA08a ( 80bar)
+!H!TROE /0.820 1E-30 1E30 1E30/                                ! RAS/GLA08a ( 50bar)
+!X!TROE /0.850 1E-30 1E30 1E30/                                ! RAS/GLA08a ( 20bar)
+!X!TROE /0.870 1E-30 1E30 1E30/                                ! RAS/GLA08a ( 10bar)
+     TROE /0.880 1E03 1E04 1E30/                               ! RAS/GLA08a (  1bar)
+!L!  TROE /0.880 1E03 1E04 1E30/                               ! RAS/GLA08a (  1bar) ¤
+     AR/0/                                                     !
+   NO+O(+AR)=NO2(+AR)                   1.3E15  -0.750       0 ! RAS/GLA08aLL/DRY97,NBS91
+     LOW  /7.56E19 -1.41 0/                                    ! RAS/GLA08 YAR/SUT91 (Fc=0.95-1E-04*T)
+!H!TROE /0.810 1E-30 1E30 1E30/                                ! RAS/GLA08a ( 80bar)
+   TROE /0.750 1E03 1E05 1E30/                                 ! RAS/GLA08a (  1bar)
+!L!TROE /0.750 1E03 1E05 1E30/                                 ! RAS/GLA08a (  1bar) ¤
+   NO+OH(+M)=HONO(+M)                   1.1E14  -0.300       0 ! RAS/GLA08 FUL/TRO98
+     LOW  /3.392E23 -2.5 0/                                    !
+     TROE /0.75 1E-30 1E30 1E30/                               ! RAS/GLA08 FUL/TRO98 [M=He,T=400K]
+   NO+HO2=NO2+OH                        2.1E12   0.000    -497 ! RAS/GLA08 CEC05
+!
+   NO2+H=NO+OH                          1.3E14   0.000     362 ! RAS/GLA08 KO/FON91
+   NO2+O=NO+O2                          1.1E14  -0.520       0 ! RAS/GLA08 BEM/CLY74
+   NO2+O(+M)=NO3(+M)                    3.5E12   0.240       0 ! RAS/GLA08 HAH/TRO00
+     LOW  /2.5E20 -1.50 0/                                     ! RAS/GLA08 (M=N2)
+     TROE /0.71 1E-30 1700 1E30/                               ! RAS/GLA08 Fc=0.71*exp(-T/1700)
+   NO2+OH(+M)=HONO2(+M)                 3.0E13   0.000       0 ! RAS/GLA08 TRO01
+     LOW  /2.938E25 -3.0 0/                                    !
+     TROE /0.4 1E-30 1E30 1E30/                                ! RAS/GLA08 Fc=0.4
+   NO2+HO2=HONO+O2                      1.9E00   3.320    3044 ! RAS/GLA08a
+   NO2+HO2=HNO2+O2                      1.9E01   3.260    4983 ! RAS/GLA08a
+   NO2+H2=HONO+H                        1.3E04   2.760   29770 ! RAS/GLA08 PAR/LIN98
+   NO2+H2=HNO2+H                        2.4E00   3.730   32400 ! RAS/GLA08a
+   NO2+NO2=NO+NO+O2                     4.5E12   0.000   27599 ! RAS/GLA08 PAR/LIN98
+   NO2+NO2=NO3+NO                       9.6E09   0.730   20900 ! GLA/MIL98 NBS91
+!
+   HONO+H=HNO+OH                        5.6E10   0.860    5000 ! SKR/GLA04 HSU/MEL97
+   HONO+H=NO+H2O                        8.1E06   1.890    3850 ! SKR/GLA04 HSU/MEL97
+   HONO+O=NO2+OH                        1.2E13   0.000    5960 ! SKR/GLA04 NBS91
+   HONO+OH=NO2+H2O                      1.7E12   0.000    -520 ! RAS/GLA08 BUR/RAV92
+   HONO+NO2=HONO2+NO                    2.0E11   0.000   32700 ! RAS/GLA08 PAR/LIN98
+   HONO+HONO=NO+NO2+H2O                 3.5E-01  3.640   12140 ! RAS/GLA08 MEB/MEL98
+!
+   HNO2(+M)=HONO(+M)                    2.5E14   0.000   32300 ! RAS/GLA08a
+     LOW  /3.1E18 0.0 31500/                                   !
+     TROE /1.149 1E-30 3125 1E30/                              !
+   HNO2+O=NO2+OH                        1.7E08   1.500    2000 ! RAS/GLA08 DEA/BOZ00
+   HNO2+OH=NO2+H2O                      4.0E13   0.000       0 ! RAS/GLA08a
+!
+   NO3+H=NO2+OH                         6.0E13   0.000       0 ! GLA/MIL98 BEC/SCH92
+   NO3+O=NO2+O2                         1.0E13   0.000       0 ! GLA/MIL98 ATK/TRO92
+   NO3+OH=NO2+HO2                       1.4E13   0.000       0 ! GLA/MIL98 ATK/TRO92
+   NO3+HO2=NO2+O2+OH                    1.5E12   0.000       0 ! GLA/MIL98 BEC/SCH92
+   NO3+NO2=NO+NO2+O2                    5.0E10   0.000    2940 ! GLA/MIL98 DEM/RAV90
+!
+   HONO2+H=H2+NO3                       5.6E08   1.500   16400 ! RAS/GLA08 BOU/LIN97
+   HONO2+H=H2O+NO2                      6.1E01   3.300    6285 ! RAS/GLA08 BOU/LIN97
+   HONO2+H=OH+HONO                      3.8E05   2.300    6976 ! RAS/GLA08 BOU/LIN97
+   HONO2+OH=H2O+NO3                     1.0E10   0.000   -1240 ! RAS/GLA08 LAM/BEN84
+!
+   N2O(+M)=N2+O(+M)                     1.3E12   0.000   62570 ! SKR/GLA04 JOH/GLA92,ROH/HAN96
+     LOW/4.0E14 0 56600/
+     N2/1.7/ O2/1.4/ CO2/3.0/ H2O/12/   !
+   N2O+H=N2+OH                          3.3E10   0.000    4729 ! SKR/GLA04 MAR/FON87
+     DUP
+   N2O+H=N2+OH                          4.4E14   0.000   19254 !
+     DUP
+   N2O+O=NO+NO                          9.2E13   0.000   27679 ! SKR/GLA04 MEA/AND00
+   N2O+O=N2+O2                          3.7E12   0.000   15936 ! SKR/GLA04 MEA/AND00
+   N2O+OH=N2+HO2                        1.3E-2   4.720   36560 ! SKR/GLA04 MEB/MOR96
+   N2O+OH=HNO+NO                        1.2E-4   4.330   25080 ! SKR/GLA04 MEB/MOR96
+   N2O+NO=NO2+N2                        5.3E05   2.230   46280 ! SKR/GLA04 MEB/MOR96
+!
+!
+! ************************************************************************
+!    N subset (red.)                                                     *
+! ************************************************************************
+!
+   NH3+M=NH2+H+M                        2.2E16   0.000   93470 ! SKR/GLA04 DAV/HAN90
+   NH3+H=NH2+H2                         6.4E05   2.390   10171 ! SKR/GLA04 MIC/SUT86
+   NH3+O=NH2+OH                         9.4E06   1.940    6460 ! SKR/GLA04 SUT/KLE90
+   NH3+OH=NH2+H2O                       2.0E06   2.040     566 ! SKR/GLA04 SAL/HAN84
+   NH3+HO2=NH2+H2O2                     3.0E11   0.000   22000 ! SKR/GLA04 JAM est
+   NH2+H=NH+H2                          7.2E05   2.320     799 ! SKR/GLA04 LIN/PAG95
+   NH2+O=HNO+H                          6.6E13   0.000       0 !           INO/WAS99,DRA/WAG84,ADA/PHI94 
+   NH2+O=NH+OH                          7.0E12   0.000       0 !           INO/WAS99,DRA/WAG84,ADA/PHI94 
+   DUP
+   NH2+O=NH+OH                          8.6E-1   4.010    1673 !           DUA/PAG95 
+   DUP   
+   NH2+OH=NH+H2O                        4.0E06   2.000    1000 ! SKR/GLA04 JAM est
+   NH2+HO2=H2NO+OH                      5.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NH2+HO2=NH3+O2                       9.2E05   1.940   -1152 ! SKR/GLA04 DEA/BOZ00 
+   NH2+O2=H2NO+O                        2.5E11   0.480   29586 ! SKR/GLA04 DEA/BOZ00 
+   NH2+O2=HNO+OH                        6.2E07   1.230   35100 ! SKR/GLA04 DEA/BOZ00 
+   NH2+NH2=NH3+NH                       5.0E13   0.000   10000 ! SKR/GLA04 DAV/HAN90
+   NH2+NH=N2H2+H                        5.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NH2+NH=NH3+N                         9.2E05   1.940    2444 ! SKR/GLA04 DEA/BOZ00
+   NH2+N =N2+H+H                        7.0E13   0.000       0 ! SKR/GLA04 WHY/PHI83
+   NH2+HNO=NH3+NO                       3.6E06   1.630   -1250 ! SKR/GLA04 MEB/MOR96
+   NH2+NO=N2+H2O                        2.8E20  -2.654    1258 ! SKR/GLA04 MIL/GLA99
+   NH2+NO=NNH+OH                        2.3E10   0.425    -814 ! SKR/GLA04 MIL/GLA99
+   NH2+HONO=NH3+NO2                     7.1E01   3.020   -4940 ! SKR/GLA04 MEB/MOR96
+   NH2+NO2=N2O+H2O                      1.6E16  -1.440     268 ! SKR/GLA04 PAR/LIN97
+   NH2+NO2=H2NO+NO                      6.5E16  -1.440     268 ! SKR/GLA04 PAR/LIN97
+   NH+H=N+H2                            3.0E13   0.000       0 ! SKR/GLA04 DAV/HAN90,rv
+   NH+O=NO+H                            9.2E13   0.000       0 ! SKR/GLA04 CEC94
+   NH+OH=HNO+H                          2.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NH+OH=N+H2O                          5.0E11   0.500    2000 ! SKR/GLA04 JAM est
+   NH+O2=HNO+O                          4.6E05   2.000    6500 ! SKR/GLA04 MIL/MEL92
+   NH+O2=NO+OH                          1.3E06   1.500     100 ! SKR/GLA04 MIL/MEL92
+   NH+NH=N2+H+H                         2.5E13   0.000       0 ! SKR/GLA04 JAM est
+   NH+N=N2+H                            3.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NH+NO=N2O+H                          2.9E14  -0.400       0 ! SKR/GLA04 MIL/MEL92
+     DUP
+   NH+NO=N2O+H                         -2.2E13  -0.230       0 !
+     DUP
+   NH+NO=N2+OH                          2.2E13  -0.230       0 ! SKR/GLA04 MIL/MEL92
+   NH+HONO=NH2+NO2                      1.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NH+NO2=N2O+OH                        1.0E13   0.000       0 ! SKR/GLA04 HAR/PHI86
+   N+OH=NO+H                            3.8E13   0.000       0 ! SKR/GLA04 FLO/HAN77,HOW/SMI80
+   N+O2=NO+O                            6.4E09   1.000    6280 ! SKR/GLA04 BAU/DRY73
+   N+NO=N2+O                            2.1E13   0.000       0 !           CEC05
+!   
+   NNH=N2+H                             6.5E07   0.000       0 ! SKR/GLA04 MIL/GLA99
+   NNH+H=N2+H2                          1.0E14   0.000       0 ! SKR/GLA04 JAM est
+   NNH+O=N2O+H                          1.0E14   0.000       0 ! SKR/GLA04 JAM est
+   NNH+O=N2+OH                          8.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NNH+O=NH+NO                          5.0E13   0.000       0 ! SKR/GLA04 MIL/MEL92
+   NNH+OH=N2+H2O                        5.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NNH+O2=N2+HO2                        2.0E14   0.000       0 ! SKR/GLA04 MIL/GLA99
+   NNH+O2=N2+H+O2                       5.0E13   0.000       0 ! SKR/GLA04 MIL/GLA99
+   NNH+NH =N2+NH2                       5.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NNH+NH2=N2+NH3                       5.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NNH+NO=N2+HNO                        5.0E13   0.000       0 ! SKR/GLA04 JAM est
+!
+   NH2+NH2=N2H4                         5.6E48 -11.300   11882 ! SKR/GLA04 DEA/BOZ00 1ATM N2(600-2500K)!
+   N2H4+H=N2H3+H2                       7.0E12   0.000    2500 ! SKR/GLA04 VAG95
+   N2H4+O=NH2OH+NH                      2.9E11   0.000   -1270 !           VAG96,VAG01
+   N2H4+O=N2H3+OH                       1.5E11   0.000   -1270 !           VAG96,VAG01
+   N2H4+OH=N2H3+H2O                     1.3E13   0.000    -318 !           VAG01
+   N2H4+NH2=N2H3+NH3                    3.9E12   0.000    1500 ! SKR/GLA04 GEH/WAG71,JAM est
+   N2H3=N2H2+H                          3.6E47 -10.380   69009 ! SKR/GLA04 DEA/BOZ00 1ATM N2 600-2500K
+   NH2+NH2=N2H3+H                       1.2E12  -0.030   10084 ! SKR/GLA04 DEA/BOZ00 1 ATM N2 !
+   N2H3+H=N2H2+H2                       2.4E08   1.500     -10 ! SKR/GLA04 DEA/BOZ00 
+   N2H3+O=N2H2+OH                       1.7E08   1.500    -646 ! SKR/GLA04 DEA/BOZ00 
+   N2H3+O=NH2+HNO                       3.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00
+   N2H3+O=>NH2+NO+H                     3.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00 
+   N2H3+OH=N2H2+H2O                     1.2E06   2.000   -1192 ! SKR/GLA04 DEA/BOZ00
+   N2H3+OH=H2NN+H2O                     3.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00
+   N2H3+OH=NH3+HNO                      1.0E12   0.000   15000 ! SKR/GLA04 JAM est
+   N2H3+HO2=N2H2+H2O2                   1.4E04   2.690   -1600 ! SKR/GLA04 DEA/BOZ00 
+   N2H3+HO2=N2H4+O2                     9.2E05   1.940    2126 ! SKR/GLA04 DEA/BOZ00
+   N2H3+NH2=N2H2+NH3                    9.2E05   1.940   -1152 ! SKR/GLA04 DEA/BOZ00 
+   N2H3+NH2=H2NN+NH3                    3.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00 
+   N2H3+NH=N2H2+NH2                     2.0E13   0.000       0 ! SKR/GLA04 JAM est
+   N2H2+M=NNH+H+M                       1.9E27  -3.050   66107 ! SKR/GLA04 DEA/BOZ00 M=N2
+     H2O/7/
+   N2H2+H=NNH+H2                        8.5E04   2.630     230 ! SKR/GLA04 LIN/PAG96
+   N2H2+O=NNH+OH                        3.3E08   1.500     497 ! SKR/GLA04 DEA/BOZ00 
+   N2H2+O=NH2+NO                        1.0E13   0.000       0 ! SKR/GLA04 JAM est
+   N2H2+OH=NNH+H2O                      5.9E01   3.400    1360 ! SKR/GLA04 LIN/PAG96
+   N2H2+NH2=NNH+NH3                     8.8E-2   4.050    1610 ! SKR/GLA04 LIN/PAG96
+   N2H2+NH=NNH+NH2                      2.4E06   2.000   -1192 ! SKR/GLA04 DEA/BOZ00 
+   N2H2+NO=N2O+NH2                      4.0E12   0.000   11922 ! SKR/GLA04 DEA/BOZ00
+   NH2+NH2=H2NN+H2                      1.2E21  -3.080    3368 ! SKR/GLA04 DEA/BOZ00 1 ATM N2 
+   H2NN=NNH+H                           3.4E26  -4.830   46228 ! SKR/GLA04 DEA/BOZ00 1 ATM 
+   H2NN+H=NNH+H2                        4.8E08   1.500    -894 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+H=N2H2+H                        7.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+O=NNH+OH                        3.3E08   1.500    -894 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+O=NH2+NO                        7.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+OH=NNH+H2O                      2.4E06   2.000   -1192 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+OH=>NH2+NO+H                    2.0E12   0.000       0 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+HO2=>NH2+NO+OH                  9.0E12   0.000       0 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+HO2=NNH+H2O2                    2.9E04   2.690   -1600 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+O2=NH2+NO2                      1.5E12   0.000    5961 ! SKR/GLA04 DEA/BOZ00
+   H2NN+NH2=NNH+NH3                     1.8E06   1.940   -1152 ! SKR/GLA04 DEA/BOZ00 
+!
+   H2NO+M=HNO+H+M                       2.8E24  -2.830   64915 ! SKR/GLA04 DEA/BOZ00
+     H2O/10/
+   H2NO+M=HNOH+M                        1.1E29  -4.000   44000 ! SKR/GLA04 DEA/BOZ00
+     H2O/10/
+   H2NO+H=HNO+H2                        3.0E07   2.000    2000 ! SKR/GLA04 JAM est
+   H2NO+H=NH2+OH                        5.0E13   0.000       0 ! SKR/GLA04 JAM est
+   H2NO+O=HNO+OH                        3.0E07   2.000    2000 ! SKR/GLA04 JAM est
+   H2NO+OH=HNO+H2O                      1.0E14   0.000       0 !           SUN/CUR01
+   H2NO+HO2=HNO+H2O2                    2.9E04   2.690   -1600 ! SKR/GLA04 DEA/BOZ00
+   H2NO+O2=HNO+HO2                      3.0E12   0.000   25000 ! SKR/GLA04 JAM est
+   H2NO+NH2=HNO+NH3                     3.0E12   0.000    1000 ! SKR/GLA04 JAM est
+   H2NO+NO=HNO+HNO                      2.0E04   2.000   13000 ! SKR/GLA04 JAM est
+   H2NO+NO2=HONO+HNO                    6.0E11   0.000    2000 ! SKR/GLA04 JAM est
+!
+   HNOH+M=HNO+H+M                       2.0E24  -2.840   58934 ! SKR/GLA04 DEA/BOZ00
+     H2O/10/
+   HNOH+H=NH2+OH                        4.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00
+   HNOH+H=HNO+H2                        4.8E08   1.500     378 ! SKR/GLA04 DEA/BOZ00
+   HNOH+O=HNO+OH                        7.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00
+     DUP
+   HNOH+O=HNO+OH                        3.3E08   1.500    -358 ! SKR/GLA04 DEA/BOZ00
+     DUP
+   HNOH+OH=HNO+H2O                      2.4E06   2.000   -1192 ! SKR/GLA04 DEA/BOZ00
+   HNOH+HO2=HNO+H2O2                    2.9E04   2.690   -1600 ! SKR/GLA04 DEA/BOZ00
+!  HNOH+HO2=NH2OH+O2                    2.9E04   2.690   -1600 ! SKR/GLA04 DEA/BOZ00
+   HNOH+O2=HNO+HO2                      3.0E12   0.000   25000 ! SKR/GLA04 JAM est
+   HNOH+NH2=N2H3+OH                     1.0E01   3.460    -467 ! SKR/GLA04 DEA/BOZ00 
+   HNOH+NH2=H2NN+H2O                    8.8E16  -1.080    1113 ! SKR/GLA04 DEA/BOZ00 
+   HNOH+NH2=NH3+HNO                     1.8E06   1.940   -1152 ! SKR/GLA04 DEA/BOZ00
+   HNOH+NO2=HONO+HNO                    6.0E11   0.000    2000 ! SKR/GLA04 JAM est
+!
+! ************************************************************************
+!    N subset (C/H/N/O)                                                  *
+! ************************************************************************
+!
+   HCN+M = H+CN+M                       3.4E35  -5.130  133000 ! DAG/ALZ08 NBS91
+     N2/0.0/ O2/1.5/ H2O/10/
+   HCN+N2 = H+CN+N2                     3.6E26  -2.600  124890 ! DAG/ALZ08 NBS91
+   HCN+M = HNC+M                        1.6E26  -3.230   54600 ! DAG/ALZ08 DEA/BOZ00, mod Ea
+     AR/0.7/ H2O/7.0/  CO2/2.0/                                !
+   CN+H2 = HCN+H                        1.1E05   2.600    1908 ! DAG/ALZ08 CEC05
+   HCN+O=NCO+H                          1.4E04   2.640    4980 ! DAG/ALZ08 MIL/BOW89
+   HCN+O=CN+OH                          4.2E10   0.400   20665 ! DAG/ALZ08 DEA/BOZ00 
+   HCN+O=NH+CO                          3.5E03   2.640    4980 ! DAG/ALZ08 MIL/BOW89
+   HCN+OH=CN+H2O                        3.9E06   1.830   10300 ! DAG/ALZ08 WOO/BOW95
+   HCN+OH=HOCN+H                        5.9E04   2.400   12500 ! DAG/ALZ08 MIL/BOW89
+   HCN+OH=HNCO+H                        2.0E-03  4.000    1000 ! DAG/ALZ08 MIL/BOW89
+   HCN+OH=NH2+CO                        7.8E-04  4.000    4000 ! DAG/ALZ08 MIL/BOW89
+   HCN+O2 = CN+HO2                      3.0E13   0.000   75100 ! DAG/ALZ08 est
+   HCN+CN=NCCN+H                        1.5E07   1.710    1530 ! DAG/ALZ08 NBS92
+!
+   HNC+H = HCN+H                        7.8E13   0.000    3600 ! DAG/ALZ08 SUM/NGU98
+   HNC+O = NH+CO                        4.6E12   0.000    2200 ! DAG/ALZ08 DEA/BOZ00
+   HNC+OH = HNCO+H                      2.8E13   0.000    3700 ! DAG/ALZ08 DEA/BOZ00
+   HNC+CN = NCCN+H                      1.0E13   0.000       0 ! DAG/ALZ08 PET/OSA04 est  
+!
+   CN+O=CO+N                            1.9E12   0.460     723 ! DAG/ALZ08 COB96
+   CN+OH=NCO+H                          1.0E15  -0.437       0 ! DAG/ALZ08 WOO96,DEC/MAC03
+   CN+O2=NCO+O                          7.2E12   0.000    -417 ! DAG/ALZ08 CEC05,RIM99
+     DUP
+   CN+O2=NCO+O                         -2.8E17  -2.000       0 ! 
+     DUP				     	
+   CN+O2=NO+CO                          2.8E17  -2.000       0 ! DAG/ALZ08 CEC05, RIM/HER99
+   CN+NO=NCO+N                          9.6E13   0.000   42100 ! DAG/ALZ08 TSA92
+   CN+NO2=NCO+NO                        5.3E15  -0.752     344 ! DAG/ALZ08 PAR93/CEC05
+   CN+NO2=CO+N2O                        4.9E14  -0.752     344 ! DAG/ALZ08 PAR93/CEC05
+   CN+NO2=N2+CO2                        3.7E14  -0.752     344 ! DAG/ALZ08 PAR93/CEC05
+   CN+HNO=HCN+NO                        1.8E13   0.000       0 ! DAG/ALZ08 NBS92
+   CN+HONO=HCN+NO2                      1.2E13   0.000       0 ! DAG/ALZ08 NBS92
+   CN+N2O=NCN+NO                        3.8E03   2.600    3700 ! DAG/ALZ08 NBS92, WIL/NEL95
+   CN+HNCO=HCN+NCO                      1.0E13   0.000       0 ! DAG/ALZ08 NBS92/1.5 
+   CN+NCO=NCN+CO                        1.8E13   0.000       0 ! DAG/ALZ08 NBS92
+!
+   HNCO+M=CO+NH+M                       1.1E16   0.000   86000 ! DAG/ALZ08 MER/HAN89
+     N2/1.5/
+   HNCO+H=NH2+CO                        3.6E04   2.490    2345 ! DAG/ALZ08 CEC05
+   HNCO+H=NCO+H2                        9.0E07   1.660   13900 ! DAG/ALZ08 CEC05
+   HNCO+O=NCO+OH                        2.2E06   2.110   11430 ! DAG/ALZ08 NBS92,CEC05
+   HNCO+O=NH+CO2                        9.6E07   1.410    8520 ! DAG/ALZ08 NBS92,CEC05
+   HNCO+O=HNO+CO                        1.5E08   1.570   44012 ! DAG/ALZ08 HE/LIN92
+   HNCO+OH=NCO+H2O                      3.6E07   1.500    3600 ! DAG/ALZ08 WOO/BOW95_hnco
+   HNCO+HO2=NCO+H2O2                    3.0E11   0.000   22000 ! DAG/ALZ08 JAM est
+   HNCO+O2=HNO+CO2                      1.0E12   0.000   35000 ! DAG/ALZ08 GLA/KRI94
+   HNCO+NH=NH2+NCO                      3.0E13   0.000   23700 ! DAG/ALZ08 JAM lr
+   HOCN+H=HNCO+H                        3.1E08   0.840    1917 ! DAG/ALZ08 DEA/BOZ00          
+   HOCN+H=NH2+CO                        1.2E08   0.610    2076 ! DAG/ALZ08 DEA/BOZ00          
+   HOCN+H=H2+NCO                        2.4E08   1.500    6617 ! DAG/ALZ08 DEA/BOZ00          
+   HOCN+O=OH+NCO                        1.7E08   1.500    4133 ! DAG/ALZ08 DEA/BOZ00          
+   HOCN+OH=H2O+NCO                      1.2E06   2.000    -248 ! DAG/ALZ08 DEA/BOZ00          
+   HOCN+NH2=NCO+NH3                     9.2E05   1.940    3646 ! DAG/ALZ08 DEA/BOZ00          
+!
+!L!HCNO=HCN+O                           2.0E30  -6.030   60733 ! DAG/ALZ08 DEA/BOZ00 0.1 ATM N2
+   HCNO=HCN+O                           4.2E31  -6.120   61210 ! DAG/ALZ08 DEA/BOZ00 1.0 ATM N2
+!H!HCNO=HCN+O                           5.9E31  -5.850   61935 ! DAG/ALZ08 DEA/BOZ00 10 ATM N2
+   HCNO+H=HCN+OH                        7.2E10   0.841    8612 ! DAG/ALZ08 MIL/GLA03  
+   HCNO+O=HCO+NO                        6.3E13   0.000       0 ! DAG/ALZ08 MIL/GLA98
+   HCNO+OH=CH2O+NO                      1.0E12   0.000       0 ! DAG/ALZ08 MIL/GLA03  (HCOH)
+   HCNO+O=NCO+OH                        7.0E12   0.000       0 ! DAG/ALZ08 MIL/GLA03  
+   HCNO+OH=NO+CO+H2                     6.5E12   0.000       0 ! DAG/ALZ08 MIL/GLA03  
+   HCNO+OH=NCO+H+OH                     4.5E12   0.000       0 ! DAG/ALZ08 MIL/GLA03  
+   HCNO+OH=NCO+H2O                      3.5E12   0.000       0 ! DAG/ALZ08 MIL/GLA03  
+   HCNO+OH=HCO+HNO                      4.5E12   0.000       0 ! DAG/ALZ08 MIL/GLA03  
+   HCNO+CN=HCN+NCO                      6.0E13   0.000       0 !           FEN/HER06,PAN/TAN08
+!
+   NCO+M=N+CO+M                         2.2E14   0.000   54050 ! DAG/ALZ08 CEC05
+     N2/1.5/
+   NCO+H=CO+NH                          7.2E13   0.000    1000 ! DAG/ALZ08 CEC05
+   NCO+O=NO+CO                          2.0E15  -0.500       0 ! DAG/ALZ08 GAO/MAC03
+   NCO+OH=HON+CO                        5.3E12  -0.070    5126 ! DAG/ALZ08 DEA/BOZ00
+   NCO+OH=H+CO+NO                       8.3E12  -0.050   18042 ! DAG/ALZ08 DEA/BOZ00
+   NCO+HO2=HNCO+O2                      2.0E13   0.000       0 ! DAG/ALZ08 mc lin est
+   NCO+O2=NO+CO2                        1.0E13   0.000   10000 !           BEC/WIE00, est ¤
+   NCO+NO=N2O+CO                        4.0E19  -2.190    1743 ! DAG/ALZ08 ZHU/LIN04
+   NCO+NO=N2+CO2                        1.5E21  -2.740    1824 ! DAG/ALZ08 ZHU/LIN04
+   NCO+NO2=CO+NO+NO                     2.5E11   0.000    -707 ! DAG/ALZ08 PAR/HER93,WOO/BOW94
+   NCO+NO2=CO2+N2O                      3.0E12   0.000    -707 ! DAG/ALZ08 PAR/HER93,WOO/BOW94
+   NCO+HNO=HNCO+NO                      1.8E13   0.000       0 ! DAG/ALZ08 NBS92
+   NCO+HONO=HNCO+NO2                    3.6E12   0.000       0 ! DAG/ALZ08 NBS92
+   NCO+NH3=HNCO+NH2                     2.8E04   2.480     980 ! DAG/ALZ08 BEC/WIE97
+   NCO+N=N2+CO                          2.0E13   0.000       0 ! DAG/ALZ08 JAM est
+   NCO+NCO=CO+CO+N2                     1.8E13   0.000       0 ! DAG/ALZ08 NBS92
+!
+! ************************************************************************
+!    CxHy/N interactions                                                 *
+! ************************************************************************
+!
+! *oxidized*
+!
+   CO+NO2=NO+CO2                         9.0E13   0.000   33800 ! GLA/MIL98 NBS91
+   CO+N2O=N2+CO2                         2.7E11   0.000   20237 ! SKR/GLA04 NBS91
+   HOCO+NO=CO+HONO                       1.5E12   0.000       0 !           PET/MOO93,OLK/SMI01
+   CH2O+NO2=HONO+HCO                     1.4E-07  5.640    9220 ! RAS/GLA08d XU/LIN03
+   CH2O+NO2=HNO2+HCO                     1.1E-01  4.220   19850 ! RAS/GLA08d XU/LIN03
+   HCO+NO=HNO+CO                         6.9E12   0.000       0 ! RAS/GLA08d DAM/FRI07 
+   HCO+NO2=NO+CO2+H                      2.3E13   0.000       0 ! RAS/GLA08d DAM/FRI07 (70%)
+   HCO+NO2=HONO+CO                       5.0E12   0.000       0 ! RAS/GLA08d DAM/FRI07 (15%)
+   HCO+NO2=NO+CO+OH                      5.0E12   0.000       0 ! RAS/GLA08d DAM/FRI07 (15%)
+   HCO+HNO=NO+CH2O                       5.8E-01  3.840     115 ! RAS/GLA08d XU/LIN04
+   CH4+NO2=HONO+CH3                      6.5E14   0.000   45800 ! RAS/GLA08d YAM/SUZ99
+   CH4+NO2=HNO2+CH3                      6.0E14   0.000   37600 ! RAS/GLA08d YAM/SUZ99
+   CH3+NO(+M)=CH3NO(+M)                  9.0E12   0.000     192 ! RAS/GLA08d DAV/PIL91
+     LOW /2.5E16 0.0 -2841/                                     !
+     TROE /5.0 1E-30 120 1E30/                                  ! RAS/GLA08d Fc=5.0exp(-T/120)
+   CH3+NO2=CH3O+NO                       1.1E13   0.000       0 !           GLA/BEN98,WOL/CRO00
+   CH3+HNO=NO+CH4                        2.3E14   0.000    8400 ! RAS/GLA08d (Ea from [XIA/ZHA06],A scaled to match room-T data)
+   CH3OH+NO2=HONO+CH2OH                  1.5E02   3.320   20035 ! RAS/GLA08d XIA/ZHA06
+   CH3OH+NO2=HNO2+CH2OH                  2.4E03   2.900   27470 ! RAS/GLA08d XIA/ZHA06
+   CH3O+NO=HNO+CH2O                      7.5E12   0.000    2017 ! RAS/GLA08d CAR/DEV98
+     DUPLICATE                                                  !
+   CH3O+NO=HNO+CH2O                      2.5E18  -2.560       0 !
+     DUPLICATE                                                  !
+   CH3O+NO(+M)=CH3ONO(+M)                6.0E14  -0.600       0 ! RAS/GLA08d CAR/DEV98
+     LOW /8.14E25 -2.8  0/                                      !
+     TROE /1.0 1E-30 900 1E30/                                  !
+   CH3O+NO2=HONO+CH2O                    6.0E12   0.000    2285 ! RAS/GLA08d MCC/KAU85
+   CH3O+NO2(+M)=CH3ONO2(+M)              2.2E15  -0.880       0 ! RAS/GLA08d MAR/MER00
+     LOW  /2.911E23 -1.74 0/                                    !
+     TROE /0.6 1E-30 1E30 1E30/                                 !
+   CH3O+HNO=NO+CH3OH                     3.2E13   0.000       0 ! RAS/GLA08d HE/LIN88
+   CH2OH+NO=CH2O+HNO                     1.3E12   0.000       0 ! RAS/GLA08d NES/STI89/p
+   CH2OH+NO2=HONO+CH2O                   5.0E12   0.000       0 ! RAS/GLA08d NES/STI89
+   CH2OH+HNO=NO+CH3OH                    3.0E13   0.000       0 ! RAS/GLA08d
+   CH3OO+NO=NO2+CH3O                     1.4E12   0.000    -715 ! RAS/GLA08d ATK/BAU06
+   C2H6+NO2=HONO+C2H5                    6.5E14   0.000   41400 ! RAS/GLA08d NO2+CH4=HONO+CH3[YAM/SUZ99],A,Ea-4400cal/mol
+   C2H6+NO2=HNO2+C2H5                    6.0E14   0.000   33200 ! RAS/GLA08d NO2+CH4=HNO2+CH3[YAM/SUZ99],A,Ea-4400cal/mol
+   C2H5+NO2=CH3CH2O+NO                   4.0E13  -0.200       0 ! RAS/GLA08d NO2+CH3=NO+CH3O 
+   C2H4+NO2=C2H3+HONO                    6.5E14   0.000   41400 ! RAS/GLA08d NO2+CH4=HONO+CH3[YAM/SUZ99],A,Ea-4400cal/mol
+   C2H4+NO2=C2H3+HNO2                    6.0E14   0.000   33200 ! RAS/GLA08d NO2+CH4=HNO2+CH3[YAM/SUZ99],A,Ea-4400cal/mol
+   C2H3+NO=C2H2+HNO                      1.0E12   0.000    1000 !           JAM est
+   C2H3+NO2=CH2CHO+NO                    7.7E14  -0.600       0 !           GEP/HAL04 (¤)
+   CH3CH2O+NO=CH3CHO+HNO                 6.6E12   0.000       0 ! RAS/GLA08d DAE/BRA95
+   CH3CH2O+NO(+M)=CH3CH2ONO(+M)          1.2E13   0.000    -143 ! RAS/GLA08d FIT/DEV99
+     LOW  /9.43E19 0 0/                                         ! RAS/GLA08d DAE/BRA95
+     TROE /0.6 1E-30 1E30 1E30/                                 ! RAS/GLA08d Fc=0.6 ATK/BAU06
+   CH3CH2O+NO2=CH3CHO+HONO               1.7E12   0.000       0 ! RAS/GLA08d FRO/SMI90,BAT87
+   CH3CH2O+NO2(+M)=CH3CH2ONO2(+M)        5.1E15  -1.000       0 ! RAS/GLA08d DEM/MOL97
+     LOW  /5.88E30 -4.0 0/                                      !
+     TROE /0.6 1E-30 1E30 1E30/                                 ! RAS/GLA08d Fc=0.6 
+   CH2CHO+NO2=CH2CO+HONO                 8.9E12   0.000    -159 !            BAR/WEI91 (¤)
+!  CH2CHO+NO2=CH2CO+HONO                 2.0E15  -0.680    1430 !            DOU/HAY96 (¤)
+!  CH2CHO+NO2=CHOCH2O+NO                 8.0E12   0.000       0 !            DOU/HAY96 (¤)
+!  CH2CHO+NO2=CHOCH2NO2                  8.0E22  -3.560    1930 !            DOU/HAY96 (¤)
+   CH3CO+NO2=>CH3+CO2+NO                 1.5E13   0.000       0 !            (CH3CO2+NO) (¤)
+   CH2CH2OH+NO2=>CH2O+CH2OH+NO           7.0E12   0.000       0 !            DOU/HAY96 (HOCH2CH2O+NO) (¤) 
+   CH3NO2(+M)=CH3+NO2(+M)                1.8E16   0.000   58500 ! GLA/MIL99 GLA/TRO74,GLA/MIL99
+     LOW  /1.259E17 0 42000/                                    ! 
+     TROE /0.183 1E-30 1E30/                                    !  
+   CH3NO2+H=CH3+HONO                     3.3E12   0.000    3730 ! GLA/MIL99
+   CH3NO2+H=CH3NO+OH                     1.4E12   0.000    3730 ! GLA/MIL99
+   CH3NO2+H=CH2NO2+H2                    5.4E02   3.500    5200 ! GLA/MIL99
+   CH3NO2+O=CH2NO2+OH                    1.5E13   0.000    5350 ! GLA/MIL99 SAL/THR77
+   CH3NO2+O2=CH2NO2+HO2                  2.0E13   0.000   57000 ! GLA/MIL99
+   CH3NO2+OH=CH3OH+NO2                   2.0E10   0.000   -1000 ! GLA/MIL99
+   CH3NO2+OH=CH2NO2+H2O                  5.0E05   2.000    1000 ! GLA/MIL99
+   CH3NO2+HO2=CH2NO2+H2O2                3.0E12   0.000   23000 ! GLA/MIL99
+   CH3NO2+CH3=CH2NO2+CH4                 5.5E-01  4.000    8300 ! GLA/MIL99
+   CH3NO2+CH3O=CH2NO2+CH3OH              3.0E11   0.000    7000 ! GLA/MIL99
+   CH3NO2+NO2=CH2NO2+HONO                3.0E11   0.000   32000 ! GLA/MIL99
+! 
+   CH2NO2=CH2O+NO                        1.0E13   0.000   36000 ! GLA/MIL99
+   CH2NO2+H=CH3+NO2                      5.0E13   0.000       0 ! GLA/MIL99
+   CH2NO2+O=CH2O+NO2                     5.0E13   0.000       0 ! GLA/MIL99
+   CH2NO2+OH=CH2OH+NO2                   1.0E13   0.000       0 ! GLA/MIL99
+   CH2NO2+OH=CH2O+HONO                   1.0E13   0.000       0 ! GLA/MIL99 
+!
+   CH3ONO+H=CH3OH+NO                     1.2E11   0.000    1900 ! GLA/MIL99 MOO/WAR77 (47%)
+   CH3ONO+H=CH2O+H2+NO                   1.4E11   0.000    1900 ! GLA/MIL99 MOO/WAR77 (53%)
+   CH3ONO+O=CH3O+NO2                     1.4E13   0.000    5210 ! GLA/MIL99 DAV/THR75
+   CH3ONO+OH=CH3OH+NO2                   6.0E13   0.000    3505 ! RAS/GLA08d NIE/SID91
+!
+   CH3ONO2+H=CH3O+HONO                   1.0E12   0.000       0 ! GLA/MIL99
+   CH3ONO2+O=CH3O+NO3                    1.5E13   0.000    5260 ! GLA/MIL99 SAL/THR77
+   CH3ONO2+OH=CH3O+HONO2                 4.9E11   0.000    2027 ! RAS/GLA08d TAL/RAV97
+! 
+!
+! *reduced*
+!
+!  CO2+N=NO+CO                                                  ! very slow (Fontijn)
+   CO2+CN=NCO+CO                         3.7E06   2.160   26900 ! DAG/ALZ08 WAN/LIN91
+   CH2O+CN=HCO+HCN                       1.7E03   2.720   -1427 !           FEN/PAN97
+   CH2O+NCO=HNCO+HCO                     6.0E12   0.000       0 ! DAG/ALZ08 NBS92
+   HCO+NCO=HNCO+CO                       3.6E13   0.000       0 ! DAG/ALZ08 NBS92
+   CH4+NH2=CH3+NH3                       1.5E03   3.010    9940 !           SON/FRI03
+   CH4+CN=CH3+HCN                        8.6E05   2.300     -32 ! GLA/MIL98 HER/SPE92
+   CH4+NCO=CH3+HNCO                      9.8E12   0.000    8120 ! GLA/MIL98 SCH/WOL94
+!L!CH3+NH2=CH3NH2                        1.3E54 -12.720   15608 ! TIA/GLA08 DEA/BOZ00 0.1 ATM N2 (600-2500K)
+   CH3+NH2=CH3NH2                        5.1E52 -11.990   16790 ! TIA/GLA08 DEA/BOZ00 1.0 ATM N2(600-2500K) 
+!H!CH3+NH2=CH3NH2                        1.6E47 -10.150   15687 ! TIA/GLA08 DEA/BOZ00 10. ATM N2 (600-2500K) 
+!L!CH3+NH2=CH2NH2+H                      1.1E13  -0.130    9905 ! TIA/GLA08 DEA/BOZ00 0.1 ATM N2
+   CH3+NH2=CH2NH2+H                      1.4E14  -0.430   11107 ! TIA/GLA08 DEA/BOZ00 1.0ATM N2 !
+!H!CH3+NH2=CH2NH2+H                      7.4E12   0.000   12071 ! TIA/GLA08 DEA/BOZ00 10. ATM N2 !
+!L!CH3+NH2=CH3NH+H                       1.2E13  -0.150   16144 ! TIA/GLA08 DEA/BOZ00 0.1 ATM N2
+   CH3+NH2=CH3NH+H                       4.4E13  -0.310   16641 ! TIA/GLA08 DEA/BOZ00 1.0ATM N2 !
+!H!CH3+NH2=CH3NH+H                       1.4E14  -0.420   17863 ! TIA/GLA08 DEA/BOZ00 10. ATM N2 !
+!L!CH3+NH2=CH2NH+H2                      2.1E11  -0.100   19095 ! TIA/GLA08 DEA/BOZ00 0.1 ATM N2
+   CH3+NH2=CH2NH+H2                      4.8E11  -0.200   19403 ! TIA/GLA08 DEA/BOZ00 1.0 ATM N2 !
+!H!CH3+NH2=CH2NH+H2                      2.9E12  -0.400   20506 ! TIA/GLA08 DEA/BOZ00 10. ATM N2
+   CH3+NH2=CH4+NH                        2.8E06   1.940    9210 ! TIA/GLA08 DEA/BOZ00 
+!  CH4+NH=CH3+NH2                        9.0E13   0.000   20000 !           ROH/WAG94 ¤
+   CH3+NH2=CH2+NH3                       1.6E06   1.870    7570 ! TIA/GLA08 DEA/BOZ00 
+   CH3+NH=CH2NH+H                        4.0E13   0.000       0 ! TIA/GLA08 DEA/BOZ00 
+   CH3+NH=N+CH4                          8.2E05   1.870    5852 ! TIA/GLA08 DEA/BOZ00 
+   CH3+N=H2CN+H                          7.1E13   0.000       0 ! GLA/MIL98 DAV/HAN91B 
+   CH3+N2H2=NNH+CH4                      1.6E06   1.870    2971 ! TIA/GLA08 DEA/BOZ00 
+   CH3+H2NN=CH4+NNH                      1.6E06   1.870     129 ! TIA/GLA08 DEA/BOZ00 
+   CH3+N2H4=N2H3+CH4                     3.3E06   1.870    5325 ! TIA/GLA08 DEA/BOZ00 
+   CH3+N2H3=N2H2+CH4                     8.2E05   1.870    1818 ! TIA/GLA08 DEA/BOZ00 
+   CH3+N2H3=H2NN+CH4                     3.0E13   0.000       0 ! TIA/GLA08 DEA/BOZ00 
+   CH3+NO=HCN+H2O                        1.5E-1   3.520    3950 ! GLA/MIL98 MIL98
+   CH3+NO=H2CN+OH                        1.5E-1   3.520    3950 ! GLA/MIL98 MIL98
+   CH3+H2NO=CH3O+NH2                     2.0E13   0.000       0 ! TIA/GLA08 DEA/BOZ00 
+   CH3+H2NO=CH4+HNO                      1.6E06   1.870    2961 ! TIA/GLA08 DEA/BOZ00 
+   CH3+CN=CH2CN+H                        1.0E14   0.000       0 ! GLA/MIL98 JAM est
+   CH3+HOCN=CH3CN+OH                     5.0E12   0.000    2000 ! GLA/MIL98 JAM
+   CH2+N=HCN+H                           5.0E13   0.000       0 ! GLA/MIL98 JAM est
+   CH2+NO=HCNO+H                         3.1E12   0.000    -378 !           ATA/WOL92,FIC/TEM01
+   CH2+NO=HCN+OH                         3.9E11   0.000    -378 !           ATA/WOL92,FIC/TEM01
+   CH2+NO2=CH2O+NO                       5.9E13   0.000       0 ! GLA/MIL98 SEI/WAG89
+   CH2+N2=HCN+NH                         1.0E13   0.000   74000 ! GLA/MIL98 JAM est
+   CH2(S)+NO=HCN+OH                      2.0E13   0.000       0 ! GLA/MIL98 JAM est
+   CH2(S)+NO=CH2+NO                      1.0E14   0.000       0 ! GLA/MIL98 CEC94
+   CH2(S)+N2O=CH2O+N2                    3.8E13   0.000       0 !           KOC/WAG90(p)
+   CH2(S)+NH3=CH2NH2+H                   3.0E13   0.000       0 !           est
+   CH2(S)+HCN=CH2CN+H                    1.8E14   0.000       0 !           KOC/WAG90
+   CH+NH3=H2CN+H+H                       4.4E13   0.000    -630 ! TIA/GLA08 BEC/WIE93
+   CH+N=CN+H                             1.3E13   0.000       0 ! GLA/MIL98 MES/CAR81
+   CH+NO=CO+NH                           9.1E12   0.000       0 !           CEC05
+   CH+NO=NCO+H                           1.8E13   0.000       0 !           CEC05
+   CH+NO=HCN+O                           7.9E13   0.000       0 !           CEC05
+   CH+NO=CN+OH                           1.1E12   0.000       0 !           CEC05
+   CH+NO=HCO+N                           6.8E12   0.000       0 !           CEC05
+   CH+NO2=HCO+NO                         1.0E14   0.000       0 ! GLA/MIL98 WAG/SAD82,RIM/HER98
+   CH+N2O=HCN+NO                         1.9E13   0.000    -511 ! GLA/MIL98 BEC/WIE93
+   CH+N2=NCN+H                           3.7E07   1.420   20723 !           MIL/WAL97,MOS/LIN00
+   C+NO=CN+O                             2.0E13   0.000       0 ! GLA/MIL98 CEC94
+   C+NO=CO+N                             2.8E13   0.000       0 ! GLA/MIL98 CEC94
+   C+N2O=CN+NO                           4.8E12   0.000       0 ! GLA/MIL98 DOR/MAR91
+!  C+N2=CN+N                             6.3E13   0.000   46000 ! GLA/MIL98
+   CN+N=C+N2                             5.9E14  -0.400       0 !           CEC05 
+!
+   C2H6+NH2=C2H5+NH3                     4.5E01   3.460    5600 !           MEB/LIN99
+   C2H6+CN=C2H5+HCN                      1.2E08   1.800    -994 ! GLA/MIL98 HER/SPE92
+   C2H6+NCO=C2H5+HNCO                    1.5E-9   6.890   -2910 ! GLA/MIL98 SCH/WOL94
+   C2H5+N=C2H4+NH                        4.3E13   0.000       0 !           STI95
+   C2H5+N=CH3+H2CN                       2.3E13   0.000       0 !           STI95
+   C2H4+NH2=C2H3+NH3                     5.3E12   0.000   10274 !           HEN/WAG95(p)
+!  C2H4+CN=CH2CHCN+H                     5.9E14  -0.240       0 !           HER/SPE92
+!  C2H4+NCO=adduct                                              !           BEC/WIE95
+   C2H3+NO=HCN+CH2O                      7.0E21  -3.382    1025 !           STR/TAA04 (¤)
+!  C2H2+NH2=NH2C2H2                      4.6E06   8.310    7430 !           MOS/LIN98 (0.46 bar)
+   C2H2+NCO=HCCO+HCN                     1.4E12   0.000    1815 ! GLA/MIL98 BEC/WIE95
+!  C2H2+CN=C2HCN+H                       3.6E15  -0.530       0 !           HER/SPE92
+   C2H+NH3=C2H2+NH2                      7.2E12   0.000    -735 !           CAR/PEE04 (¤)
+   C2H+NO=HCN+CO                         6.0E13   0.000     570 !           PEE/CEU96
+   C2+NO=C2O+N                           2.3E13   0.000    8640 !           KRU/ROT99
+!  C2+NO=CCN+O                           5.2E13   0.000    8640 !           KRU/ROT99
+   C2+N2=CN+CN                           1.5E13   0.000   41730 !           Sommer+97
+! 
+   HCCO+N=HCN+CO                         5.0E13   0.000       0 ! GLA/MIL98 JAM est
+   HCCO+NO=HCNO+CO                       5.9E12   0.089    -457 !           MIL/GLA03
+   HCCO+NO=HCN+CO2                       3.7E14  -0.750     -90 !           MIL/GLA03
+   HCCO+NO2=HCNO+CO2                     1.6E13   0.000       0 ! GLA/MIL98 TEM/WAG92/p
+   C2O+NO=CO+NCO                         1.0E14   0.000     670 !           THW/HER04(p)
+   C2O+NO2=CO2+NCO                       5.1E13   0.000     125 !           THW/HER04(p)
+!  H2CCCH+N=HCN+C2H2                     1.0E14   0.000       0 !           JAM est
+!
+   NCN+H=HCN+N                           1.0E14   0.000       0 ! GLA/MIL98 JAM est
+   NCN+O=CN+NO                           1.0E14   0.000       0 ! GLA/MIL98 JAM est
+   NCN+OH=HCN+NO                         5.0E13   0.000       0 ! GLA/MIL98 JAM est
+   NCN+O2=NO+NCO                         4.4E09   0.510   24580 !           ZHU/LIN05
+!
+!  CH3NH2+M=CHNH2+H2+M                   1.3E14   0.000   82560 ! TIA/GLA08 ZHA/LEE00 
+   CH3NH2+M=CH2NH+H2+M                   2.4E13   0.000  107260 ! TIA/GLA08 ZHA/LEE00 
+!  CH3NH2+M=CH3N+H2+M                    9.8E14   0.000  117550 ! TIA/GLA08 ZHA/LEE00 
+   CH3NH2+H=CH2NH2+H2                    5.6E08   1.500    5464 ! TIA/GLA08 DEA/BOZ00 
+   CH3NH2+H=CH3NH+H2                     4.8E08   1.500    9706 ! TIA/GLA08 DEA/BOZ00
+   CH3NH2+O=CH2NH2+OH                    4.0E08   1.500    5196 ! TIA/GLA08 DEA/BOZ00 
+   CH3NH2+O=CH3NH+OH                     3.3E08   1.500    6348 ! TIA/GLA08 DEA/BOZ00
+   CH3NH2+OH=CH2NH2+H2O                  1.0E13   0.000       0 ! TIA/GLA08 CAR/CRO98
+   CH3NH2+OH=CH3NH+H2O                   2.4E06   2.000     447 ! TIA/GLA08 DEA/BOZ00
+   CH3NH2+CH3=CH2NH2+CH4                 1.5E06   1.870    9170 ! TIA/GLA08 DEA/BOZ00 
+   CH3NH2+CH3=CH3NH+CH4                  1.6E06   1.870    8842 ! TIA/GLA08 DEA/BOZ00
+   CH3NH2+NH2=CH2NH2+NH3                 2.8E06   1.940    5494 ! TIA/GLA08 DEA/BOZ00
+   CH3NH2+NH2=CH3NH+NH3                  1.8E06   1.940    7143 ! TIA/GLA08 DEA/BOZ00
+!
+!L!CH2NH2=CH2NH+H                        1.1E45 -10.240   47817 ! TIA/GLA08 DEA/BOZ00 0.1 ATM N2 (600-2500K)
+   CH2NH2=CH2NH+H                        2.4E48 -10.820   52040 ! TIA/GLA08 DEA/BOZ00 1 ATM N2 (600-2500K) 
+!H!CH2NH2=CH2NH+H                        3.2E46  -9.950   53530 ! TIA/GLA08 DEA/BOZ00 10. ATM N2 (600-2500K)
+   CH2NH2+H=CH2NH+H2                     4.8E08   1.500    -894 ! TIA/GLA08 DEA/BOZ00
+   CH2NH2+O=CH2O+NH2                     7.0E13   0.000       0 ! TIA/GLA08 DEA/BOZ00
+   CH2NH2+O=CH2NH+OH                     3.3E08   1.500    -894 ! TIA/GLA08 DEA/BOZ00
+   CH2NH2+OH=CH2OH+NH2                   4.0E13   0.000       0 ! TIA/GLA08 DEA/BOZ00
+   CH2NH2+OH=CH2NH+H2O                   2.4E06   2.000   -1192 ! TIA/GLA08 DEA/BOZ00
+!   CH2NH2+O2=NH2CH2O+O                   6.0E18  -1.590   30192 ! TIA/GLA08 DEA/BOZ00
+   CH2NH2+O2=CH2NH+HO2                   1.0E22  -3.090    6756 ! TIA/GLA08 DEA/BOZ00
+   CH2NH2+CH3=C2H5+NH2                   2.0E13   0.000    2702 ! TIA/GLA08 DEA/BOZ00
+   CH2NH2+CH3=CH2NH+CH4                  1.6E06   1.870    -626 ! TIA/GLA08 DEA/BOZ00
+!L!CH3NH=CH2NH+H                         1.6E36  -7.920   36342 ! TIA/GLA08 DEA/BOZ00 0.1 ATM N2 (600-2500K)
+   CH3NH=CH2NH+H                         1.3E42  -9.240   41340 ! TIA/GLA08 DEA/BOZ00 1 ATM N2 (600-2500K) !
+!H!CH3NH=CH2NH+H                         2.3E44  -9.510   45244 ! TIA/GLA08 DEA/BOZ00 10. ATM N2 (600-2500K)
+   CH3NH+H=CH2NH+H2                      7.2E08   1.500    -894 ! TIA/GLA08 DEA/BOZ00
+   CH3NH+O=CH2NH+OH                      5.0E08   1.500    -894 ! TIA/GLA08 DEA/BOZ00
+   CH3NH+OH=CH2NH+H2O                    3.6E06   2.000   -1192 ! TIA/GLA08 DEA/BOZ00
+   CH3NH+CH3=CH2NH+CH4                   2.4E06   1.870   -1113 ! TIA/GLA08 DEA/BOZ00
+!
+   CH2NH+H=H2CN+H2                       2.4E08   1.500    7322 ! TIA/GLA08 DEA/BOZ00
+   CH2NH+H=HCNH+H2                       3.0E08   1.500    6130 ! TIA/GLA08 DEA/BOZ00
+   CH2NH+O=H2CN+OH                       1.7E08   1.500    4630 ! TIA/GLA08 DEA/BOZ00
+   CH2NH+O=HCNH+OH                       2.2E08   1.500    5404 ! TIA/GLA08 DEA/BOZ00
+   CH2NH+O=CH2O+NH                       1.7E06   2.080       0 ! TIA/GLA08 DEA/BOZ00
+   CH2NH+OH=H2CN+H2O                     1.2E06   2.000     -89 ! TIA/GLA08 DEA/BOZ00
+   CH2NH+OH=HCNH+H2O                     2.4E06   2.000     457 ! TIA/GLA08 DEA/BOZ00
+   CH2NH+CH3=H2CN+CH4                    8.2E05   1.870    7123 ! TIA/GLA08 DEA/BOZ00
+   CH2NH+CH3=HCNH+CH4                    5.3E05   1.870    9687 ! TIA/GLA08 DEA/BOZ00
+   CH2NH+NH2=H2CN+NH3                    9.2E05   1.940    4441 ! TIA/GLA08 DEA/BOZ00
+   CH2NH+NH2=HCNH+NH3                    1.8E06   1.940    6090 ! TIA/GLA08 DEA/BOZ00
+!
+!L!H2CN=HCN+H                            1.3E29  -6.030   29894 ! DAG/ALZ08 DEA/BOZ00 0.1 atm
+   H2CN=HCN+H                            6.0E31  -6.460   32110 ! DAG/ALZ08 DEA/BOZ00 1 atm
+!H!H2CN=HCN+H                            3.5E29  -5.460   32547 ! DAG/ALZ08 DEA/BOZ00 10 atm
+   H2CN+H=HCN+H2                         2.4E08   1.500    -894 ! DAG/ALZ08 DEA/BOZ00 
+   H2CN+O=HCN+OH                         1.7E08   1.500    -894 ! DAG/ALZ08 DEA/BOZ00 
+!L!H2CN+OH=HCN+H2O                       2.1E17  -1.680     318 ! DAG/ALZ08 DEA/BOZ00 0.1 ATM N2 
+   H2CN+OH=HCN+H2O                       1.5E19  -2.180    2166 ! DAG/ALZ08 DEA/BOZ00 1 ATM N2 
+!H!H2CN+OH=HCN+H2O                       9.5E21  -2.910    5633 ! DAG/ALZ08 DEA/BOZ00 10 ATM N2 
+     DUPLICATE
+   H2CN+OH=HCN+H2O                       1.2E06   2.000   -1192 ! 
+     DUPLICATE
+   H2CN+O2=CH2O+NO                       3.0E12   0.000    5961 ! DAG/ALZ08 DEA/BOZ00 
+   H2CN+NH2=HCN+NH3                      9.2E05   1.940   -1152 ! DAG/ALZ08 DEA/BOZ00 
+   H2CN+N=CH2+N2                         2.0E13   0.000       0 ! GLA/MIL98 JAM est
+!
+!L!HCNH=HCN+H                            7.7E25  -5.200   21986 ! TIA/GLA08 DEA/BOZ00 0.1 ATM N2
+   HCNH=HCN+H                            6.1E28  -5.690   24271 ! TIA/GLA08 DEA/BOZ00 1 ATM N2 !
+!H!HCNH=HCN+H                            6.2E26  -4.770   24818 ! TIA/GLA08 DEA/BOZ00 10. ATM N2
+   HCNH+H=H2CN+H                         2.0E13   0.000       0 ! TIA/GLA08 DEA/BOZ00
+   HCNH+H=HCN+H2                         2.4E08   1.500    -894 ! TIA/GLA08 DEA/BOZ00
+   HCNH+O=HNCO+H                         7.0E13   0.000       0 ! TIA/GLA08 DEA/BOZ00
+   HCNH+O=HCN+OH                         1.7E08   1.500    -894 ! TIA/GLA08 DEA/BOZ00
+   HCNH+OH=HCN+H2O                       1.2E06   2.000   -1192 ! TIA/GLA08 DEA/BOZ00
+   HCNH+CH3=HCN+CH4                      8.2E05   1.870   -1113 ! TIA/GLA08 DEA/BOZ00
+!
+   CH3CN+H=HCN+CH3                       4.0E07   2.000    2000 ! GLA/MIL98 JAM est
+   CH3CN+H=CH2CN+H2                      3.0E07   2.000    1000 ! GLA/MIL98 JAM est
+   CH3CN+O=NCO+CH3                       1.5E04   2.640    4980 ! GLA/MIL98 JAM est
+   CH3CN+OH=CH2CN+H2O                    2.0E07   2.000    2000 ! GLA/MIL98 JAM est
+   CH2CN+O=CH2O+CN                       1.0E14   0.000       0 ! GLA/MIL98 JAM est
+   CH2OH+CN=CH2CN+OH                     5.0E13   0.000       0 !           JAM est
+ END
+!
+!*******************************************************************************
+!*******************************************************************************
+!******************************   BIBLIOGRAPHY   *******************************
+!*******************************************************************************
+!*******************************************************************************
+!
+ADA/BAS81  Adachi H Basco N James DGL IJCK 13:1251-1276
+ADA/PHI94  Adamson JD Farhat SK Morter CL Glass GP Curl RF Philips LF JPC 98:5665
+ALL/DRY97  Allen MT Yetter RA Dryer FL CF 109:449
+ATA/WOL92  B Atakan D Kocis J Wolfrum PCI 24:691
+ATK97      Atkinson R JPC Ref. Data 26:215-290
+ATK/TRO92  Atkinson R Baulch DL Cox RA Hampson Jr RF Kerr JA Troe J JPCRD 21:1125-1168
+*ATK/TRO02  
+ATK/BAU06  Atkinson R Baulch DL Cox RA Crowley JN Hampson RF Hynes RG Jenkin ME Rossi 
+           MJ Troe JACP 6:3625-4055
+BAC/MAC05  Bacskay GB Mackie JC JPCA 109:2019-2025
+BAL/LAN69  Baldwin RR Walker RW Langford DH TFS 65:806
+BAL/WAL84  Baldwin RR Keen A Walker RW JCSFT 80:435 
+BAG/WAL87  Baggott JE Frey HM Lightfoot PD Walsh R JPC 91:3386-3393
+BAR/HOY91  Bartels M Edelbuttal J Hoyermann K PCI 23:131
+BAR/WEI91  Barnhard KI Santiago A He M Asmar F Weiner BR CPL 178:150-156
+BAT87      Batt L Int. Rev. Phys. Chem. 6:53-90
+BAU/DRY73  Baulch DL Drysdale DD Horne DG PCI 14:107-118
+BAU/MEU85  Bauer W Becker KH Meuser R BBPC 89:340
+BAU/OLD84  Baughum SL Oldenborg RC ACS SS (ed TM Sloane) 249:257-266
+BAU/WAG95  Bauerle S Klatt M Wagner HGg BBPC 99:870
+BEC/BAY92  Becker KH Konig R Meuser R Wiesen P Bayes KD J Photochem Photobiol A 64:1-14
+BEC/SCH92  Becker E Rahman MM Schindler RN BBPC 96:776
+BEC/WIE93  Becker KH Engelhardt B Geiger H Kurtenbach R Wiesen P CPL 210:135-140
+BEC/WIE95  Becker KH Kurtenbach R Schmidt F Wiesen P CPL 235:230-234 (C2H2+NCO)
+BEC/WIE95  Becker KH Kurtenbach R Wiesen P JPC 99:5986-5991 (C2H4+NCO)
+BEC/WIE97  Becker K Kurtenbach R Schmidt F Wiesen P BBPC 101:128-133   
+BEC/WIE00  Becker K Kurtenbach R Schmidt F Wiesen P CF 120:570-577
+BEM/CLY74  Bemand PP Clyne MAA Watson RT JCSFT2 70:564-576
+BEN96a     Benson SW IJCK 28:665-672
+BLI/SEA03  Blitz MA McKee KW Pilling MJ Seakins PW CPL 372:295-299
+BOG/HAN78  Bogan DJ Hand CW JPC 82:2067
+BOH/WAG84  Bohland T Temps F Wagner HGg BBPC 88:1222
+BOH/WAG85  Bohland T Dobe S Temps F Wagner HGg BBPC 89:1110
+BOH/WAG88  Bohland T Temps F Wagner HGg PCI 21:841
+BOU/LIN97  Boughton JW Kristyan S Lin MC Chem. Phys 214:219
+BOZ98      Bozzelli J private communication
+BOZ/DEA93  Bozzelli JW Dean AM JPC 97:4427
+BUR/RAV92  Burkholder JB Mellouki A Talukdar R Ravishankara AR IJCK 24:711
+BURCAT     Burcat's Therm. DB, http://garfield.chem.elte.hu/Burcat/burcat.html
+           "Third Millennium Ideal Gas and Condensed Phase Thermochemical Database
+           for Combustion with updates from Active Thermochemical Tables" ANL-05/20
+           and TAE 960 Technion-IIT, Aerospace Engineering, and Argonne National
+           Laboratory, Chemistry Division, September 2005. 
+CAL/COO89  Callear AB Cooper IA CPL 155:146
+CAM/CRO02  Cameron M Sivakumaran V Dillon TJ Crowley JN PCCP 2002 4:3628
+CAR/CRO98  Carl SA Crowley JN JPCA 102:8130-8142
+CAR/DEA05  Carstensen H-H Dean AM PCI 30:995-1003
+CAR/DEV98  Caralp F Rayez M-T Forst W Gomez N Delcroix B Fittschen C Devolder P JCSFT 94:3321-3330
+CAR/PEE04  Carl SA Elsamra RMI Kulkami RM Nguyen HMT Peeters J JPCA 108:3695-3698
+CAR/VIS99  Caralp F Devolder P Fittschen C Gomez N Hippler H Méreau R Rayez MT Striebel F 
+           Viskolcz B PCCP 1:2935-2944
+CAR/WAG95  Carstensen HH Wagner HGg BBPC 99:1539
+CEC92      Baulch DL Cobos CJ Cox RA Esser C Frank P Just Th Kerr JA Pilling MJ Troe J
+           Walker RW Warnatz J JPCRD 21:403
+CEC94      Baulch DL Cobos CJ Cox RA Frank P Hayman G Just Th Kerr JA
+           Murrells T Pilling MJ Troe J Walker RW Warnatz J JPCRD 23:847-1033
+CEC05      Baulch DL Bowman CT Cobos CJ Cox RA Just Th Kerr JA Pilling MJ Stocker D
+           Troe J Tsang W Walker RW Warnatz J JPCRD 34:757-1397
+COB96      Cobos CJ React Kinet Catal Lett 57:43-47
+COB/TRO90  Cobos CJ Troe J ZPC(NF) 167:129-149
+COH/WES83  Cohen N Westberg KR JPCRD 12:531
+CON/WES04  Conaire MO Curran HJ Simmie JM Pitz WJ Westbrook CK IJCK 36:603
+DAE/BRA95  Daële V Ray A Vassalli I Poulet G Le Bras G IJCK 27:1121-1133
+DAG/SIM96  Dagaut P Voisin D Cathonnet M McGuinness M Simmie JM CF 106:62-88
+DAM/FRI07  Dammeier J Colberg M Friedrichs G PCCP 9:4177-4188
+DAV/HAN90  Davidson DF Kohse-Hoinghaus K Chang AY Hanson RK IJCK 22:513
+DAV/HAN91  Davidson DF Hanson RK PCI 23:267
+DAV/THR75  Davidson JA Thrush BA JCS-FT I 71:2413
+DAV/PIL91  Davies JW Green NJB Pilling MJ JCSFT 87:2317-2324
+*DAV/WAN99   CH2CHCH2+H(+M)=C3H6(+M)              2.0E14   0.000       0 !           
+DEA/BOZ00  Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 
+DEC/MAC03  Decker BK MacDonald RG JPCA 107:9137-9146
+DEM/RAV90  DeMore WB Sander SP Golden DM Molina MJ Hampson RF Kurylo MJ 
+           Howard CJ Ravishankara AR JPL P 90-1:1
+DEM/MOL97  DeMore WB Sander SP Golden DM Hampson RF Kurylo MJ Howard CJ 
+           Ravishankara AR Kolb CE Molina MJ JPL Pub. 97-4
+DES/TAT01  DeSain JD Jusinski LE Ho AD Taatjes CA CPL 347:79
+DOM/WAG92  Dombrowsky Ch Wagner HGg BBPC 96:1048-1055
+DOR/MAR91  Dorthe G Caubet P Vias Th Barrere B Marchais J JPC 95:5109-5116
+DOU/HAY96  Doughty A Barnes FJ Bromly JH Haynes BS PCI 26
+DRA/WAG84  Dransfeld P Hack W Kurzke H Temps F Wagner HGg PCI 20:655
+DUA/PAG95  Duan X Page M JCP 102:6121-6127
+EIT/FRE98  Eiteneer B Yu CL Goldenberg M Frenklach M JPCA 102:5196
+EWI/ZEL87  Ewig F Rhäsa D Zellner R Ber. Bunsenges. Phys. Chem. 91:708-717
+FAH/LAU91  Fahr A Laufer A Klein R Braun W JPC 95:3218-3224
+FEI/BUR08  Feierabend KJ Zhu L Talukdar RK Burkholder JB JPCA 112:73-82
+FEN/HER06  Feng WH Hershberger JF JPCA 110:12184
+FEN/LIG93  Fenter FF Catoire V Lesclaux R Lightfoot PD JPC 97:3530-3538
+FEN/PAN97  Feng WL Wang Y Zhang SW Pang XY CPL 266:43-46
+FER/TRO06  Fernandes RX Luther K Troe J JPCA 110:4442-4449
+FIC/TEM01  Fikri M Meyer S Roggenbuck J Temps F Far Disc 119:223-242
+FIS/CUR00  Fischer SL Dryer FL Curran HJ IJCK 32(12):713
+FIT/DEV99  Fittschen C Frenzel A Imrik K Devolder P IJCK 31:860-866
+FLO/HAN77  Flower WL Hanson RK Kruger CH CST 15:115
+FRI/DAV02  Friedrichs G Herbon JT Davidson DF Hanson RK CPPC 4:5778-5788
+FRI/HAN04  Friedrichs G Herbon JT Davidson DF Hanson RK IJCK 36:157-169
+*FRI/WAG98   C2O+M=C+CO+M                         2.0E15   0.000   44200 !            est
+FRO/SMI90  Frost MJ Smith IWM JCSFT 86:1751-1756
+FUL/TRO98  Fulle D Hamann HF Hippler H Troe J JCP 108:5391
+GAO/MAC03  Gao Y MacDonald G JPCA 107:4625-4635 
+GEH/WAG71  Gehring MV Hoyermann K Wagner HGg Wolfrum J BBPC 75:1287
+GEP/HAL04  Geppert WD Eskola AJ Timonen RS Halonen L JPCA 108:4232-4238
+GLA/ALZ03  Glarborg P Alzueta MU Kjaergaard K Dam-Johansen K CF 115:629
+GLA/MIL99  Glarborg P Bendtsen AB Miller JA IJCK 31:591-602
+GLA/KRI94  Glarborg P Kristensen PG Jensen SH Dam-Johansen K CF 98:241-258 
+GLA/MIL86  Glarborg P Miller JA Kee RJ CF 65:177
+GLA/MIL98  Glarborg P Alzueta MU Dam-Johansen K Miller JA CF 115:1
+GLA/MIL99  Glarborg P Bendtsen AB Miller JA IJCK 31:591-602 (CH3NO2)
+GLA/TRO73  Glänzer K Troe J Helv. Chim. Acta 56:577-585
+GLA/TRO74  Glänzer K Troe J Ber. Bunsen-Ges. Phys. Chem. 78:182
+GRI2.11    GRI-Mech v2.11 
+GRI3.0     GRI-Mech v3.0 (Frenklach M et al. 2004, I-net)
+GRU/WAG94  Grussdorf J Nolte J Temps F Wagner HGg Ber. Bun. Phys. Chem. 98:546-553
+GUP/HAR06  Gupte KS Kiefer JH Tranter RS Klippenstein SJ Harding LB PCI 31:167-174
+HAC/WAG88  Hack W Wagner HGg Wilms A BBPC 92:620-627
+HAC/WAG89  Hack W Koch M Wagener R Wagner HGg BBPC 93:165
+HAH/MIL01  Hahn DK Klippenstein SJ Miller JA Far Dis 119:79-100
+HAH/TRO00  Hahn J Luther K Troe J PCCP 2:5098
+HAR/CHI82  Harding LB Schatz GC Chiles RA JCP 76:5172-5173
+HAR/KLI05  Harding LB Georgievskii Y Klippenstein SJ JPCA 109:4646-4656
+HAR/PHI86  Harrison JA Whyte AR Phillips LF CPL 129:346
+HAY/KIN96  Hayes F Lawrance WD Staker WS King KD JPC 100:11314
+HE/LIN88   He Y Sanders WA Lin MC JPC 92:5474
+HE/LIN92   He Y Lin MC Wu CK Melius CF PCI 24:711
+HEL/DRY98  Held TJ Dryer FL IJCK 30:805-830
+HEN/WAG95  Hennig G Wagner HGg BBPC 99:989-994
+HER88      Herron JT JPCRD 17:967
+HER/SPE92  Herbert L Smith IWM Spencer-Smith RD IJCK 24:791-802
+HES98      Hessler JP JPCA 102:4517
+*HID/HIG92  Hidaka Y Nakamura T Tinaka H Jinno A Kawano H Higashihara T
+HIP/TRO95  Hippler H Neunaber H Troe J JCP 103:3510-3516
+HIP/VIS01  Hippler H Striebel F Viskolcz B PCCP 3:2450-2458
+HIP/STR04  Hippler H Krasteva N Striebel F PCCP 6:3383-3388
+HUA/WAN05  Hua H Ruscic B Wang B CP 311:335-341
+HOW/SMI80  Howard MJ Smith IWM CPL 69:40
+HRA/MIC98  Hranisavljevic J Kumaran SS Michael JV PCI 27:159-166
+HSU/MEL97  Hsu CC Lin MC Mebel AM Melius CF JPCA 101:60
+HUS/KIR71  Husain D Kirsch LJ Trans Faraday Soc 67:2025
+ING/BOZ03  Ing W-C Sheng CY Bozzelli JW FPT 83:111-145
+INO/WAS99  Inomata S Washida N JPCA 103:5023-5031
+JAS/HAR07  Jasper AW Klippenstein SJ Harding LB JPCA 111:8689-8707
+JAS/RUS07  Jasper AW Klippenstein SJ Harding LB Ruscic B JPCA 111:3932-3950
+JOH/GLA92  Johnsson JE Glarborg P Dam-Johansen K PCI 24:917
+JOS/WAN05  Joshi A You X Barckholtz TA Wang H JPCA 109:8016-8027
+KAP/TRO02  Kappel C Luther K Troe J PCCP 4:4392-4398
+KAR/LIF88  Karni M Oref I Barzilai-Gilboa S Lifshitz A JPC 92:6924
+KEI/PIL88  Keiffer M Miscampbell AJ Pilling MJ JCSFT2 84:505
+KLE/YAR90  Klemm RB Sutherland JW Wickramaaratchi MA Yarwood G JPC 94:3354-3357
+KLI/MIL02  Klippenstein SJ Miller JA Harding LB PCI 29:1209-1217
+KO/FON91   Ko T Fontijn A JPC 95:3984-3987
+KOC/WAG90  Koch M Temps FWagener R Wagner HGg BBPC 94:645-650 (CH2(s)+CO2)
+KRA/MIC04  Krasnoperov LN Michael JV JPCA 108:8317-8323
+KRU/ROT97  Kruse T Roth P JPCA 101:2138-2146
+KRU/ROT99  Kruse T Roth P IJCK 31:11-21
+KUW/PET07  Kuwata KT Dibble TS Sliz E Petersen EB JPCA 111:5032-5042
+LAM/BEN84  Lamb JJ Mozurkewich M Benson SW JPC 88:6441-6448
+LAS/WAN99  Laskin A Wang H CPL 303:43-49
+LAS/LAW00  Laskin A Wang H Law CK IJCK 32:589
+LI/DRY04   Li J Zhao Z Kazakov A Dryer FL IJCK 36:566
+LIF/BEN83  cC2H4O+H=cC2H3O+H2                   2.0E13   0.000    8310 ! GIM/GLA08 
+MEB/MOR96  Mebel AM Diau EWG Lin MC Morokuma K JPC 100:7517-7525
+LIN/PAG95  Linder DP Duan X Page X JPC 99:11458-11463
+LIN/PAG96  Linder DP Duan X Page M JCP 104:6298
+LIU/KUR90  Liu R Huie RE Kurylo MJ CPL 167:519-523
+LUD/TEM06  Ludwig W Brandt B Friedrichs G Temps F JPCA 110:3330-3337
+MAH/FON88  Mahmud K Marshall P Fontijn A JCP 88:2393-2397
+MAR/FON87  Marshall P Fontijn A Melius CF JCP 86:5540
+MAR99      Marinov NM IJCK 31:183
+MAR/MER00  Martínez E Albaladejo J Jiménez E Notario A de Mera D
+MAR/SEN96  Marinov NM Pitz WJ Westbrook CK Castaldi MJ Senkan SM CST 116:211
+MCC/KAU85  McCaulley JA Anderson SM Jeffries JB CP Lett. 115:180
+MEA/AND00  Meagher NE Anderson WR JPCA 104:6013-6031
+MEB/LIN99  Mebel AM Lin MC JPCA 103:2088-2096
+MEB/MEL98  Mebel AM Lin MC Melius CF JPCA 102:1803
+MEB/MOR96  Mebel AM Lin MC Morokuma K IJCK 28:693
+MEB/MOR98  Mebel AM Lin MC Morokuma K IJCK 30:729-736
+MEL/SID03  Mellouki A Bras GL Sidebottom H Chem Rev 103:5077-5096
+MER/HAN89  Mertens JD Chang AY Hanson RK Bowman CT IJCK 21:1049
+MES/CAR81  Messing I Filseth SV Sadowski CM Carrington T JCP 74:3874
+MIC92      Michael JV PECS 18:327
+MIC/SUT86  Michael JV Sutherland JW Klemm RB JPC 90:497
+MIC/WAG00  Michael JV Sutherland JW Harding LB Wagner AF PCI 28:1471-1478
+MIL/GLA98  Miller JA Melius CF Glarborg P IJCK 30:223-228
+MIL/BOW89  Miller JA Bowman CT PECS 15:287
+MIL/GLA99  Miller JA Melius CF Glarborg P IJCK 31:757-765
+MIL/GLA03  Miller JA Klippenstein SJ Glarborg P CF 135:357-362  
+MIL/KLI01  Miller JA Klippenstein IJCK 33:654
+MIL/KLI04  Miller JA Klippenstein PCCP 6:1192-1202
+MIL/MEL92  Miller JA Melius CF PCI 24:719
+MIL/WAL97  Miller JA Walch SP IJCK 29:253
+MON/SHA95  Monks PS Nesbitt FL Payne WA Scanlon M Stief LJ Shallcross DE JPC 99:17151-17159
+MOO/WAR77  Moortgat GK Slemr F Warneck P IJCK 9:249
+MOS/LIN98  Moskaleva LV Lin MC JPCA 102:4687-4693
+MOS/LIN00  Moskaleva LV Lin MC PCI 28:2393-2401
+MUE/DRY98  Mueller MA Yetter RA Dryer FL PCI 27:177
+MUE/DRY99  Mueller MA Yetter RA Dryer FL IJCK 31:705
+NBS86      Tsang W Hampson RF JPCRD 15:1087
+NBS87      Tsang W JPCRD 16:471
+NBS91      Tsang W JPCRD 20:221
+NBS92      Tsang W JPCRD 21:753-791 (N) 
+NES/STI89  Nesbitt FL Payne WA Stiff LJ JPC 93:5158
+NIE/SID91  Nielsen OJ Sidebottom HW Donlon M Treacy J IJCK 23:1095-1109
+NOL/WAG93  Nolte J Grussdorf J Temps F Wagner HGg Z. Naturforsch. A 48:1234-1238
+OHM/WAS90  Ohmori K Miyoshi A Matsui H Washida N JPC 94:3253
+OLI/SOL04  Olivella S Sole A JPCA 108:11651-11663
+OLK/SMI01  Olkhov RV Li Q Osborne MC Smith IWM PCCP 3:4522-4528
+OPA/LEO96  Opansky BJ Leone SR JPC 100:4888-4892
+PAN/TAN08  Pang JL Xie HB Zhang SW Ding YH Tang AQ JPCA 112:5251-5257
+PAR/HER93  Park J Hershberger JF JPC 99:3488-3493
+PAR/LIN97  Park J Lin MC JPCA 101:2643-2647
+PAR/LIN98  Park J Giles ND Moore J Lin MC JPCA 102:10099
+PAU/MIL96  Pauwels J-F Volponi JV Miller JA CST 110:249
+PEE/CEU96  Peeters J van Look H Ceursters B JPCA 100:15124-15129
+PET/MOO93  Petty JT Harrison JA Moore cb JPC 97:11194
+PET/OSA04  Petrie S Osamura Y JPCA 108:3623-3631
+POP/MIL00  Pope CJ Miller JA PCI 28:1519
+PRE/FLY00  Press JM Fockenberg C Flynn GW JPCA 104:6755-6763
+REI/SMI84  Reid IAB Robinson C Smith DB PCI 20:1833-1843
+RIL/FON03  Riley PS Cosic B Fontijn A IJCK 35:374  
+RIM/HER99  Rim KT Hershberger JF JPCA 103:3721-3725
+RIM/HER98  Rim KT Hershberger F JPCA 102:5898
+ROH/HAN96  Rohrig M Petersen EL Davidson DF Hanson RK IJCK 28:599-608
+SAI/MUR84  Saito K Kakumoto T Murakami I JPC 88:1182-1187
+*SAL/HAN84   NH3+OH=NH2+H2O                       2.0E06   2.040     566 ! SKR/GLA04 
+*SAL/THR77  Salter LF Thrush BA JCSFT 1:1098 *2025-2030*
+SCH/WOL94  Schuck A Volpp H-R Wolfrum J CF 99:491
+SEE/GUT94  Seetula JA Kalinovski IJ Slagle IR Gutman D Chem. Phys. Lett. 224:533
+SEI/WAG89  Seidler V Temps F Wagner HGg Wolf M JPC 93:1070
+SEN/MIL05  Senosiain JP Klippenstein SJ Miller JA JPCA 109:6045-6055
+SEN/MIL06  Senosiain JP Klippenstein SJ Miller JA JPCA 110:5772-5781 (CH2CHO, CH3CO) 
+SEN/MIL06  Senosiain JP Klippenstein SJ Miller JA JPCA 110:6960-6970 
+SHE/BOZ00  Sheng CY Bozzelli IJCK 32:623-641
+SHE/CHA02  Sheng CY Bozzelli JW Dean AM Chang AY JPCA 106:7276-7293
+*SCH/FRA00  Scherer Just Frank PCI 28: 
+SLA/GUT91  Slagle IR Gmurczyk GW Batt L Gutman D PCI 23:115-121
+SLA/MIL88  Slagle IR Sarzynski D Gutman D Miller JA Melius CF JCSFT2 84:491
+SLE/WAR77  Slemr F Warneck P IJCK 9:267
+SON/FRI03  Song S Golden DM Hanson RK Bowman CT Senosiain JP Musgrave CB Friedrichs G IJCK 35:304-309
+SOT/PAG92  Soto MR Page M JCP 97:7287
+SRI/MIC05  Srinivasan NK Su M-C Sutherland JW Michael JV JPCA 109:7902-7914
+SRI/MIC06  Srinivasan NK Michael JV IJCK 38:211-219
+SRI/MIC07  Srinivasan NK Su M-C Michael JV JPCA 111:3951-3958
+STE/GOL88  Stewart PH Rothem T Golden DM PCI 22:943-952
+STI/KLE95  Stief LJ Nesbitt FL Payne WA Kuo SC Tao W Klemm RB JCP 102:5309-5316
+STO/SLA00  Stoliarov SI Knyazev VD Slagle IR JPCA 104:9687-9697
+STR/TAA04  Stribel F Jusinski LE Fahr A Halpern JB Klippenstein SJ Taatjes CA PCCP 6:2216-2223
+SOM/HIP97  Sommer T Kruse T Roth P Hippler H JPCA 101:3720-3725
+SUM/NGU98  Sumathi R Nguyen MT JPCA 102:8013-8020
+SUN/CUR01  Sun F DeSain JD Scott G Hung PY Thompson RI Glass GP Curl RF JPCA 105:6121-6128
+SUT/KLE90  Sutherland JW Patterson PM Klemm RB JPC 94:2471
+SUT/MIC01  Sutherland JW Su M-C Michael JV IJCK 33:669-684
+TAL/RAV97  Talukdar RK Herndon SC Burkholder JB Roberts JM Ravishankara AR JCSFT 93:2787-2796 
+TAY/MAR96  Taylor PH Rahman MS Arif M Dellinger B Marshall P PCI 26:497
+TEM/WAG92  Temps F Wagner HGg Wolf M ZPC (Munich) 176:27
+THI/TAA97  Thiesemann H Taatjes CA CPL 270:580-586
+THW/HER04  Thweat WD Erickson MA Hershberger JF JPCA 108:74-79
+TRA/BRE05  Tranter RS Raman A Sivaramakrishnan R Brezinsky K IJCK 37:306-331
+TRO01      Troe J IJCK 33:878
+TRO05      Troe J JPCA 109:8320-8328
+TSA91      Tsang W JPCRD 20:221-273 (C3H6)
+TYN/WAL01  Tyndall GS Cox RA Granier C Lesclaux R Moortgat GK Pilling MJ Ravishankara AR 
+           Wallington TJ J. Geophys. Res. 106:12157-12182
+VAG95      Vaghjiani GL IJCK 27:777
+VAG96      Vaghjiani GL JPC 104:5479-5489
+VAG01      Vaghjiani GL IJCK 33:354-362 (N2H4+OH)
+VAG01      Vaghjiani GL JPCA 105:4682-4690 (N2H4+O)
+VAS/HAN05  Vasudevan V Davidson DF Hanson RK IJCK 37:98-109
+WAG/SAD82  Wagal SS Carrington T Filseth SV Sadowski CM CP 69:61
+WAN01      Wang H IJCK 33:698-706 (C2H4+M, H3CCCH+O2)          
+WAN/GU99   Wang B Hou H Gu Y JPCA 103:8021-8029
+WAN/LIN91  Wang NS Yang DL Lin MC IJCK 23:151
+WAN/WIN87a Wantuck PJ Oldenborg RC Baughcum SL Winn KR JPC 91:4653-4655
+WAN/WIN88  Wantuck PJ Oldenborg RC Baughcum SL Winn KR PCI 22:973-981
+WAS/SAT83  Washida N Hatakeyama S Takagi H Kyogoku T Sato S JCP 78:4533-4540
+WHY/PHI83  Whyte AR Phillips LF CPL 102:451
+WIL/NEL95  Williams BA Papas P Nelson HH JPC 99:13471
+WIL/BAL98  Wilson C Balint-Kurti GG JPCA 102:1625-1631
+WIL/BAY67  Williamson DG Bayes KD JACS 89:3390
+WIL/FLE07  Williams BA Fleming JW PCI 31:1109-1117
+WOL/CRO00  Wollenhaupt M Crowley JN JPCA 104:6429-6438
+WOO/BOW94  Wooldridge ST Mertens JD Hanson RK Bowman CT PCI 25:983-991
+WOO/BOW95  Wooldridge ST Hanson RK Bowman CT IJCK 27:1075-1087 (HCN+OH)
+WOO/BOW95  Wooldridge ST Hanson RK Bowman CT IJCK 28:361-372 (HNCO+OH)
+XIA/ZHA06  Xiao C-X Yan N Zou M Hou S-C Kou Y Liu W Zhang S J Mol Cat A Chem 252:202-211
+XU/LIN03   Xu ZF Lin MC IJCK 35:184
+XU/LIN04   Xu ZF Lin MC IJCK 36:205
+XU/LIN07   XU K Xu ZF Lin MC Mol Phys 105:2763-2776
+YAM/LAY99  Yamada T Bozzelli JW Lay T JPCA 103:7646-7655
+YAM/SUZ99  Yamaguchi Y Teng YH Shimomura S Tabata K Suzuki E JPCA 103(41):8272
+YAR/SUT91  Yarwood G Sutherland JW Wickramaaratchi MA Klemm RB JPC 95:8771
+YOU/KLI07  You X Wang H Goos E Sung C-J Klippenstein SJ JCPA 111:4031-4042
+YU/FRA05   Yu H-G Muckerman JT Francisco JS JPCA 109:5230-5236
+ZHA/LEE00  Zhang RQ Han KL Zhu RS Lee CS Lee ST CPL 321:101-105
+ZHA/LI05   Zhang Y Zhang S Li QS CP 308:109-116
+ZHU/LIN01  Zhu RS Lin MC JPCA 105:6243-6248
+ZHU/LIN04  Zhu RS Lin MC JPCA 104:10807-10811
+ZHU/LIN05  Zhu RS Lin MC IJCK 37:593-598
+
+
+************************************************************************************************
+
+!ACK/TRO90 Ackermann L Hippler H Reihs C Troe J JPC 94:5247
+!ADU/FON93 Adusei GY Fontijn A JPC 97:1406 (CH2CHCHCH2+O)
+!ADU/FON93 Adusei GY Fontijn A PCI 25:801-808 (HCL+H)
+!ALK/HOM89: A Alkemade, KH Homann BBPC 93:434-439
+!ALZ/GLA98 Alzueta MU Oliva M Glarborg P IJCK 30:683
+!ALZ/GLA00 Alzueta MU Glarborg P Dam-Johansen K IJCK 32:498-522
+!ALZ/GLA01 Alzueta MU Bilbao R Glarborg CF 127:2234-2251
+!ARE/MUL93 Arends IWCE Louw R Mulder P JPC 97:7914
+!ATK/TRO92 Atkinson R Baulch DL Cox RA Hampson Jr RF Kerr JA Troe J
+!          JPCRD 21:1125-1168
+!ATK/TRO97 Atkinson R Baulch DL Cox RA Hampson Jr RF Kerr JA Rossi MJ 
+!          Troe J JPCRD 26:521-1011
+!BAJ/FON96 Bajaj PN Fontijn A CF 105:239.
+!BAL/WAL69 Baldwin RR Walker RW Langford DH 65:806
+!BAL/WAL74 Baldwin RR Fuller AR Longthorne D Walker RW JCSFT 70:1257
+!BAR/HOY91 M Bartels,J Edelbuttal, K Hoyermann PCI 23:131
+!BAU/LIF71 Bauer SH Jeffers P Lifshitz A Jadava BP PI Shock Tube S 13:417
+!BAU/MON81 Baulch DL Duxbury J Grant SJ Montague DC JPCRD 10, Suppl
+!BEC/BAY92 Becker KH Konig R Meuser R Wiesen P Bayes KD
+!          J Photochem Photobiol A Chem 64:1-14
+!BEC/SCH92 E Becker, MM Rahman, RN Schindler BBPC 96:776
+!BEN/GLA00 Bendtsen AB Glarborg P Dam-Johansen K CST 151:31
+!BER/LOI01 Bergeat A Calvo T Caralp F Fillion J_H Dorthe G Loison J-C Far Disc 119:67-77
+!BHA/WES98 Bhargava, Westmoreland CF 1998
+!BLI/PIL00 Blitz MA McKee KW Pilling M PCI 28:2491-2497
+!BOZ/DEA90 Bozzelli JW Dean AM JPC 94:3313
+!BRA/PIL70 Braun W Bass AM Pilling M JCP 52:5131
+!BRU/MOU88 Bruinsma O-SL Tromp PJJ de Sauvage Nolting HJJ Moulijn JA Fuel 67:334
+!BUR/RAV92 Burkholder JB Mellouki A Talukdar R Ravishankara AR IJCK 24:711-725
+!BUT/HOY94 Buth R Hoyermann K Seeba J PCI 25:841
+!CAN/WAL85 Canosa-Mas CE Frey HM Walsh RJ Chem Soc Faraday Trans 2 81:283
+!CAR/WAG95 CH2(S)+H2O
+!CAR/WES02 Carriere T Westmoreland PR Kazakov A Stein YS Dryer FL PCI 29:?
+!CEC92     DL Baulch,CJ Cobos,RA Cox,C Esser,P Frank,Th Just,JA Kerr,MJ Pilling,
+!          J Troe,RW Walker,J Warnatz JPCRD 21:403
+!CLA/PRI70 Clark W D Price SJ Can J Chem 48:1059
+!COB/TRO85 Cobos CJ Hippler H Troe J JPC 89:1778-1783
+!COH/WES83 Cohen N Westberg KR JPCRD 12:531
+!COL/HOW84 Cole JA Bittner JD Longwell JP Howard JB CF 56:51 (1984)
+!DAG/CAT98 Dagaut P Cathonnet M CST 140:225
+!DAV/LAW99 Davis SG Law CK Wang H CF 119:375
+!DEA90     Dean A M  JPC 94:1432-1439
+!DEA/BOZ00 Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 
+!DEM/RAV87 Demore WB Golden DM Hampson RF Howard CJ Kurylo MJ Molina MJ 
+!          Ravishankara AR Sander SP JPL P 87-41:1
+!DEM/RAV90 Demore WB Sander SP Golden DM Molina MJ Hampson RF Kurylo MJ
+!          Howard CJ Ravishankara AR JPL P 90-1:1
+!DEM/MOL97 DeMore WB Sander SP Golden DM Hampson RF Kurylo MJ Howard CJ 
+!          Ravishankara AR Kolb CE Molina M J JPL Publ 97-4 
+!DES/TAT01 DeSain JD Jusinski LE Ho AD Taatjes CA CPL 347:79
+!EIT/FRE98 Eiteneer B Yu CL Goldenberg M Frenklach M JPCA 102:5196
+!EMD/BRE92 Emdee JL Brezinsky K Glassman I JPC 96:2151
+!FAH/LAU91 A Fahr, A Laufer, R Klein, W Braun JPC 95:3218-3224
+!FAH/STE88 Fahr A Stein SE JPC 92:4951
+!FAH/STE89 Fahr A Stein SE PCI 22:1023
+!FAH/BRA91 Fahr A Laufer A Klein R Braun W JPC95:3218-3224
+!FEN/KEL50 CP Fenimore JR Kelso JACS 72:5045
+!FRA/JUS80 Frank P Just Th CF 38:231
+!FRA/JUS88 Frank P Bhaskaran KA Just Th PCI 21:885
+!FRA/WAH94 Frank P Herzler J Just Th Wahl C PCI 25:833
+!FRE/STE85 Frenklach M Clary DW Gardiner WC Jr Stein SE PCI 20:887
+!FRI/DAV02 Friedrichs G Herbon JT Davidson DF Hanson RK CPPC 4:5778-5788
+!FRI/HAN02 Friedrichs G Davidson DF Hanson RK IJCK 34:374
+!FUL/HIP97 Fulle D Hamann HF Hippler H Jansch CP BBPC 101:1433-1442
+!FUL/HIP99 Fulle D Hamann HF Hippler H PCCP 1:2695 
+!GLA/MIL94 P Glarborg,K Dam-Johansen,JA Miller,RJ Kee,ME Coltrin IJCK 26:421
+!GLA/DAM95 P Glarborg,PG Kristensen,D Kubel,J Hansen,KDam-Johansen CST 110:461
+!GLA/BOZ96 Glarborg P Kubel D Dam-Johansen K Chiang H-M Bozzelli J IJCK 28:773-790
+!GLA/MIL96 NH2+NO2
+!GLA/MIL98 Glarborg P Alzueta MU Dam-Johansen K CF 115:1
+!GLA/OST98 H+NO+M
+!GLA/BEN98 nitromethane paper
+!GOU/MAR93 Goumri A Laakso D Roucha JD-R Francis D Marshall P JPC 97:5295-5297
+!GOU/MAR95 Goumri A Roucha JD-R Marshall P JPC 99:10834
+!GOU/MAR99 Goumri A Roucha JD-R Laakso D Smith CE Marshall P JPCA 103:11328 (S)
+!GOU/MAR99 A Goumri, JDR Rocha, A Misra, P Marshall, JPCA 103:9252 (K)
+!GRI/KOL01: J Griffin DR Worsnop, RC Brown CE Kolb DR Herschbach JPCA 105:1643
+!GRU/WAG95 CH2CO+OH
+!HAR/BLI88 Harris SJ Weiner AM Blint RJ CF 72:91
+!HAR/WAG88 Harding LB Wagner AF PCI 21:721
+!HEL/PLA93a M Helmer JMC Plane J Geophys Res 98:207-222
+!HEL/PLA93b M Helmer JMC Plane JCP 99:7696
+!HER/WAG74 Herbrechtsmeier P Wagner HGg Z Phys Chem (Neue Folge) 93:143
+!          IJCK 24:761
+!HID/KAW95 Hidaka Y Higashihara T Oki T Kawano H IJCK 27:321-330
+!HID/KAW96 Hidaka Y Higashihara T Ninomiya N Masaoka H Nakamura T Kawano H IJCK 28:137
+!HIG/MUR80 Higashihara T Saito K Murakami I Bull CS Jpn 53:15
+!HIP/TRO91 Hippler H Reihs C Troe J PCI 23:37-43
+!HOR/BEC83 Horie O Bauer W Meuser R Scmidt VH Becker KH CPL 100:251
+!HOR/FRA98 Horn C Roy K Frank P Just Th PCI 27:321
+!HOR/WES98 Hori M Matsunaga Marinov N Pitz W Westbrook C PVI 27:389
+!HOW80     CJ Howard JACS 102:6937
+!HRA/MIC98 Hranisavljevic J Kumaran SS Michael JV PCI 27:159-166
+!HUS89     Husain D JCS Far Trans 2 85:85-130
+!INO/WAS99 S Inomata, N Washida JPCA 103:5023
+!IRD/WAG93 Irdam EI Kiefer JH Harding LB Wagner AF IJCK 25:285
+!JAC/COH67 Jacobs TA Giedt RR Cohen N JCP 47:54-57
+!JEN/MAC79: DE Jensen,GA Jones, CH Mace, Ber Bunsenges Phys Chem (?)
+!KER/WU88  Kern RD Singh HJ Wu CH IJCK 20:731
+!KHE/LES77 PV Khe,JC Soulignac,R Lesclaux JPC 81:210
+!KIE/WEI85 Kiefer JH Mizerka LJ Patel MR Wei H-C JPC 89:2013
+!KIM/DRY95 TJ Kim, RA Yetter, FL Dryer PCI 25:759
+!KNI/ZET90 Knispel R Koch R Siese M Zetzsch C BBPC 94:1375
+!KNY/SLA96 Knyazev VD Slagle IR JPC 100:16899-16911
+!KUM/MIC97 Kumaran SS Michael JV Proc 21 Int Symp Shock Waves
+!KUM/MIC98 SS Kumaran,JJ Carroll,JV Michael PCI 27:125
+!LAM/BEN86 Lamb JJ Benson SW J Geoph Res 91:8683-8689
+!LAN83     CH2CO+CH2(S)
+!LAN/CUR90 Lander DR Unfried KG Glass GP Curl RF JPC 94:7759
+!LAS99     C2H4+C2H
+!LAS/WAN99 Laskin A Wang H CPL 303:43
+!LEI/WAG89 Leidreiter HI Wagner HGg Z Phys Chem (Neue Folge) 165:1
+!LIG/LES91 PD Lightfoot, P Roussel, F Caralp, R Lesclaux JCSFT 87:3213-3220
+!LIN/LIN86 Lin C-Y Lin MC Aust J Chem 39:723
+!LIN96     HNO+NH2
+!LIU/JON88 Liu A Mulac WA Jonah CD JPC 92:131.
+!LOV/MOD90 CH2CO+CH2(S)
+!MAH/FON90 Mahmud K Kim J Fontijn A JPC 94:2994
+!MAR95     C2H4+H+M
+!MAR96     C2H2+H+M
+!MAR/SEN96 Marinov NM Pitz WJ Westbrook CK Castaldi MJ Senkan SM CST 116:211
+!MAR/TSA97 Marinov NM Castaldi MJ Melius CF Tsang W CST 128:295-342
+!MAR/HER83 Martinez RI Herron JT 15:1127
+!MAS/BOW90 Masten DA Hanson RK Bowman CT JPC 94:7119
+!MEL/EVL92 Melius C F Miller JA Evleth EM PCI 24:621-628
+!MIC92     Michael JV PECS 18:327
+!MIC/SU99  Michael JV Kumaran SS Su MCM JPCA 103:5942
+!MEB/MOR97 Mebel AM Lin MC Yu T Morokuma K JPCA 101:3189
+!MEB/MEL98 AM Mebel,MC Lin,CF Melius JPCA 102:1803
+!MIL/MEL88 C2H2+OH
+!MIL/ROB00 Miller JA Klippenstein SJ Robertson SH PCI 28:1479
+!MUE/DRY98 MA Mueller,RA Yetter,FL Dryer PCI 27:177
+!MUE/DRY99 MA Mueller,RA Yetter,FL Dryer IJCK 31:705
+!MUE/DRY00 MA Mueller,RA Yetter,FL Dryer IJCK 32:317-329
+!NBS86     W Tsang, RF Hampson, JPCRD 15:1087
+!NBS87     Tsang W JPCRD 16:471
+!NBS91     W Tsang JPCRD 20:609
+!OHM/WAS90 K Ohmori,A Miyoshi,H Matsui,N Washida JPC 94:3253
+!PAR/LIN97 NH2+NO2
+!PAR/LIN98 J Park,ND Giles,J Moore,MC Lin JPCA 102:10099
+!PEN/MAR99 Peng J HU X Marshall P JPCA 103:5307-5311
+!PER84     Perry RA CF 58:221
+!PER/MIL96 RA Perry, JA Miller, IJCK 28:217
+!PLA/BAR89 JMC Plane, B Rajasekhar, L Bartolotti, JCP 91:6177
+!PLA/BAR90 JMC Plane, B Rajasekhar, L Bartolotti, JPC 94:4161
+!PLA/TRO84 Plach HJ Troe J IJCK 16:1531
+!PRE/FLY00 Press JM Fockenberg C Flynn GW JPCA 104:6755-6763
+!RAV/THO85 Ravishankara AR Wine PH Wells JR Thompson RL IJCK 17:1281
+!RIC/HOW99 Richter H Grieco WJ Howard JB CF 119:1-22
+!RIL/FON01 PS Riley B Cosic A Fontijn submitted 2003
+!RIM/HER98 Rim, Hershberger CH+NO2
+!ROY/FRA97 Roy K Frank P Proc 21 Symp Shock Waves paper 1560
+!SAL/HAN84 NH3+OH
+!SCH/STE92 K Schofield M Steinberg JPC 96:715-726 
+!SHA/HOW96 Shandross R A Longwell JP Howard JB PCI 26:711-719
+!SHI/MAT96 Shiina H Oya M Yamashita K Miyoshi A Matsui H JPCA 100:2136
+!SHI/MAT98 Shiina H Miyoshi A Matsui H JPCA 102:3556
+!SIE/ZET95 Siese M Zetzsch C ZPC (Munich) 188:75-89
+!SIL/KOL84 JA Silver, AC Stanton, MS Zahniser, CE Kolb JPC 88:3123-3129
+!SIL86     JA Silver JCP 84:4718-4720
+!SIL/KOL86 JA Silver CE Kolb JPC 90:3267-3269
+!SIN/CVE78 Singleton DL Cvetanovic RJ Can J Chem 56:2934 
+!SIN/CVE88 Singleton DL Cvetanovic RJ JPCRD 17:1377
+!SKI/BUR72 Skinner GB Lifshitz A Scheller K Burcat A JCP 56:3853
+!SLA/MIL88 IR Slagle,D Sarzynski,D Gutman,JA Miller,CF Melius JCSFT2 84:491
+!SLE/WAR77 F Slemr, P Warneck IJCK 9:267
+!SOT/PAG92 MR Soto, M Page JCP 97:7287
+!STE/GLA87 Stephens JW Hall JL Solka H Yan W-B Curl RF Glass GP JPC 91:5740
+!SUT/MIC01 Sutherland JW Su M-C Michael JV IJCK 33:669-684
+!TAL/HOW86 CL Talcott JW Ager III CJ Howard JCP 84:6161-6169
+!TAN/DAG94 Tan Y Dagaut P Cathonnet M Boettner JC CST 102:21
+!TEM/WOL92 Temps F Wagner HGg Wolf M Z Phys Chem (Munich) 176:27-39
+!TRO78     Troe J Ann Rev PC 29:223
+!TSU/DUP94 Tsuchiya K Yokoyama K Matsui H Oya M Dupre G JPC 98;8419
+!TSU/MAT97 Tsuchiya K Kamiya K Matsui H IJCK 29:57
+!TYN/RAV91 Tyndall GS Ravishankara AR IJCK 23:483
+!VAG/RAV90 GL Vaghjiani, AR Ravishankara IJCK 22:351
+!YAR/SUT91 G Yarwood,JW Sutherland,MA Wickramaaratchi,RB Klemm JPC 95:8771
+!YU/FRE91  CL Yu, C Wang, M Frenklach, 24 ESS-Fall, paper 61
+!YU/FRE95  Yu CL Wang C Frenklach M JPC 99:14377
+!YU/MEL94  Yu T Lin M C Melius CF IJCK 26:1095-1104
+!VEN/PEE90 van de Ven P Peeters J Bull Soc Chim Belg 99:509-516
+!VEY/LES81 Veyret B Lesclaux R JPC 85:1918
+!WAN/FRE97 Wang H Frenklach M CF 110:173
+!WAN/BRE98 Wang H Brezinsky K JPCA 102:1530
+!WAR84     Warnatz J Combustion Chemistry, ed WC Gardiner Jr Springer-Verlag,NY (1984)
+!WES/LON89 Westmoreland PR Dean AM Howard JB Longwell JP JPC 93:8171-8180
+!WOI/ROT95 Woiki D Roth P IJCK 27:59-71
+!ZHA/BAC90 Zhang H-X Back MH IJCK 22:21
+!ZHO/BOZ98 Zhong X Bozzelli JW JPCA 102:3537
+!ZHU/LIN01 Zhu R Lin MC JPCA 105:6243-6248
+
+
+
+
+ ! BEC/WIE95: KH Becker, R Kurtenbach, P Wiesen, JPC 99,5986,1995
+ ! BIG/CAR93:P Biggs,CE Casona-Mas,J-M Fracheboud,AD Parr,DE Shallcross,
+ !           RP Wayne,F Caralp, JCSFT 89,4163,1993
+ ! BLU/WAG73: B Blumenberg, HGg Wagner, BBPC 77,253,1973
+ ! BOG/HAN78: DJ Bogan, CW Hand, JPC 82,2067,1978
+ ! BOT/COH91: JF Bott, N Cohen, IJCK 23,1075,1991
+ ! BOZ/DEA90: JW Bozzelli, AM Dean, JPC 94,3313,1990
+ ! BRY/SAR93: MGBryukow,AAKachanov,RTimonen,JSeetula,JVandooren,
+              OMSarsikov, CPL 208,392,1993
+ ! BUR/RAV92:JBBurkholder,AMellouki,RTalukdar,ARRavishankara,IJCK24,711
+ ! COB/TRO85: CJ Cobos, H Hippler, J Troe, JPC 89,342,1985
+ ! DAR/MOO95: DC Darwin, CB Moore, JPC 99,13467,1995
+ ! DAV/HAN91: DF Davidson, AJ Dean, MD DiRosa, RK Hanson, IJCK23,1035,1991
+ ! DAV/HAN91B: DF Davidson, RK Hanson, 23SIC267,1991
+ ! DAV/HAN91C: DFDavidson,MDDiRosa,AYChang,RK Hanson, 18ISSH,1991
+ ! DUR/TUL89: JL Durant, FP Tully, CPL 154,568,1989
+ ! GEH/WAG69: MVGehring,KHoyermann,HGgWagner,JWolfrum, BBPC 73,956,1969
+ ! GLA94: PGlarborg, PGKristensen, SHJensen, KDam-Johansen, CF98,241,1994
+ ! GLA94B: P Glarborg, JE Johnsson, K Dam-Johansen, CF99,523,1994
+ ! 94sncrB: P Glarborg, JA Miller, CF 99,475, 1994
+ ! GLA/MIL95: P Glarborg, K Dam-Johansen, JA Miller, IJCK 27,1207,1995
+ ! GLA/TRO74: K Glaenzer, J Troe, BBPC 78,182,1974
+ ! GRO/JUS85: HHGrotheer,GRickert,UMeier,ThJust, BBPC89,187,1985
+ ! GRO/JUS89: HHGrotheer,GRickert,DWalter,ThJust, 22SIC963,1989
+ ! FUL/TRO98: DFulle,HFHamann,HHippler,JTroe JCP 108,5391,1998
+ ! HE/LIN89: Y He, E Kolby, P Shumaker, MC Lin, IJCK 21, 1015, 1989
+ ! HE/LIN92B: Y He, MC Lin, IJCK 24,743,1992
+ ! HER88: JT Herron, JPCRF 17,967,1988
+ ! HWA/RAB99: SMHwang,SORyu,KJDWitt,MJRabinowitz JCPA 103,5949,1999
+ ! HIP/TRO92: H Hippler, J Troe, J Willner, JCP 93,1755,1992
+ ! HIP/TRO95: H Hippler, H Neunaber, J Troe, JCP 103,3510,1995
+ ! HIP/TRO95: H Hippler, H Neunaber, J Troe, JCP 103,3510,1995
+ ! LIF83: A Lifshitz, H Ben-Hamou JPC 87, 1782, 1983
+ ! MAR/STI89:GMarston,FLNesbitt,DFNava,WAPayne,LJStief,JPC93,5769,1993
+ ! MES/CAR81: IMessing,SVFilseth,CMSadowski,TCarrington, JCP74,3874,1981
+ ! MIC99: JV Michael,SSKumaran,MCSu JPCA 103,5942,1999
+ ! MIL82: JA Miller, RE Mitchell, MD Smooke, RJ Kee, 19SIC181, 1982
+ ! MIL83: JA Miller, MD Smooke, RM Green, RJ Kee, CST34,149,1983
+ ! MIL/BOW92: JA Miller, CT Bowman, IJCK
+ ! MIL/95cono: JA Miller, P Glarborg, SSCP, in press
+ ! MIL/MEL92: JA Miller, CF Melius, CF 91,21,1992
+ ! MIL/MEL92B: JA Miller, CF Melius, IJCK 24,421,1992
+ ! MIL/MEL92C: JA Miller, CF Melius, 24SIC719,1992
+ ! MIL94: JA Miller, JF Durant, CF Melius, unpublished results
+ ! NBS87: W Tsang, JPCRD 16,471,1987
+ ! NES/STI99: FLNesbitt,JFGleason,LJStief JPC-A 103,3039,1999
+ ! PAY/STI96: WAPayne,PSMonks,FLNesbitt,LJStief JCP 104,9808,1996
+ ! PEE95: J Peeters, W Boullart, K Devriendt, JPC 99,3583,1995
+ ! PHI79: LF Philips, CF 35,233,1979
+ ! RAB/SUT91: MJRabinovich,JWSutherland,PMPatterson,RBKlemm, JPC 95,674,1991
+ ! ROH/HAN97: MRohrig,ELPetersen,DFDavidson,RKHanson IJCK29,483,1997
+ ! ROH/WAG94: M Rohrig, HGg Wagner, 25SIC973,1994
+ ! ROH/WAG95: M Rohrig, HJRomming, HGg Wagner, BBPC,99,105,1995
+ ! SLA77: MW Slack, CF 28,241,1977
+ ! STE/GLA87:JWStephens,JLHall,HSolka,WBYan,RFCurl,GPGlass,JPC91,5740,1987
+ ! SUT86: JW Sutherland, PM Patterson, RB Klemm, JPC 94,2471,1990
+ ! TIM/GUT87: RS Timonen, E Ratajczak, D Gutman, AF Wagner, JPC 91,5325,1987
+ ! VAG96: Vaghjiani, JCP 104,5479,1996
+ ! WAG/GUT90: AF Wagner, IR Slagle, D Sarzynski, D Gutman JPC 94,1853,1990
+ ! WIL69: KA Wilde, CF 13,173,1969
+

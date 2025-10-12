@@ -1,0 +1,5 @@
+usage: __main__.py [-h] -l {c,cuda,fortran,matlab} -i INPUT [-t THERMO]
+                   [-ic INITIAL_CONDITIONS] [-co] [-nosmem] [-pshare]
+                   [-nb NUM_BLOCKS] [-nt NUM_THREADS] [-mt MULTI_THREAD]
+                   [-fopt] [-b BUILD_PATH] [-ls LAST_SPECIES] [-ad] [-sj]
+__main__.py: error: unrecognized arguments: -LAST_SPECIES N2

@@ -1,0 +1,25 @@
+ELEMENTS
+C  H  O  N
+END
+
+SPECIES
+C12H23 CH H N2 H2 NH HO2 NO O O2 H2O OH CO CO2 C2H2 N
+END
+
+REACTIONS
+! Reaction 1
+C12H23 + O2 = 12CO + 11.5H2    1.0E12  0.0  30000.0
+
+! Reaction 2
+CO + OH = CO2 + H              1.5E07  1.3  -758.0
+
+! Reaction 3
+H + O2 = OH + O                1.9E14  0.0  16450.0
+
+! Reaction 4
+O + H2 = OH + H                5.1E04  2.67  6290.0
+
+! Reaction 5
+OH + H2 = H2O + H              2.2E13  0.0  5150.0
+
+END

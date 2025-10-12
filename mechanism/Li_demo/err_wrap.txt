@@ -1,0 +1,9 @@
+In file included from /opt/anaconda3/lib/python3.8/site-packages/numpy/core/include/numpy/ndarraytypes.h:1940,
+                 from /opt/anaconda3/lib/python3.8/site-packages/numpy/core/include/numpy/ndarrayobject.h:12,
+                 from /opt/anaconda3/lib/python3.8/site-packages/numpy/core/include/numpy/arrayobject.h:5,
+                 from /opt/anaconda3/lib/python3.8/site-packages/pyjac/pywrap/pyjacob_wrapper.c:610:
+/opt/anaconda3/lib/python3.8/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h:17:2: warning: #warning "Using deprecated NumPy API, disable it with " "#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION" [-Wcpp]
+ #warning "Using deprecated NumPy API, disable it with " \
+  ^~~~~~~
+/opt/anaconda3/lib/python3.8/site-packages/Cython/Compiler/Main.py:369: FutureWarning: Cython directive 'language_level' not set, using 2 for now (Py2). This will change in a later release! File: /opt/anaconda3/lib/python3.8/site-packages/pyjac/pywrap/pyjacob_wrapper.pyx
+  tree = Parsing.p_module(s, pxd, full_module_name)

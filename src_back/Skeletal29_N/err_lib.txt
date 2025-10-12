@@ -1,0 +1,1 @@
+WARNING:root:Troe parameters in reaction 10 modified to avoid division by zero!.

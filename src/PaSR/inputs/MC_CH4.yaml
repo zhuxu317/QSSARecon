@@ -1,0 +1,16 @@
+# Input parameters for PaSR simulation.
+case: non-premixed
+mech: "mech/gri12.cti"
+mixing model: "MC"
+number of particles: 10
+temperature: 300.0
+pressure: 1.0
+equivalence ratio: 1.0
+residence time: 2.e-3
+mixing time: 0.7e-3
+number of residence times: 5
+fuel:
+  CH4: 1.0
+oxidizer:
+  O2: 0.21
+  N2: 0.79

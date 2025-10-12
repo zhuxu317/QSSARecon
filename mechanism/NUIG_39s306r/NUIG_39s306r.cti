@@ -1,0 +1,2311 @@
+"""
+-------------------------------------------------------
+  Authors: Yuxiang Zhu, Henry J. Curran, Chong-Wen Zhou*
+  Including:
+    - NH3 oxidation and related reactions
+    - NOx formation related reactions
+-------------------------------------------------------
+-------------------------------------------------------
+  Authors: Yuxiang Zhu, Henry J. Curran, Chong-Wen Zhou*
+  Including:
+    - NH3 oxidation and related reactions
+    - NOx formation related reactions
+-------------------------------------------------------
+"""
+
+units(length='cm', time='s', quantity='mol', act_energy='cal/mol')
+
+ideal_gas(name='gas',
+          elements="C H O N Ar He",
+          species="""H2O         NH3         NO          N2O
+                     N2          O2          H2          NO2
+                     AR          HE          H           O
+                     OH          HO2         H2O2        OHV
+                     NH2         NH          N           N2H4
+                     N2H3        N2H2        H2NN        NNH
+                     NO3         HNO         HON         H2NO
+                     HNOH        NH2OH       HONO        HNO2
+                     HONO2       t-ONNH      c-ONNH      ONHN
+                     H2NNO2      t-HNN(O)OH  c-HNN(O)OH  CO
+                     CO2         CH4         C2H6""",
+          reactions='all',
+          transport='Mix',
+          initial_state=state(temperature=300.0, pressure=OneAtm))
+
+#-------------------------------------------------------------------------------
+# Species data
+#-------------------------------------------------------------------------------
+
+species(name='H2O',
+        atoms='H:2 O:1',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 4.19863520E+00, -2.03640170E-03,  6.52034160E-06,
+                      -5.48792690E-09,  1.77196800E-12, -3.02937260E+04,
+                      -8.49009010E-01]),
+                NASA([1000.00, 6000.00],
+                     [ 2.67703890E+00,  2.97318160E-03, -7.73768890E-07,
+                       9.44335140E-11, -4.26899910E-15, -2.98858940E+04,
+                       6.88255000E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=2.943,
+                                well_depth=637.056,
+                                dipole=1.851,
+                                polar=1.407,
+                                rot_relax=4.0))
+
+species(name='NH3',
+        atoms='H:3 N:1',
+        thermo=(NASA([300.00, 1000.00],
+                     [ 2.20435200E+00,  1.01147600E-02, -1.46526500E-05,
+                       1.44723500E-08, -5.32850900E-12, -6.52548800E+03,
+                       8.12713800E+00]),
+                NASA([1000.00, 5000.00],
+                     [ 2.46190400E+00,  6.05916600E-03, -2.00497700E-06,
+                       3.13600300E-10, -1.93831700E-14, -6.49327000E+03,
+                       7.47209700E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=2.92,
+                                well_depth=481.0,
+                                dipole=1.47,
+                                rot_relax=10.0))
+
+species(name='NO',
+        atoms='N:1 O:1',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 4.15036687E+00, -4.08890008E-03,  9.38071726E-06,
+                      -7.50908901E-09,  2.11742798E-12,  9.77018679E+03,
+                       2.53971032E+00]),
+                NASA([1000.00, 3000.00],
+                     [ 2.79462839E+00,  2.12260586E-03, -1.11936971E-06,
+                       2.79521018E-10, -2.68625363E-14,  1.00019069E+04,
+                       8.88322674E+00])),
+        transport=gas_transport(geom='linear',
+                                diam=3.339,
+                                well_depth=139.32,
+                                dipole=0.2,
+                                polar=1.76,
+                                rot_relax=4.0))
+
+species(name='N2O',
+        atoms='N:2 O:1',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 2.49126356E+00,  9.16224976E-03, -8.24847853E-06,
+                       3.83289657E-09, -7.19461784E-13,  8.84938621E+03,
+                       9.80262335E+00]),
+                NASA([1000.00, 3000.00],
+                     [ 3.61316907E+00,  5.15970465E-03, -2.97227625E-06,
+                       8.00505298E-10, -8.26331952E-14,  8.60075126E+03,
+                       4.26880857E+00])),
+        transport=gas_transport(geom='linear',
+                                diam=3.828,
+                                well_depth=232.4,
+                                rot_relax=1.0))
+
+species(name='N2',
+        atoms='N:2',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 3.53100528E+00, -1.23660988E-04, -5.02999433E-07,
+                       2.43530612E-09, -1.40881235E-12, -1.04697628E+03,
+                       2.96747038E+00]),
+                NASA([1000.00, 6000.00],
+                     [ 2.95257637E+00,  1.39690040E-03, -4.92631603E-07,
+                       7.86010195E-11, -4.60755204E-15, -9.23948688E+02,
+                       5.87188762E+00])),
+        transport=gas_transport(geom='linear',
+                                diam=3.61,
+                                well_depth=97.839,
+                                polar=1.756,
+                                rot_relax=4.0))
+
+species(name='O2',
+        atoms='O:2',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 3.78245636E+00, -2.99673416E-03,  9.84730201E-06,
+                      -9.68129509E-09,  3.24372837E-12, -1.06394356E+03,
+                       3.65767573E+00]),
+                NASA([1000.00, 6000.00],
+                     [ 3.66096065E+00,  6.56365811E-04, -1.41149627E-07,
+                       2.05797935E-11, -1.29913436E-15, -1.21597718E+03,
+                       3.41536279E+00])),
+        transport=gas_transport(geom='linear',
+                                diam=3.069,
+                                well_depth=676.424,
+                                polar=1.487,
+                                rot_relax=3.8))
+
+species(name='H2',
+        atoms='H:2',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 2.34433112E+00,  7.98052075E-03, -1.94781510E-05,
+                       2.01572094E-08, -7.37611761E-12, -9.17935173E+02,
+                       6.83010238E-01]),
+                NASA([1000.00, 6000.00],
+                     [ 2.93286575E+00,  8.26608026E-04, -1.46402364E-07,
+                       1.54100414E-11, -6.88804800E-16, -8.13065581E+02,
+                      -1.02432865E+00])),
+        transport=gas_transport(geom='linear',
+                                diam=2.19,
+                                well_depth=304.69,
+                                polar=0.775,
+                                rot_relax=280.0))
+
+species(name='NO2',
+        atoms='N:1 O:2',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 3.39100918E+00,  2.62448348E-03,  5.09790306E-06,
+                      -7.62120493E-09,  2.79960135E-12,  2.78130679E+03,
+                       8.57220275E+00]),
+                NASA([1000.00, 3000.00],
+                     [ 3.65239279E+00,  4.71632310E-03, -2.74591748E-06,
+                       7.45382834E-10, -7.63891108E-14,  2.57216137E+03,
+                       6.52683440E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.852,
+                                well_depth=333.59,
+                                dipole=0.4,
+                                rot_relax=1.0))
+
+species(name='AR',
+        atoms='Ar:1',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 2.50000000E+00,  0.00000000E+00,  0.00000000E+00,
+                       0.00000000E+00,  0.00000000E+00, -7.45375000E+02,
+                       4.37967491E+00]),
+                NASA([1000.00, 6000.00],
+                     [ 2.50000000E+00,  0.00000000E+00,  0.00000000E+00,
+                       0.00000000E+00,  0.00000000E+00, -7.45375000E+02,
+                       4.37967491E+00])),
+        transport=gas_transport(geom='atom',
+                                diam=3.462,
+                                well_depth=127.697,
+                                polar=1.609,
+                                rot_relax=2.0))
+
+species(name='HE',
+        atoms='He:1',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 2.50000000E+00,  0.00000000E+00,  0.00000000E+00,
+                       0.00000000E+00,  0.00000000E+00, -7.45375000E+02,
+                       9.28723974E-01]),
+                NASA([1000.00, 6000.00],
+                     [ 2.50000000E+00,  0.00000000E+00,  0.00000000E+00,
+                       0.00000000E+00,  0.00000000E+00, -7.45375000E+02,
+                       9.28723974E-01])),
+        transport=gas_transport(geom='atom',
+                                diam=2.715,
+                                well_depth=11.442,
+                                polar=0.204,
+                                rot_relax=2.0))
+
+species(name='H',
+        atoms='H:1',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 2.50000000E+00,  0.00000000E+00,  0.00000000E+00,
+                       0.00000000E+00,  0.00000000E+00,  2.54736600E+04,
+                      -4.46682850E-01]),
+                NASA([1000.00, 6000.00],
+                     [ 2.50000000E+00,  0.00000000E+00,  0.00000000E+00,
+                       0.00000000E+00,  0.00000000E+00,  2.54736600E+04,
+                      -4.46682850E-01])),
+        transport=gas_transport(geom='atom',
+                                diam=1.842,
+                                well_depth=541.672,
+                                polar=0.666))
+
+species(name='O',
+        atoms='O:1',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 3.16826710E+00, -3.27931884E-03,  6.64306396E-06,
+                      -6.12806624E-09,  2.11265971E-12,  2.91222592E+04,
+                       2.05193346E+00]),
+                NASA([1000.00, 6000.00],
+                     [ 2.54363697E+00, -2.73162486E-05, -4.19029520E-09,
+                       4.95481845E-12, -4.79553694E-16,  2.92260120E+04,
+                       4.92229457E+00])),
+        transport=gas_transport(geom='atom',
+                                diam=2.485,
+                                well_depth=235.686,
+                                polar=0.744))
+
+species(name='OH',
+        atoms='H:1 O:1',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 3.99198424E+00, -2.40106655E-03,  4.61664033E-06,
+                      -3.87916306E-09,  1.36319502E-12,  3.36889836E+03,
+                      -1.03998477E-01]),
+                NASA([1000.00, 6000.00],
+                     [ 2.83853033E+00,  1.10741289E-03, -2.94000209E-07,
+                       4.20698729E-11, -2.42289890E-15,  3.69780808E+03,
+                       5.84494652E+00])),
+        transport=gas_transport(geom='linear',
+                                diam=2.582,
+                                well_depth=514.598,
+                                dipole=1.635,
+                                polar=1.077))
+
+species(name='HO2',
+        atoms='H:1 O:2',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 4.30179807E+00, -4.74912097E-03,  2.11582905E-05,
+                      -2.42763914E-08,  9.29225225E-12,  2.64018485E+02,
+                       3.71666220E+00]),
+                NASA([1000.00, 5000.00],
+                     [ 4.17228741E+00,  1.88117627E-03, -3.46277286E-07,
+                       1.94657549E-11,  1.76256905E-16,  3.10206839E+01,
+                       2.95767672E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.129,
+                                well_depth=963.003,
+                                dipole=2.146,
+                                polar=1.959,
+                                rot_relax=3.8))
+
+species(name='H2O2',
+        atoms='H:2 O:2',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 4.31515149E+00, -8.47390622E-04,  1.76404323E-05,
+                      -2.26762944E-08,  9.08950158E-12, -1.77067437E+04,
+                       3.27373319E+00]),
+                NASA([1000.00, 6000.00],
+                     [ 4.57977305E+00,  4.05326003E-03, -1.29844730E-06,
+                       1.98211400E-10, -1.13968792E-14, -1.80071775E+04,
+                       6.64970694E-01])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.179,
+                                well_depth=1361.148,
+                                dipole=1.702,
+                                polar=2.239,
+                                rot_relax=3.8))
+
+species(name='OHV',
+        atoms='H:1 O:1',
+        thermo=(NASA([300.00, 1710.00],
+                     [ 3.41896226E+00,  3.19255801E-04, -3.08292717E-07,
+                       3.64407494E-10, -1.00195479E-13,  5.00756946E+04,
+                       2.51917016E+00]),
+                NASA([1710.00, 5000.00],
+                     [ 2.85376040E+00,  1.02994334E-03, -2.32666477E-07,
+                       1.93750704E-11, -3.15759847E-16,  5.03225473E+04,
+                       5.76240468E+00])),
+        transport=gas_transport(geom='linear',
+                                diam=2.75,
+                                well_depth=80.0))
+
+species(name='NH2',
+        atoms='H:2 N:1',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 3.97883538E+00, -5.13888088E-04,  2.68436156E-06,
+                      -9.18832600E-10, -9.82251152E-14,  2.12486673E+04,
+                       7.77619668E-01]),
+                NASA([1000.00, 3000.00],
+                     [ 2.62839610E+00,  3.44379888E-03, -1.08606365E-06,
+                       1.50714038E-10, -4.59423280E-15,  2.15909586E+04,
+                       7.65372613E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=2.65,
+                                well_depth=80.0,
+                                polar=2.26,
+                                rot_relax=4.0))
+
+species(name='NH',
+        atoms='H:1 N:1',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 3.44697209E+00,  5.57847818E-04, -2.00289360E-06,
+                       2.85952922E-09, -1.12434284E-12,  4.17899268E+04,
+                       2.02990852E+00]),
+                NASA([1000.00, 3000.00],
+                     [ 2.95100955E+00,  9.09994439E-04, -8.35582439E-08,
+                      -5.17312027E-11,  1.13981436E-14,  4.19707045E+04,
+                       4.83056694E+00])),
+        transport=gas_transport(geom='linear',
+                                diam=2.65,
+                                well_depth=80.0,
+                                rot_relax=4.0))
+
+species(name='N',
+        atoms='N:1',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 2.49976643E+00,  5.02149594E-07,  1.93091211E-09,
+                      -4.94632629E-12,  2.74089506E-15,  5.60760710E+04,
+                       4.19499326E+00]),
+                NASA([1000.00, 6000.00],
+                     [ 2.41604245E+00,  1.74663766E-04, -1.18864562E-07,
+                       3.01850054E-11, -2.03260159E-15,  5.61051512E+04,
+                       4.64905706E+00])),
+        transport=gas_transport(geom='atom',
+                                diam=3.298,
+                                well_depth=71.4))
+
+species(name='N2H4',
+        atoms='H:4 N:2',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 9.42542945E-01,  2.13488271E-02, -1.88705886E-05,
+                       1.00963087E-08, -2.30996292E-12,  1.09652651E+04,
+                       1.75719609E+01]),
+                NASA([1000.00, 3000.00],
+                     [ 3.21893892E+00,  1.23204128E-02, -5.44372150E-06,
+                       1.22223350E-09, -1.10736520E-13,  1.05061274E+04,
+                       6.57037382E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=4.23,
+                                well_depth=205.0,
+                                polar=4.26,
+                                rot_relax=1.5))
+
+species(name='N2H3',
+        atoms='H:3 N:2',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 3.80271862E+00,  5.52764141E-03,  6.84860021E-07,
+                      -2.00296493E-09,  6.21445742E-13,  2.57522809E+04,
+                       5.58213774E+00]),
+                NASA([1000.00, 3000.00],
+                     [ 3.20302281E+00,  7.99162955E-03, -3.10892955E-06,
+                       5.91433018E-10, -4.34549709E-14,  2.58689598E+04,
+                       8.45902214E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.9,
+                                well_depth=200.0,
+                                rot_relax=1.0))
+
+species(name='N2H2',
+        atoms='H:2 N:2',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 4.06590870E+00, -4.34024418E-03,  2.13250316E-05,
+                      -1.96839880E-08,  5.96855172E-12,  2.32953530E+04,
+                       3.56067162E+00]),
+                NASA([1000.00, 3000.00],
+                     [ 1.53340891E+00,  9.32034303E-03, -4.46173127E-06,
+                       1.03777534E-09, -9.45361252E-14,  2.36253236E+04,
+                       1.48958722E+01])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.798,
+                                well_depth=71.4,
+                                rot_relax=1.0))
+
+species(name='H2NN',
+        atoms='H:2 N:2',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 3.87707453E+00, -2.65244519E-03,  1.86066175E-05,
+                      -1.76694483E-08,  5.38800676E-12,  3.52637434E+04,
+                       4.23249694E+00]),
+                NASA([1000.00, 3000.00],
+                     [ 1.46257631E+00,  1.01013888E-02, -5.16789506E-06,
+                       1.27606779E-09, -1.22332550E-13,  3.55918510E+04,
+                       1.51070949E+01])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.798,
+                                well_depth=71.4,
+                                rot_relax=1.0))
+
+species(name='NNH',
+        atoms='H:1 N:2',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 4.25474632E+00, -3.45098298E-03,  1.37788699E-05,
+                      -1.33263744E-08,  4.41023397E-12,  2.85807437E+04,
+                       3.28551762E+00]),
+                NASA([1000.00, 6000.00],
+                     [ 3.42744423E+00,  3.23295234E-03, -1.17296299E-06,
+                       1.90508356E-10, -1.14491506E-14,  2.85551384E+04,
+                       6.39209233E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.798,
+                                well_depth=71.4,
+                                rot_relax=1.0))
+
+species(name='NO3',
+        atoms='N:1 O:3',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 3.09446759E+00,  1.51014573E-02, -1.26448498E-05,
+                       3.67237581E-09,  8.62184172E-14,  7.18626632E+03,
+                       1.04314685E+01]),
+                NASA([1000.00, 3000.00],
+                     [ 6.38293838E+00,  5.42422503E-03, -3.34397780E-06,
+                       9.48445417E-10, -1.01961714E-13,  6.35473962E+03,
+                      -6.30266486E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=4.2,
+                                well_depth=400.0,
+                                dipole=0.2,
+                                rot_relax=1.0))
+
+species(name='HNO',
+        atoms='H:1 N:1 O:1',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 4.51988078E+00, -5.42507623E-03,  1.70239636E-05,
+                      -1.48708172E-08,  4.44763498E-12,  1.17637925E+04,
+                       1.75618526E+00]),
+                NASA([1000.00, 3000.00],
+                     [ 2.58819802E+00,  4.87708822E-03, -2.29243315E-06,
+                       5.82214028E-10, -5.94811743E-14,  1.20213574E+04,
+                       1.04315796E+01])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.43,
+                                well_depth=170.0,
+                                dipole=1.62,
+                                rot_relax=1.0))
+
+species(name='HON',
+        atoms='H:1 N:1 O:1',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 3.05581786E+00,  4.43591111E-03, -1.22219840E-06,
+                      -1.14007451E-09,  6.69025432E-13,  2.46094424E+04,
+                       9.08279393E+00]),
+                NASA([1000.00, 3000.00],
+                     [ 3.71174626E+00,  3.16088951E-03, -1.33270405E-06,
+                       2.82287945E-10, -2.37381901E-14,  2.44108221E+04,
+                       5.58114551E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.492,
+                                well_depth=116.7,
+                                rot_relax=1.0))
+
+species(name='H2NO',
+        atoms='H:2 N:1 O:1',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 3.93370869E+00,  2.21175605E-03,  5.86220201E-06,
+                      -6.72931776E-09,  2.17836171E-12,  6.59507215E+03,
+                       4.42022091E+00]),
+                NASA([1000.00, 3000.00],
+                     [ 3.36485636E+00,  6.13307432E-03, -2.48863886E-06,
+                       4.83818467E-10, -3.63995936E-14,  6.62654717E+03,
+                       6.75312730E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.492,
+                                well_depth=116.7,
+                                rot_relax=1.0))
+
+species(name='HNOH',
+        atoms='H:2 N:1 O:1',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 2.95651985E+00,  4.25182310E-03,  8.05096459E-06,
+                      -1.06999953E-08,  3.62571809E-12,  1.02709524E+04,
+                       9.01260159E+00]),
+                NASA([1000.00, 3000.00],
+                     [ 1.99860924E+00,  1.09126316E-02, -6.18399709E-06,
+                       1.61914516E-09, -1.61358511E-13,  1.03210763E+04,
+                       1.29266751E+01])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.492,
+                                well_depth=116.7,
+                                rot_relax=1.0))
+
+species(name='NH2OH',
+        atoms='H:3 N:1 O:1',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 2.43399499E+00,  8.76264006E-03,  7.67848905E-06,
+                      -1.49985749E-08,  5.93967032E-12, -6.07272284E+03,
+                       1.15653845E+01]),
+                NASA([1000.00, 3000.00],
+                     [ 4.54616899E+00,  8.46242727E-03, -4.09391661E-06,
+                       9.98178715E-10, -9.66389018E-14, -6.90258180E+03,
+                      -6.61754964E-01])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.492,
+                                well_depth=116.7,
+                                rot_relax=1.0))
+
+species(name='HONO',
+        atoms='H:1 N:1 O:2',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 3.49106617E+00,  6.81116875E-03, -1.30943120E-06,
+                      -2.34197204E-09,  1.18931535E-12, -1.05722865E+04,
+                       8.99803804E+00]),
+                NASA([1000.00, 3000.00],
+                     [ 4.19966671E+00,  5.94217338E-03, -2.95404834E-06,
+                       7.19846187E-10, -6.74909061E-14, -1.08122769E+04,
+                       5.08809833E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.95,
+                                well_depth=350.0,
+                                dipole=1.639,
+                                rot_relax=1.0))
+
+species(name='HNO2',
+        atoms='H:1 N:1 O:2',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 2.86816457E+00,  4.08036347E-03,  9.55139253E-06,
+                      -1.29604691E-08,  4.57373772E-12, -6.42160346E+03,
+                       1.07615202E+01]),
+                NASA([1000.00, 3000.00],
+                     [ 2.71886798E+00,  9.23249468E-03, -5.00922160E-06,
+                       1.30155189E-09, -1.30503734E-13, -6.61949139E+03,
+                       1.03430537E+01])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.95,
+                                well_depth=350.0,
+                                dipole=1.639,
+                                rot_relax=1.0))
+
+species(name='HONO2',
+        atoms='H:1 N:1 O:3',
+        thermo=(NASA([298.15, 1000.00],
+                     [ 1.03437078E+00,  2.44807579E-02, -2.31762285E-05,
+                       1.03094550E-08, -1.64107287E-12, -1.75562224E+04,
+                       1.98358158E+01]),
+                NASA([1000.00, 3000.00],
+                     [ 5.28851491E+00,  1.02507554E-02, -6.01108580E-06,
+                       1.65260052E-09, -1.73502753E-13, -1.85463799E+04,
+                      -1.38461402E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=4.2,
+                                well_depth=400.0,
+                                dipole=0.2,
+                                rot_relax=1.0))
+
+species(name='t-ONNH',
+        atoms='H:1 N:2 O:1',
+        thermo=(NASA([300.00, 1000.00],
+                     [ 2.20617370E+00,  1.10153550E-02, -6.36109190E-06,
+                       1.22732170E-09,  3.40434270E-14,  2.32676400E+04,
+                       1.42916460E+01]),
+                NASA([1000.00, 4000.00],
+                     [ 4.33545690E+00,  5.93097880E-03, -2.65932640E-06,
+                       5.59787550E-10, -4.50945980E-14,  2.26293340E+04,
+                       3.05886820E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.828,
+                                well_depth=232.4,
+                                rot_relax=1.0))
+
+species(name='c-ONNH',
+        atoms='H:1 N:2 O:1',
+        thermo=(NASA([300.00, 1000.00],
+                     [ 2.22713520E+00,  1.18382350E-02, -8.60298140E-06,
+                       3.48944520E-09, -7.54459850E-13,  2.63106600E+04,
+                       1.41518430E+01]),
+                NASA([1000.00, 4000.00],
+                     [ 4.42623830E+00,  5.93706560E-03, -2.68956900E-06,
+                       5.69715990E-10, -4.60768050E-14,  2.56792600E+04,
+                       2.70158780E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.828,
+                                well_depth=232.4,
+                                rot_relax=1.0))
+
+species(name='ONHN',
+        atoms='H:1 N:2 O:1',
+        thermo=(NASA([300.00, 1000.00],
+                     [ 2.41194860E+00,  9.37329300E-03, -2.53892520E-06,
+                      -2.06554700E-09,  1.01307710E-12,  3.48266210E+04,
+                       1.37446530E+01]),
+                NASA([1000.00, 4000.00],
+                     [ 4.24542000E+00,  6.26181670E-03, -2.87972550E-06,
+                       6.16597350E-10, -5.02619020E-14,  3.42046200E+04,
+                       3.73314540E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.828,
+                                well_depth=232.4,
+                                rot_relax=1.0))
+
+species(name='H2NNO2',
+        atoms='H:2 N:2 O:2',
+        thermo=(NASA([300.00, 1000.00],
+                     [ 3.28592470E-01,  2.91133220E-02, -2.94541460E-05,
+                       1.68195760E-08, -4.24891260E-12, -2.13629670E+01,
+                       2.30264540E+01]),
+                NASA([1000.00, 4000.00],
+                     [ 6.12753110E+00,  9.94876810E-03, -4.34434280E-06,
+                       8.97876740E-10, -7.14012450E-14, -1.46303650E+03,
+                      -6.15868740E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.828,
+                                well_depth=232.4,
+                                rot_relax=1.0))
+
+species(name='t-HNN(O)OH',
+        atoms='H:2 N:2 O:2',
+        thermo=(NASA([300.00, 1000.00],
+                     [-1.31976750E-01,  3.24068340E-02, -3.56638440E-05,
+                       2.16752310E-08, -5.64070280E-12,  9.12462170E+03,
+                       2.49041370E+01]),
+                NASA([1000.00, 4000.00],
+                     [ 6.45850650E+00,  9.55194370E-03, -4.15271650E-06,
+                       8.55715180E-10, -6.79066950E-14,  7.54819440E+03,
+                      -7.97534210E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.828,
+                                well_depth=232.4,
+                                rot_relax=1.0))
+
+species(name='c-HNN(O)OH',
+        atoms='H:2 N:2 O:2',
+        thermo=(NASA([300.00, 1000.00],
+                     [-3.87692140E-02,  3.32056340E-02, -3.80708790E-05,
+                       2.39715710E-08, -6.37815570E-12,  4.42837840E+03,
+                       2.43760950E+01]),
+                NASA([1000.00, 4000.00],
+                     [ 6.66040280E+00,  9.28593550E-03, -4.01607400E-06,
+                       8.24368940E-10, -6.52317950E-14,  2.86166980E+03,
+                      -8.87034690E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.828,
+                                well_depth=232.4,
+                                rot_relax=1.0))
+
+species(name='CO',
+        atoms='C:1 O:1',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 3.57953350E+00, -6.10353690E-04,  1.01681430E-06,
+                       9.07005860E-10, -9.04424490E-13, -1.43440860E+04,
+                       3.50840930E+00]),
+                NASA([1000.00, 6000.00],
+                     [ 3.04848590E+00,  1.35172810E-03, -4.85794050E-07,
+                       7.88536440E-11, -4.69807460E-15, -1.42661170E+04,
+                       6.01709770E+00])),
+        transport=gas_transport(geom='linear',
+                                diam=3.65,
+                                well_depth=98.1,
+                                polar=1.95,
+                                rot_relax=1.8))
+
+species(name='CO2',
+        atoms='C:1 O:2',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 2.35681300E+00,  8.98412990E-03, -7.12206320E-06,
+                       2.45730080E-09, -1.42885480E-13, -4.83719710E+04,
+                       9.90090350E+00]),
+                NASA([1000.00, 6000.00],
+                     [ 4.63651110E+00,  2.74145690E-03, -9.95897590E-07,
+                       1.60386660E-10, -9.16198570E-15, -4.90249040E+04,
+                      -1.93489550E+00])),
+        transport=gas_transport(geom='linear',
+                                diam=3.763,
+                                well_depth=244.0,
+                                polar=2.65,
+                                rot_relax=2.1))
+
+species(name='CH4',
+        atoms='C:1 H:4',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 5.14911468E+00, -1.36622009E-02,  4.91453921E-05,
+                      -4.84246767E-08,  1.66603441E-11, -1.02465983E+04,
+                      -4.63848842E+00]),
+                NASA([1000.00, 6000.00],
+                     [ 1.65326226E+00,  1.00263099E-02, -3.31661238E-06,
+                       5.36483138E-10, -3.14696758E-14, -1.00095936E+04,
+                       9.90506283E+00])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=3.746,
+                                well_depth=141.4,
+                                polar=2.6,
+                                rot_relax=13.0))
+
+species(name='C2H6',
+        atoms='C:2 H:6',
+        thermo=(NASA([200.00, 1000.00],
+                     [ 4.29142572E+00, -5.50154901E-03,  5.99438458E-05,
+                      -7.08466469E-08,  2.68685836E-11, -1.15222056E+04,
+                       2.66678994E+00]),
+                NASA([1000.00, 6000.00],
+                     [ 4.04666411E+00,  1.53538802E-02, -5.47039485E-06,
+                       8.77826544E-10, -5.23167531E-14, -1.24473499E+04,
+                      -9.68698313E-01])),
+        transport=gas_transport(geom='nonlinear',
+                                diam=4.35,
+                                well_depth=247.5,
+                                rot_relax=1.5))
+
+#-------------------------------------------------------------------------------
+# Reaction data
+#-------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+#   H2/O2 subset
+# ---------------------------------------------------------------------------
+
+# Reaction 1
+three_body_reaction('H2 + M <=> 2 H + M', [4.577000e+19, -1.4, 104400.0],
+                    efficiencies='C2H6:3.0 CH4:2.0 CO:1.9 CO2:3.8 H2:2.5 H2O:12.0 HE:0.83 O2:0.0')
+# \Author: AK !\Ref: TSANG AND HAMPSON, J. PHYS. CHEM. REF. DATA, 15 !\Comment: WARNING
+
+# Reaction 2
+reaction('H2 + O <=> H + OH', [3.650000e+06, 2.15065, 7380.68955],
+         options='duplicate')
+#  refit, 03/08/2023; H2 project rate constant at >1500 K & H2 project rate constant x 1.1 at 900-1200 K
+
+# Reaction 3
+reaction('H2 + O <=> H + OH', [-1.650000e+41, -7.46129, 43208.9365],
+         options=['negative_A', 'duplicate'])
+
+# Reaction 4
+reaction('H2 + OH <=> H + H2O', [2.200000e+08, 1.51, 3430.0])
+# \Ref: J.V.MICHAEL SUTHERLAND, J.PHYS.CHEM. 92(1988) 3853 !\Comment: WARNING
+
+# Reaction 5
+reaction('2 H + O2 <=> H2 + O2', [8.800000e+22, -1.835, 800.0])
+# \Ref: Michael P. Burke & Stephen J. Klippenstein, Nature Chemistry volume 9, pages1078 1082 (2017) !\Comment: (Ref added, YM)
+
+# Reaction 6
+reaction('2 H + O2 <=> 2 OH', [4.000000e+22, -1.835, 800.0])
+# \Ref: Michael P. Burke & Stephen J. Klippenstein, Nature Chemistry volume 9, pages1078 1082 (2017) !\Comment: (Ref added, YM)
+
+# Reaction 7
+reaction('H + O + O2 <=> OH + O2', [7.350000e+22, -1.835, 800.0])
+# \Ref: Michael P. Burke & Stephen J. Klippenstein, Nature Chemistry volume 9, pages1078 1082 (2017) !\Comment: (Ref added, YM)
+
+# Reaction 8
+reaction('H + OH + O2 <=> H2O + O2', [2.560000e+22, -1.835, 800.0])
+# \Ref: Michael P. Burke & Stephen J. Klippenstein, Nature Chemistry volume 9, pages1078 1082 (2017) !\Comment: (Ref added, YM)
+
+# Reaction 9
+three_body_reaction('2 O + M <=> O2 + M', [6.165000e+15, -0.5, 0.0],
+                    efficiencies='AR:0.83 C2H6:3.0 CH4:2.0 CO:1.9 CO2:3.8 H2:2.5 H2O:12.0 HE:0.83')
+# \Author: AK !\Ref: TSANG AND HAMPSON, J. PHYS. CHEM. REF. DATA, 15 !\Comment: WARNING
+
+# Reaction 10
+reaction('H + O2 <=> O + OH', [1.040000e+14, 0.0, 15286.0])
+# \Author: AK !\Ref: HONG ET AL. PROC. OF THE COMB. INST. 33(2011) 309?16 !\Comment: 2 PARAMETER FIT
+
+# Reaction 11
+falloff_reaction('H + OH (+ M) <=> H2O (+ M)',
+                 kf=[2.500000e+13, 0.234, -114.0],
+                 kf0=[4.530000e+21, -1.81, 492.0],
+                 efficiencies='AR:0.4 H2:1.5 H2O:13.0 HE:0.57 N2:1.0 O2:1.0',
+                 falloff=Troe(A=0.73, T3=1e-30, T1=1e+30, T2=1e+30))
+# \Author: ABS_TEST SP !\Ref: SELLEVAG, S. R.;J. PHYS. CHEM. A 2008, 112, 50855095 ! !\Comment: WARNING
+
+# Reaction 12
+reaction('2 OH <=> H2O + O', [2.880000e+06, 1.79, -1750.0])
+# \Author: WARNING !\Ref: G. ALTINAY, J. PHYS. CHEM. A, 118(2014), PP. 38-54 !\Comment: WARNING
+
+# Reaction 13
+three_body_reaction('H + O + M <=> OH + M', [4.714000e+18, -1.0, 0.0],
+                    efficiencies='AR:0.75 C2H6:3.0 CH4:2.0 CO:1.5 CO2:2.0 H2:2.5 H2O:12.0 HE:0.75 O2:0.0')
+# \Author: AK !\Ref: TSANG AND HAMPSON, J. PHYS. CHEM. REF. DATA, 15 !\Comment: WARNING
+
+# Reaction 14
+falloff_reaction('H2O2 (+ M) <=> 2 OH (+ M)',
+                 kf=[2.000000e+12, 0.9, 48749.0],
+                 kf0=[2.353018e+24, -2.2929358, 48743.405],
+                 efficiencies='CO:2.4 CO2:1.86 H2:2.0 H2O:9.0 H2O2:9.9 HE:0.88 N2:1.5 O2:1.5',
+                 falloff=Troe(A=0.43, T3=1e-30, T1=1e+30))
+# \Author: UB !\Ref: TROE, COMBUST. FLAME, 158 !\Comment: RATE CONSTANT IS FOR N2,
+
+# Reaction 15
+reaction('H + H2O2 <=> H2O + OH', [2.410000e+13, 0.0, 3970.0])
+# \Author: AK !\Ref: TSANG AND HAMPSON, J. PHYS. CHEM. REF. DATA, 15 !\Comment: WARNING
+
+# Reaction 16
+reaction('H + H2O2 <=> H2 + HO2', [1.650000e+10, 1.0, 6000.0])
+# \Author: WARNING !\Ref: WARNING !\Comment: Decrease by 25% PW
+
+# Reaction 17
+reaction('H2O2 + O <=> HO2 + OH', [9.550000e+06, 2.0, 3970.0])
+# \Author: AK !\Ref: TSANG AND HAMPSON, J. PHYS. CHEM. REF. DATA, 15 !\Comment: WARNING
+
+# Reaction 18
+reaction('H2O2 + OH <=> H2O + HO2', [1.740000e+12, 0.0, 318.0],
+         options='duplicate')
+# \Author: AK !\Ref: HONG ET AL. J. PHYS. CHEM. A 114(2010) 5718-5727 !\Comment: WARNING
+
+# Reaction 19
+reaction('H2O2 + OH <=> H2O + HO2', [7.590000e+13, 0.0, 7269.0],
+         options='duplicate')
+# \Author: AK !\Ref: HONG ET AL. J. PHYS. CHEM. A 114(2010) 5718-5727 !\Comment: WARNING
+
+# Reaction 20
+reaction('H + HO2 <=> H2 + O2', [2.800000e+06, 2.09, -1451.0])
+# \Author: WARNING !\Ref: WARNING !\Comment: WARNING
+
+# Reaction 21
+reaction('H + HO2 <=> 2 OH', [7.079000e+13, 0.0, 295.0])
+# \Author: AK !\Ref: MUELLER ET AL., INT. J. CHEM. KINET. 31(10)(1999) 705724. !\Comment: WARNING
+
+# Reaction 22
+reaction('HO2 + O <=> O2 + OH', [3.250000e+13, 0.0, 0.0])
+# \Author: AK !\Ref: BAULCH ET AL., J. PHYS. CHEM. REF DATA, 21 !\Comment: WARNING
+
+# Reaction 23
+reaction('HO2 + OH <=> H2O + O2', [1.930000e+20, -2.49, 584.24],
+         options='duplicate')
+# \Author: UB !\Ref: M.P. BURKE, S.J. KLIPPENSTEIN, L.B. HARDING, PROC. COMBUST. INST. 34(2013) 547-555 !\Comment: WARNING
+
+# Reaction 24
+reaction('HO2 + OH <=> H2O + O2', [1.210000e+09, 1.24, -1307.58],
+         options='duplicate')
+# \Author: UB !\Ref: M.P. BURKE, S.J. KLIPPENSTEIN, L.B. HARDING, PROC. COMBUST. INST. 34(2013) 547-555 !\Comment: WARNING
+
+# Reaction 25
+reaction('2 HO2 <=> H2O2 + O2', [1.930000e-02, 4.12, -4960.0])
+# \Author: SP !\Ref: S.J. KLIPPENSTEIN, M.P. BURKE, K.P. SOMERS, 11th U.S. NAT.COMB.MEETING (2019) !\Comment: WARNING
+
+# Reaction 26
+reaction('2 HO2 <=> O2 + 2 OH', [6.410000e+17, -1.54, 8540.0])
+# \Author: SP !\Ref: S.J. KLIPPENSTEIN, M.P. BURKE, K.P. SOMERS, 11th U.S. NAT.COMB.MEETING (2019) !\Comment: WARNING
+
+# Reaction 27
+falloff_reaction('H + O2 (+ M) <=> HO2 (+ M)',
+                 kf=[4.660000e+12, 0.44, 0.0],
+                 kf0=[4.066200e+19, -1.4, -180.537],
+                 efficiencies='AR:0.0 CH4:2.0 CO:4.0 CO2:3.25 H2:2.0 H2O:17.6 HE:0.57 N2:0.0 O2:1.0',
+                 falloff=Troe(A=0.5, T3=1.0, T1=10000000000.0, T2=1e+30))
+# \Author: SP !\Ref: TROE _ 2000 / PCCP FERNANDES 2008
+# LPL 202210 new fit by Snehasish Panigrahy
+
+# Reaction 28
+falloff_reaction('H + O2 (+ N2) <=> HO2 (+ N2)',
+                 kf=[4.660000e+12, 0.44, 0.0],
+                 kf0=[1.910000e+20, -1.5568, 253.86],
+                 falloff=Troe(A=0.5, T3=1.0, T1=10000000000.0, T2=1e+30))
+# ! YM 28 July 2023 H2 project recommended
+
+# Reaction 29
+pdep_arrhenius('H + O2 + AR <=> HO2 + AR',
+               [(0.01, 'atm'), 6.937020e+18, -1.1912, 11.4078],
+               [(0.1, 'atm'), 6.779140e+18, -1.1893, 23.5054],
+               [(1.0, 'atm'), 6.885210e+18, -1.1925, 61.3437],
+               [(5.0, 'atm'), 8.114740e+18, -1.2141, 148.419],
+               [(10.0, 'atm'), 9.852410e+18, -1.2389, 228.9929],
+               [(20.0, 'atm'), 1.374510e+19, -1.2808, 358.9709],
+               [(30.0, 'atm'), 2.668050e+20, -1.6788, 610.4862],
+               [(40.0, 'atm'), 3.883850e+20, -1.7252, 746.2754],
+               [(50.0, 'atm'), 5.116210e+20, -1.7589, 857.089],
+               [(100.0, 'atm'), 8.717010e+20, -1.8195, 1191.9876],
+               [(300.0, 'atm'), 2.905840e+20, -1.6631, 1493.4906])
+# \Author: YM !\Ref: PLOG fitting 27 July 2023
+# ---------------------------------------------------------------------------
+#   Excited OH subset
+# ---------------------------------------------------------------------------
+# ! ADOPTED FROM T. Kathrotia et al. / Combustion and Flame 157 (2010) 12611273
+
+# Reaction 30
+three_body_reaction('H + O + M <=> OHV + M', [1.500000e+13, 0.0, 5975.1434],
+                    efficiencies='AR:0.35 H2O:6.5 N2:0.4 O2:0.4')
+
+# Reaction 31
+reaction('OHV <=> OH', [1.450000e+06, 0.0, 0.0])
+
+# Reaction 32
+reaction('O2 + OHV <=> O2 + OH', [2.100000e+12, 0.5, -478.011472])
+
+# Reaction 33
+reaction('H2O + OHV <=> H2O + OH', [5.930000e+12, 0.5, -860.42065])
+
+# Reaction 34
+reaction('H2 + OHV <=> H2 + OH', [2.950000e+12, 0.5, -454.110899])
+
+# Reaction 35
+reaction('N2 + OHV <=> N2 + OH', [1.080000e+11, 0.5, -1242.82983])
+
+# Reaction 36
+reaction('OH + OHV <=> 2 OH', [6.010000e+12, 0.5, -764.818356])
+
+# Reaction 37
+reaction('H + OHV <=> H + OH', [1.310000e+12, 0.5, -167.304015])
+
+# Reaction 38
+reaction('AR + OHV <=> AR + OH', [1.690000e+12, 0.0, 4134.79924])
+# ! ADOPTED FROM W. Sun, Q. Zhao, H.J. Curran et al. Combustion and Flame 245 (2022) 112308
+
+# Reaction 39
+reaction('NO + OHV <=> NO + OH', [6.000000e+12, 0.5, -397.0])
+# \AUTHOR: SC !\REF:Clayton R.MulvihillEric L.Petersen. COMB & FLAME 2020, 213, 291-301 !\COMMENT:
+
+# Reaction 40
+reaction('NO2 + OHV <=> NO2 + OH', [6.000000e+12, 0.5, -556.0])
+# \AUTHOR: SC !\REF:Clayton R.MulvihillEric L.Petersen. COMB & FLAME 2020, 213, 291-301 !\COMMENT:
+
+# Reaction 41
+reaction('H + NO2 <=> NO + OHV', [7.000000e+13, 0.0, 55000.0])
+# \AUTHOR: SC !\REF:Clayton R.MulvihillEric L.Petersen. COMB & FLAME 2020, 213, 291-301 !\COMMENT:
+
+# Reaction 42
+reaction('H + N2O <=> N2 + OHV', [1.600000e+14, 0.0, 50300.0])
+# \AUTHOR: SC !\REF:Y. Hidaka, H. Takuma, M. Suga. J. Phys. Chem. 89 (1985) 4903-4905 !\COMMENT:
+
+# Reaction 43
+reaction('N2O + OHV <=> N2O + OH', [6.000000e+12, 0.5, -556.0])
+# \AUTHOR: SC !\REF:Clayton R.MulvihillEric L.Petersen. COMB & FLAME 2020, 213, 291-301 !\COMMENT:
+
+# Reaction 44
+reaction('NH3 + OHV <=> NH3 + OH', [9.000000e+12, 0.5, -596.0])
+# \AUTHOR: SC !\REF:Clayton R.MulvihillEric L.Petersen. COMB & FLAME 2020, 213, 291-301 !\COMMENT:
+# ---------------------------------------------------------------------------
+#   NH3 subset
+# ---------------------------------------------------------------------------
+
+# Reaction 45
+three_body_reaction('NH3 + M <=> H + NH2 + M', [2.860000e+16, 0.0, 93470.0])
+# x1.3 Reference: D.F. Davidson, K. Kohse-Hoinghaus, A.Y. Chang, R.K. Hanson, A pyrolysis mechanism for ammonia, International Journal of Chemical Kinetics 22 (1990) 513-535.
+
+# Reaction 46
+reaction('H + NH3 <=> H2 + NH2', [2.890000e+06, 2.23, 10400.0])
+# T.L. Nguyen, J.F. Stanton, Ab initio thermal rate coefficients for H + NH3 = H2 + NH2, International Journal of Chemical Kinetics 51 (2019) 321-328.
+
+# Reaction 47
+reaction('NH3 + O <=> NH2 + OH', [9.330000e+01, 3.29, 3670.0])
+# (Adjusted) S.J. Klippenstein, L.B. Harding, B. Ruscic, R. Sivaramakrishnan, N.K. Srinivasan, M.-C. Su, J.V. Michael, J. Phys. Chem. A 113 (2009) 1024110259.
+
+# Reaction 48
+reaction('NH3 + OH <=> H2O + NH2', [1.090000e+05, 2.37, -181.0])
+# (Adjusted) Stagni, A. et al. React. Chem. Eng. doi:10.1039/C9RE00429G(2020).
+
+# Reaction 49
+reaction('HO2 + NH3 <=> H2O2 + NH2', [1.173000e+00, 3.839, 17260.0])
+# Stagni, A. et al. React. Chem. Eng. doi:10.1039/C9RE00429G(2020).
+
+# Reaction 50
+reaction('NH3 + NO2 <=> HONO + NH2', [4.235619e-10, 6.48, 27007.6482],
+         options='duplicate')
+# CIS & TRANS; S. Xu, M.C. Lin, Int J Chem Kinet 41: 667677, 2009
+
+# Reaction 51
+reaction('NH3 + NO2 <=> HONO + NH2', [2.683758e-01, 4.02, 23250.478],
+         options='duplicate')
+# CIS & TRANS; S. Xu, M.C. Lin, Int J Chem Kinet 41: 667677, 2009
+
+# Reaction 52
+reaction('NH3 + NO2 <=> HNO2 + NH2', [2.450140e+11, 0.0, 25095.6023])
+# Thaxton, A.G.; Hsu, C.C.; Lin, M.C. Int. J. Chem. Kinet. 29 245-251 (1997)
+
+# Reaction 53
+three_body_reaction('NH2 + M <=> H + NH + M', [1.200000e+15, 0.0, 76002.75])
+# J. Deppe, Berichte der Bunsengesellschaft f  r physikalische Chemie 102 (1998) 1474-1485.
+
+# Reaction 54
+reaction('H + NH2 <=> H2 + NH', [1.090000e+05, 2.59, 1810.0])
+#  Y. Li, S.M. Sarathy, Int. J. Hydrogen Energy 45 (2020) 23624-23637.
+
+# Reaction 55
+reaction('NH2 + O <=> NH + OH', [3.090000e+03, 2.84, -2780.0])
+#  Klippenstein, S. J., Mulvihill, C. R., & Glarborg, P. (2023). Theoretical Kinetics Predictions for Reactions on the NH2O Potential Energy Surface. The Journal of Physical Chemistry A.
+
+# Reaction 56
+reaction('NH2 + OH <=> H2O + NH', [3.300000e+06, 1.949, -217.0])
+# SJ Klippenstein LB Harding B Ruscic R Sivaramakrishnan NK Srinivasan M-C Su JV Michael JPCA 113 (2009) 10241-10259.
+
+# Reaction 57
+reaction('2 NH2 <=> NH + NH3', [5.636000e+00, 3.53, 552.6])
+# SJ Klippenstein LB Harding B Ruscic R Sivaramakrishnan NK Srinivasan M-C Su JV Michael JPCA 113 (2009) 10241-10259.
+
+# Reaction 58
+reaction('2 NH <=> N + NH2', [5.660000e-01, 3.88, 342.0])
+# SJ Klippenstein LB Harding B Ruscic R Sivaramakrishnan NK Srinivasan M-C Su JV Michael JPCA 113 (2009) 10241-10259.
+
+# Reaction 59
+reaction('NH2 + O <=> H + HNO', [2.780000e+13, -0.065, -188.0])
+#  Klippenstein, S. J., Mulvihill, C. R., & Glarborg, P. (2023). Theoretical Kinetics Predictions for Reactions on the NH2O Potential Energy Surface. The Journal of Physical Chemistry A.
+
+# Reaction 60
+reaction('NH2 + O <=> H2 + NO', [2.380000e+12, 0.112, -347.0])
+#  Klippenstein, S. J., Mulvihill, C. R., & Glarborg, P. (2023). Theoretical Kinetics Predictions for Reactions on the NH2O Potential Energy Surface. The Journal of Physical Chemistry A.
+
+# Reaction 61
+reaction('NH2 + OH <=> H + H2NO', [6.381200e+13, 0.0, 18427.3423])
+# Mousavipour, S.H. et al. J. Phys. Chem. A 113 12961-12971 (2009)
+
+# Reaction 62
+reaction('NH2 + OH <=> H + HNOH', [6.381200e+13, 0.0, 31309.7514],
+         options='duplicate')
+# CIS & TRANS; Mousavipour, S.H. et al. J. Phys. Chem. A 113 12961-12971 (2009)
+
+# Reaction 63
+reaction('NH2 + OH <=> H + HNOH', [4.996600e+13, 0.0, 25812.6195],
+         options='duplicate')
+# CIS & TRANS; Mousavipour, S.H. et al. J. Phys. Chem. A 113 12961-12971 (2009)
+
+# Reaction 64
+reaction('NH2 + O2 <=> HNO + OH', [2.900000e-02, 3.764, 18185.0])
+#  S.J. Klippenstein et al. / Combustion and Flame 158 (2011) 774789
+
+# Reaction 65
+reaction('NH2 + O2 <=> H2NO + O', [3.000000e+13, 0.0, 29800.0])
+# x0.5 Henning (Wagner grp) 1995
+
+# Reaction 66
+reaction('HO2 + NH2 <=> NH3 + O2', [6.040000e+18, -1.91, 306.0],
+         options='duplicate')
+# S.J. Klippenstein and P. Glarborg Combustion and Flame 236 (2022) 111787
+
+# Reaction 67
+reaction('HO2 + NH2 <=> NH3 + O2', [5.910000e+07, 1.59, -1373.0],
+         options='duplicate')
+
+# Reaction 68
+reaction('HO2 + NH2 <=> H2NO + OH', [2.550000e+12, 0.166, -938.0])
+# x 2.5 S.J. Klippenstein and P. Glarborg Combustion and Flame 236 (2022) 111787
+
+# Reaction 69
+reaction('HO2 + NH2 <=> H2O + HNO', [2.190000e+09, 0.791, -1428.0])
+# S.J. Klippenstein and P. Glarborg Combustion and Flame 236 (2022) 111787
+
+# Reaction 70
+reaction('NH2 + NO <=> NNH + OH', [4.300000e+10, 0.294, -866.0])
+# S. Song R.K. Hanson C.T. Bowman D.M. Golden Int J Chem Kinet 33 715-721, 2001 (kT)
+
+# Reaction 71
+reaction('NH2 + NO <=> H2O + N2', [2.600000e+19, -2.369, 870.0])
+# S. Song R.K. Hanson C.T. Bowman D.M. Golden Int J Chem Kinet 33 715-721, 2001 (kT)
+
+# Reaction 72
+reaction('NH2 + NO2 <=> H2NO + NO', [8.180000e+11, 0.032, -1510.0])
+# x 0.9 Klippenstein et al., J. Phys. Chem. A 2013, 117, 90119022
+
+# Reaction 73
+reaction('NH2 + NO2 <=> H2O + N2O', [2.600000e+18, -2.19, 455.0])
+# Klippenstein et al., J. Phys. Chem. A 2013, 117, 90119022
+
+# Reaction 74
+reaction('NH + NH2 <=> H + N2H2', [1.500000e+15, -0.5, 0.0])
+#  D.F. Davidson, K. Kohse-Hoinghaus, A.Y. Chang, R.K. Hanson, A pyrolysis mechanism for ammonia, International Journal of Chemical Kinetics 22 (1990) 513-535.
+
+# Reaction 75
+reaction('N + NH2 => 2 H + N2', [4.550000e+13, 0.0, 0.0])
+# Ratio est. 65/35; Dransfeld, P., & Wagner, H. G. (1987). Investigation of the gas phase reaction N+ NH2 N2+ 2H at room temperature. Zeitschrift fr Physikalische Chemie, 153(1-2), 89-97.
+
+# Reaction 76
+reaction('N + NH2 <=> H2 + N2', [2.450000e+13, 0.0, 0.0])
+# Ratio est. 65/35; Dransfeld, P., & Wagner, H. G. (1987). Investigation of the gas phase reaction N+ NH2 N2+ 2H at room temperature. Zeitschrift fr Physikalische Chemie, 153(1-2), 89-97.
+
+# Reaction 77
+reaction('2 NH2 <=> H2 + N2H2', [1.740000e+08, 1.02, 11783.0])
+# SJ Klippenstein LB Harding B Ruscic R Sivaramakrishnan NK Srinivasan M-C Su JV Michael JPCA 113 (2009) 10241-10259.
+
+# Reaction 78
+reaction('2 NH2 <=> H2 + H2NN', [7.170000e+04, 1.88, 8802.0])
+# SJ Klippenstein LB Harding B Ruscic R Sivaramakrishnan NK Srinivasan M-C Su JV Michael JPCA 113 (2009) 10241-10259.
+
+# Reaction 79
+reaction('NH2 + NH3 <=> H2 + N2H3', [1.500000e+13, 0.0, 58900.0])
+#  Marshall, P., & Glarborg, P. (2023). The Journal of Physical Chemistry A, 127(11), 2601-2607.
+
+# Reaction 80
+three_body_reaction('NH + M <=> H + N + M', [1.800000e+14, 0.0, 74760.0])
+# J. Deppe, G. Friedrichs, A. Ibrahim, H.-J. Romming, H.G. Wagner, The Thermal Decomposition of NH2 and NH Radicals, Berichte der Bunsengesellschaft fur physikalische Chemie 102 (1998) 1474-1485.
+
+# Reaction 81
+reaction('H + NH <=> H2 + N', [1.650000e+11, 0.71, 931.0])
+# C.-X. Yao, P.-Y. Zhang, Z.-X. Duan, G.-J. Zhao, Theoretical Chemistry Accounts 133 (2014) 1489.
+
+# Reaction 82
+reaction('NH + O <=> N + OH', [2.070000e+10, 0.622, -358.0])
+# R. Guadagnini, G.C. Schatz, S.P. Walch, J. Chem. Phys. 102 (1995) 784-791.
+
+# Reaction 83
+reaction('NH + OH <=> H2O + N', [2.610000e+07, 1.66, -945.0])
+#  Klippenstein, S. J., Mulvihill, C. R., & Glarborg, P. (2023). Theoretical Kinetics Predictions for Reactions on the NH2O Potential Energy Surface. The Journal of Physical Chemistry A.
+
+# Reaction 84
+reaction('NH + NH2 <=> N + NH3', [9.570000e+03, 2.46, 107.0])
+# SJ Klippenstein LB Harding B Ruscic R Sivaramakrishnan NK Srinivasan M-C Su JV Michael JPCA 113 (2009) 10241-10259.
+
+# Reaction 85
+reaction('NH + O <=> H + NO', [1.410000e+14, -0.21603, 46.37343])
+#  Li, A., Xie, C., Xie, D., & Guo, H. (2011). A global ab initio potential energy surface for HNO (a3A ) and quantum mechanical studies of vibrational states and reaction dynamics. The Journal of chemical physics, 134(19).
+
+# Reaction 86
+reaction('NH + OH <=> H + HNO', [1.510000e+14, -0.314, -308.0])
+#  Klippenstein, S. J., Mulvihill, C. R., & Glarborg, P. (2023). Theoretical Kinetics Predictions for Reactions on the NH2O Potential Energy Surface. The Journal of Physical Chemistry A.
+
+# Reaction 87
+reaction('NH + OH <=> H2 + NO', [3.430000e+13, -0.303, -336.0])
+#  Klippenstein, S. J., Mulvihill, C. R., & Glarborg, P. (2023). Theoretical Kinetics Predictions for Reactions on the NH2O Potential Energy Surface. The Journal of Physical Chemistry A.
+
+# Reaction 88
+reaction('NH + O2 <=> HNO + O', [3.320000e+09, 1.034, 11420.0])
+# Elishav et al., Chem. Rev. 2020, 120, 53525436 // Fit
+
+# Reaction 89
+reaction('NH + O2 <=> NO + OH', [4.500000e+08, 0.79, 1195.0])
+# Romming, H. J.; Wagner, H. G. A Kinetic Study of the Reactions of NH(X3) with O2 and No in the Temperature Range from 1200 to 2200 K. Symp. Combust., [Proc.] 1996, 26, 559566.
+
+# Reaction 90
+reaction('2 NH => H2 + N2', [6.260000e+12, -0.036, -160.9])
+# SJ Klippenstein et al J Phys Chem A 113 10241-10259 (2009)
+
+# Reaction 91
+reaction('2 NH => 2 H + N2', [5.634000e+13, -0.036, -160.9])
+# SJ Klippenstein et al J Phys Chem A 113 10241-10259 (2009)
+
+# Reaction 92
+reaction('N + NH <=> H + N2', [6.420000e+11, 0.51, 19.1])
+# Caridade ETAL, J. Phys. Chem. A, 109, 2356 - 2363, 2005
+
+# Reaction 93
+reaction('NH + NO <=> H + N2O', [2.250000e+15, -0.78, 20.0])
+#  x 1/1.2; Baulch, D. L., Bowman, C. T., Cobos, C. J., Cox, R. A., Just, T., Kerr, J. A., ... & Warnatz, J. (2005). Journal of physical and chemical reference data, 34(3), 757-1397.
+
+# Reaction 94
+reaction('NH + NO <=> N2 + OH', [6.800000e+14, -0.78, 20.0])
+#  Baulch, D. L., Bowman, C. T., Cobos, C. J., Cox, R. A., Just, T., Kerr, J. A., ... & Warnatz, J. (2005). Journal of physical and chemical reference data, 34(3), 757-1397.
+
+# Reaction 95
+reaction('NH + NO2 <=> HNO + NO', [5.718398e+12, 0.0, 0.0])
+# ratio 59-41
+
+# Reaction 96
+reaction('NH + NO2 <=> N2O + OH', [3.973802e+12, 0.0, 0.0])
+# ratio 59-41
+
+# Reaction 97
+three_body_reaction('N2 + M <=> 2 N + M', [1.890000e+18, -0.85, 224950.0],
+                    efficiencies='H2O:16.25')
+# P. Dagaut, F. Lecomte, S. Chevailler, M. Cathonnet, Experimental and Detailed Kinetic Modeling of Nitric Oxide Reduction by a Natural Gas Blend in Simulated Reburning Conditions, Combustion Science and Technology 139 (1998) 329-363.
+
+# Reaction 98
+reaction('N + OH <=> H + NO', [1.850000e+14, -0.30941, 3.98725])
+#  Ge, M. H., Chu, T. S., & Han, K. L. (2008). An accurate quantum dynamics study of the N+ OH reaction. Journal of Theoretical and Computational Chemistry, 7(04), 607-613.
+
+# Reaction 99
+reaction('N + O2 <=> NO + O', [5.840000e+09, 1.01, 6200.0])
+#  Baulch, D. L., Bowman, C. T., Cobos, C. J., Cox, R. A., Just, T., Kerr, J. A., ... & Warnatz, J. (2005). Journal of physical and chemical reference data, 34(3), 757-1397.
+
+# Reaction 100
+reaction('N + NO <=> N2 + O', [7.030000e+13, -0.05053, 243.37842],
+         options='duplicate')
+#  Yuxiang; REFIT NIST
+
+# Reaction 101
+reaction('N + NO <=> N2 + O', [-6.550000e+16, -1.04361, 1491.01075],
+         options=['negative_A', 'duplicate'])
+#  Yuxiang; REFIT NIST
+
+# Reaction 102
+falloff_reaction('2 NH2 (+ M) <=> N2H4 (+ M)',
+                 kf=[5.620000e+14, -0.414, 65.6],
+                 kf0=[4.130000e+28, -3.41, 0.0],
+                 efficiencies='AR:0.59 N2:1.0 NH3:4.87 O2:0.69',
+                 falloff=Troe(A=0.13, T3=1e-30, T1=1e+30, T2=1e+30))
+# SJK 2009 HPL
+# ALTINAY 2015 LPL & TROE PARAMETERS
+# P. Glarborg et al., J. Phys. Chem. A 125 (2021) 1505-1516
+
+# Reaction 103
+pdep_arrhenius('N2H4 <=> H2 + H2NN',
+               [(0.1, 'atm'), 4.000000e+44, -9.85, 71353.0],
+               [(1.0, 'atm'), 5.300000e+39, -8.35, 69307.0],
+               [(10.0, 'atm'), 2.500000e+39, -8.19, 69664.0])
+# A. Dean, J. Bozzelli, Combustion Chemistry of Nitrogen, (2000).
+
+# Reaction 104
+reaction('H + N2H4 <=> H2 + N2H3', [2.760000e+05, 2.56, 1220.0])
+# N. Kanno, T. Kito, Theoretical study on the hydrogen abstraction reactions from hydrazine derivatives by H atom, International Journal of Chemical Kinetics 52 (2020) 548-555.
+
+# Reaction 105
+reaction('N2H4 + O <=> N2H3 + OH', [4.500000e+11, 0.0, -1270.0])
+# Vaghjiani 1996 data fitted
+
+# Reaction 106
+reaction('N2H4 + OH <=> H2O + N2H3', [1.510000e+08, 1.64915, -1503.96476])
+# Mai 2019 fitted
+
+# Reaction 107
+reaction('N2H4 + O2 <=> HO2 + N2H3', [5.050000e+12, 0.0, 32100.0])
+# S. Asgharzade et al. / Computational and Theoretical Chemistry 1104 (2017) 4755
+
+# Reaction 108
+reaction('N2H4 + NH2 <=> N2H3 + NH3', [3.800000e+01, 3.44, -574.0])
+# GAO 2022
+
+# Reaction 109
+reaction('N2H4 + NH <=> N2H3 + NH2', [6.090000e+01, 3.61, 5807.83939])
+# DANA ET AL., J. Phys. Chem. A 2019, 123, 46794692
+
+# Reaction 110
+reaction('N + N2H4 <=> N2H3 + NH', [1.000000e+10, 1.0, 2000.0])
+# A.A. Konnov, J. De Ruyck, Kinetic modeling of the decomposition and flames o
+
+# Reaction 111
+reaction('N2H4 + NO <=> HNO + N2H3', [6.000000e+01, 3.16, 30845.0])
+# P. Raghunath and Y.H. Lin and M.C. Lin, Comp. Theor. Chem. 1046, 73-80, 2014
+
+# Reaction 112
+reaction('N2H4 + NO2 <=> HNO2 + N2H3', [2.400000e-02, 4.14, 7946.0])
+# P. Raghunath and Y.H. Lin and M.C. Lin, Comp. Theor. Chem. 1046, 73-80, 2014
+
+# Reaction 113
+reaction('N2H4 + NO2 <=> HONO + N2H3', [8.200000e+01, 3.13, 8860.0])
+# P. Raghunath and Y.H. Lin and M.C. Lin, Comp. Theor. Chem. 1046, 73-80, 2014
+
+# Reaction 114
+reaction('N2H4 + O <=> H2O + N2H2', [2.900000e+11, 0.0, -1270.0])
+# Vaghjiani GL JPC 104:5479-5489 1996 // Vaghjiani GL JPCA 105:4682-4690 2001
+
+# Reaction 115
+reaction('H + N2H4 <=> NH2 + NH3', [2.400000e+09, 0.0, 3100.0])
+# A.A. Konnov, J. De Ruyck, Kinetic modeling of the decomposition and flames of hydrazine, Combustion and Flame 124 (2001) 106-126.
+
+# Reaction 116
+falloff_reaction('N2H3 (+ M) <=> NH + NH2 (+ M)',
+                 kf=[1.479000e+13, -0.179, 88748.0],
+                 kf0=[3.344000e+42, -6.531, 126211.3],
+                 efficiencies='AR:1.0 C2H6:4.5 CH4:3.0 H2:3.0 HE:1.0 NH3:3.0',
+                 falloff=Troe(A=0.606, T3=115583.0, T1=9186.0, T2=9792.2))
+#  Reverse rate constant from Klippenstein et al., Thermal Decompos
+#  Journal of Physical Chemistry A, 2009, Vol. 113, pp. 10241-10259
+# P. Divart, L. Catoire, Contributions of Experimental Data Obtained in Concentrated Mixtures to Kinetic Studies: Application to Monomethylhydrazine Pyrolysis, The Journal of Physical Chemistry A 124 (2020) 6214-6236.
+
+# Reaction 117
+three_body_reaction('N2H3 + M <=> H + N2H2 + M', [3.540000e+44, -7.92978, 68061.1644])
+# REFITTED TO DEAN 2000 PLOG
+
+# Reaction 118
+reaction('H + N2H3 <=> H2 + N2H2', [7.476000e+03, 2.796, 4680.0])
+# P. Divart, L. Catoire, Contributions of Experimental Data Obtained in Concentr
+
+# Reaction 119
+reaction('H + N2H3 <=> H2 + H2NN', [6.243000e+06, 1.89, 247.0])
+# P. Divart, L. Catoire, Contributions of Experimental Data Obtained in Concentr
+
+# Reaction 120
+reaction('N2H3 + O <=> N2H2 + OH', [1.700000e+08, 1.5, -646.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 121
+reaction('N2H3 + OH <=> H2O + N2H2', [1.200000e+06, 2.0, -1192.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 122
+reaction('N2H3 + OH <=> H2NN + H2O', [3.000000e+13, 0.0, 0.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 123
+reaction('HO2 + N2H3 <=> H2O2 + N2H2', [2.800000e+04, 2.69, -1600.0])
+# x2 Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 124
+reaction('N2H3 + NH <=> N2H2 + NH2', [2.000000e+13, 0.0, 0.0])
+# JIM MILLER ESTIMATED
+
+# Reaction 125
+reaction('N2H3 + NH2 <=> N2H2 + NH3', [6.080000e-01, 3.574, 1190.0])
+# P. Divart, L. Catoire, Contributions of Experimental Data Obtained in Concentrated Mixtures to Kinetic Studies: Application to Monomethylhydrazine Pyrolysis, The Journal of Physical Chemistry A 124 (2020) 6214-6236.
+
+# Reaction 126
+reaction('N2H3 + NH2 <=> H2NN + NH3', [3.100000e+00, 3.43, -1959.84704])
+# Dana 2019
+
+# Reaction 127
+reaction('H + N2H3 <=> NH + NH3', [1.000000e+11, 0.0, 0.0])
+# A.A. Konnov, J. De Ruyck, Kinetic modeling of the decomposition and flames of hydrazine, Combustion and Flame 124 (2001) 106-126.
+
+# Reaction 128
+reaction('N2H3 + O <=> HNO + NH2', [3.000000e+13, 0.0, 0.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 129
+reaction('N2H3 + O => H + NH2 + NO', [3.000000e+13, 0.0, 0.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 130
+reaction('N2H3 + OH <=> HNO + NH3', [1.000000e+12, 0.0, 15000.0])
+# JIM MILLER ESTIMATED
+
+# Reaction 131
+reaction('HNOH + NH2 <=> N2H3 + OH', [1.000000e+01, 3.46, -467.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 132
+pdep_arrhenius('H2NN <=> H + NNH',
+               [(0.1, 'atm'), 5.900000e+32, -6.99, 51791.2],
+               [(1.0, 'atm'), 9.600000e+35, -7.57, 54841.2],
+               [(10.0, 'atm'), 5.000000e+36, -7.43, 57295.1],
+               options='duplicate')
+# \AUTHOR: AS !\REF: Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000. !\COMMENT:
+
+# Reaction 133
+pdep_arrhenius('H2NN <=> H + NNH',
+               [(0.1, 'atm'), 7.200000e+28, -7.77, 50757.9],
+               [(1.0, 'atm'), 3.200000e+31, -6.22, 52317.7],
+               [(10.0, 'atm'), 5.100000e+33, -6.52, 54215.3],
+               options='duplicate')
+# \REF: Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000. !\COMMENT:
+
+# Reaction 134
+reaction('H2NN <=> H2 + N2', [2.500000e+14, 0.0, 52785.0])
+# D.-Y. Hwang, A.M. Mebel, J. Phys. Chem. A 2003, 107, 2865-2874
+
+# Reaction 135
+pdep_arrhenius('N2H2 <=> H2NN',
+               [(0.1, 'atm'), 9.200000e+38, -9.01, 67727.0],
+               [(1.0, 'atm'), 2.000000e+41, -9.38, 68452.0],
+               [(10.0, 'atm'), 1.300000e+45, -10.13, 70757.0])
+#  Reference: A. Dean, J. Bozzelli, Combustion Chemistry of Nitrogen,  (2000).
+
+# Reaction 136
+reaction('H + H2NN <=> H2 + NNH', [4.800000e+08, 1.5, -894.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 137
+reaction('H2NN + O <=> NNH + OH', [3.300000e+08, 1.5, -894.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 138
+reaction('H2NN + OH <=> H2O + NNH', [2.400000e+06, 2.0, -1192.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 139
+reaction('H2NN + HO2 <=> H2O2 + NNH', [2.900000e+04, 2.69, -1600.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 140
+reaction('H2NN + NH2 <=> NH3 + NNH', [1.800000e+06, 1.94, -1152.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 141
+reaction('H + H2NN <=> H + N2H2', [7.000000e+13, 0.0, 0.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 142
+reaction('H2NN + O <=> NH2 + NO', [7.000000e+13, 0.0, 0.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 143
+reaction('H2NN + OH => H + NH2 + NO', [2.000000e+12, 0.0, 0.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 144
+reaction('H2NN + O2 <=> NH2 + NO2', [1.500000e+12, 0.0, 5961.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 145
+reaction('H2NN + HO2 => NH2 + NO + OH', [9.000000e+12, 0.0, 0.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 146
+three_body_reaction('N2H2 + M <=> H + NNH + M', [1.410000e+43, -7.60359, 74765.531],
+                    efficiencies='H2O:7.0')
+#  fit 1 & 10 atm PLOG Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 147
+reaction('H + N2H2 <=> H2 + NNH', [4.340000e+08, 1.76, 2740.0])
+#  (Adjusted) Y. Li, S.M. Sarathy, Int. J. Hydrogen Energy 45 (2020) 23624-23637.
+
+# Reaction 148
+reaction('N2H2 + O <=> NNH + OH', [1.110000e+08, 1.62, 804.816])
+# Y. Li, S.M. Sarathy, Int. J. Hydrogen Energy 45 (2020) 23624-23637.
+
+# Reaction 149
+reaction('N2H2 + OH <=> H2O + NNH', [6.740000e+03, 2.8, -507.0])
+#  P. Raghunath, et al.,Chapter Seven - Ab Initio Chemical Kinetics of Key Proces
+
+# Reaction 150
+reaction('N2H2 + NH <=> NH2 + NNH', [2.400000e+06, 2.0, -1192.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 151
+reaction('N2H2 + NH2 <=> NH3 + NNH', [2.710000e+05, 2.226, -1030.0])
+# P. Divart, L. Catoire, Contributions of Experimental Data Obtained in Concentrated Mixtures to Kinetic Studies: Application to Monomethylhydrazine Pyrolysis, The Journal of Physical Chemistry A 124 (2020) 6214-6236.
+
+# Reaction 152
+reaction('N2H2 + NO <=> N2O + NH2', [4.000000e+12, 0.0, 11922.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 153
+reaction('NNH <=> H + N2', [3.000000e+08, 0.0, 0.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 154
+reaction('NNH + O <=> N2 + OH', [1.200000e+13, 0.145, -217.0])
+# S.J. Klippenstein et al. / Combustion and Flame 158 (2011) 774789
+
+# Reaction 155
+reaction('NNH + O2 <=> HO2 + N2', [5.600000e+14, -0.385, -13.0])
+# S.J. Klippenstein et al. / Combustion and Flame 158 (2011) 774789
+
+# Reaction 156
+reaction('HO2 + NNH <=> H2O2 + N2', [1.400000e+04, 2.69, -1599.535])
+# ESTIMATED BY Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 157
+reaction('NH + NNH <=> N2 + NH2', [5.000000e+13, 0.0, 0.0])
+# JIM MILLER ESTIMATED // J.A. Miller, C.T. Bowman, Mechanism and modeling of nitrogen chemistry in combustion, Progress in Energy and Combustion Science 15 (1989) 287-338.
+
+# Reaction 158
+reaction('H + NNH <=> H2 + N2', [1.000000e+14, 0.0, 0.0])
+# JIM MILLER ESTIMATED // J.A. Miller, C.T. Bowman, Mechanism and modeling of nitrogen chemistry in combustion, Progress in Energy and Combustion Science 15 (1989) 287-338.
+
+# Reaction 159
+reaction('NNH + OH <=> H2O + N2', [5.000000e+13, 0.0, 0.0])
+# JIM MILLER ESTIMATED // J.A. Miller, C.T. Bowman, Mechanism and modeling of nitrogen chemistry in combustion, Progress in Energy and Combustion Science 15 (1989) 287-338.
+
+# Reaction 160
+reaction('NNH + NO <=> HNO + N2', [5.000000e+13, 0.0, 0.0])
+# JIM MILLER ESTIMATED // J.A. Miller, C.T. Bowman, Mechanism and modeling of nitrogen chemistry in combustion, Progress in Energy and Combustion Science 15 (1989) 287-338.
+
+# Reaction 161
+reaction('NH2 + NNH <=> N2 + NH3', [5.000000e+13, 0.0, 0.0])
+# JIM MILLER ESTIMATED // J.A. Miller, C.T. Bowman, Mechanism and modeling of nitrogen chemistry in combustion, Progress in Energy and Combustion Science 15 (1989) 287-338.
+
+# Reaction 162
+reaction('NNH + O <=> NH + NO', [7.800000e+11, 0.381, -409.0])
+# +50%; S.J. Klippenstein et al. / Combustion and Flame 158 (2011) 774789
+
+# Reaction 163
+reaction('NNH + O <=> H + N2O', [1.900000e+14, -0.274, -22.0])
+# S.J. Klippenstein et al. / Combustion and Flame 158 (2011) 774789
+
+# Reaction 164
+three_body_reaction('N + O + M <=> NO + M', [7.600000e+14, -0.1, -1770.0],
+                    efficiencies='H2O:16.25')
+# \AUTHOR: YJZ !\REF:COHEN 91
+
+# Reaction 165
+reaction('HO2 + NO <=> NO2 + OH', [2.100000e+12, 0.0, -497.0])
+# \AUTHOR: YJZ !\REF:Baulch et al., J.Phys. Chem. Ref. Data, 2005, 34: 757-1397 !\COMMENT:
+
+# Reaction 166
+falloff_reaction('NO + O (+ M) <=> NO2 (+ M)',
+                 kf=[1.300000e+15, -0.75, 0.0],
+                 kf0=[9.440000e+24, -2.87, 1551.0],
+                 efficiencies='AR:0.6 CO2:6.0 H2O:10.0 N2O:4.4 NO:1.8 NO2:6.2 O2:0.8',
+                 falloff=Troe(A=0.962, T3=10.0, T1=7962.0))
+# \Author: YJZ !\Ref: TSANG AND HERRON, JPCRD, 1991,20(4) !\Comment: WARNING
+
+# Reaction 167
+reaction('H + NO2 <=> NO + OH', [2.300000e+11, 0.84, -1058.0])
+# \AUTHOR: pw !\REF: Chen et al., Reaction Chemistry and Engineering,2019,4,323-333 !\COMMENT: 1.15A_+2.0000000E+011
+
+# Reaction 168
+reaction('NO2 + O <=> NO + O2', [5.180000e+15, -1.035, 53.9914],
+         options='duplicate')
+# \AUTHOR: SC !\REF: Li et al., Phys. Chem. Chem. Phys., 2021, 23, 585-596 !\COMMENT: big effect on CO 2A
+
+# Reaction 169
+reaction('NO2 + O <=> NO + O2', [8.480000e+16, -0.861, 12164.071],
+         options='duplicate')
+
+# Reaction 170
+reaction('H + NO3 <=> NO2 + OH', [6.000000e+13, 0.0, 0.0])
+#  ! Becker E Rahman MM Schindler RN BBPC 96:776 1992
+
+# Reaction 171
+reaction('HNO2 + O <=> NO2 + OH', [1.700000e+08, 1.5, 2000.0])
+#  ! Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 172
+reaction('2 NO2 <=> 2 NO + O2', [4.500000e+12, 0.0, 27599.0])
+#  ! Park J Giles ND Moore J Lin MC JPCA 102:10099 1998
+
+# Reaction 173
+reaction('2 NO2 <=> NO + NO3', [9.600000e+09, 0.73, 20900.0])
+#  Tsang W JPCRD 20:221 1991
+
+# Reaction 174
+reaction('NO3 + OH <=> HO2 + NO2', [1.400000e+13, 0.0, 0.0])
+#  ! Atkinson R Baulch DL Cox RA Hampson RF Kerr JA Troe J JPC \Ref Data 1992, 21, 11251568.
+
+# Reaction 175
+reaction('H2 + NO2 <=> H + HONO', [1.155000e+00, 3.886, 25980.0])
+# \AUTHOR: pw !\REF:JIAJUE CHAI AND F. GOLDSMITH. PCI, 2016 !\COMMENT: sum of cis- and trans-HONO
+
+# Reaction 176
+reaction('H + HNO2 <=> H2 + NO2', [2.330000e+04, 2.77, -2021.9])
+# \AUTHOR: !\REF:
+
+# Reaction 177
+reaction('HO2 + NO2 <=> HONO + O2', [1.900000e+00, 3.32, 3044.0])
+#  ! CL Rasmussen J Hansen P Marshall P Glarborg IJCK 40, 454-480 (2008)
+
+# Reaction 178
+reaction('HO2 + NO2 <=> HNO2 + O2', [1.900000e+01, 3.26, 4983.0])
+#  ! CL Rasmussen J Hansen P Marshall P Glarborg IJCK 40, 454-480 (2008)
+
+# Reaction 179
+falloff_reaction('NO2 + O (+ M) <=> NO3 (+ M)',
+                 kf=[3.500000e+12, 0.24, 0.0],
+                 kf0=[2.500000e+20, -1.5, 0.0],
+                 falloff=Troe(A=0.71, T3=1e-30, T1=1700.0, T2=1e+30))
+#  ! Hahn J Luther K Troe J PCCP 2:5098 2000
+
+# Reaction 180
+reaction('NO3 + O <=> NO2 + O2', [1.000000e+13, 0.0, 0.0])
+#  ! Atkinson R Baulch DL Cox RA Hampson RF Kerr JA Troe J JPC \Ref Data 1992, 21, 11251568.
+
+# Reaction 181
+reaction('HO2 + NO3 <=> NO2 + O2 + OH', [1.500000e+12, 0.0, 0.0])
+#  ! Becker E Rahman MM Schindler RN BBPC 96:776 1992
+
+# Reaction 182
+reaction('NO3 + NO2 <=> NO + O2 + NO2', [5.000000e+10, 0.0, 2940.0])
+#  ! DeMore WB Sander SP Golden DM Molina MJ Hampson RF Kurylo MJ Howard CJ Ravishankara AR JPL P 90-1:1 1990
+
+# Reaction 183
+falloff_reaction('N2O (+ M) <=> N2 + O (+ M)',
+                 kf=[1.690000e+11, 0.0, 57653.0],
+                 kf0=[1.040000e+15, 0.0, 59810.0],
+                 efficiencies='H2O:12.0 N2:1.7 N2O:3.5 NO:3.0 O2:1.4')
+# \Author: YJZ !\Ref: KLIPPENSTEIN ET AL., CNF, 2011, 158 !\Comment: WARNING
+# LOW-PRESSURE-LIMIT!\AUTHOR: SC !\REF: Mulvihill et al., CNF,2020,224,6-13 !\COMMENT: T range: 820-2500
+
+# Reaction 184
+reaction('H + N2O <=> N2 + OH', [6.700000e+10, 0.0, 5390.0],
+         options='duplicate')
+#  Marshall, P., Ko, T., & Fontijn, A. (1989). The Journal of Physical Chemistry, 93(5), 1922-1927.
+
+# Reaction 185
+reaction('H + N2O <=> N2 + OH', [4.400000e+14, 0.0, 18900.0],
+         options='duplicate')
+#  Marshall, P., Ko, T., & Fontijn, A. (1989). The Journal of Physical Chemistry, 93(5), 1922-1927.
+
+# Reaction 186
+reaction('N2O + O <=> 2 NO', [1.748000e+16, -0.557, 28050.0])
+# \Author: YJZ !\Ref: MEBEL ET AL., IJCK, 1996, 28(9) !\Comment: WARNING
+
+# Reaction 187
+reaction('N2O + O <=> N2 + O2', [3.690000e+12, 0.0, 15936.0])
+# \Author: YJZ !\Ref: MEBEL ET AL., IJCK, 1996, 28(9) !\Comment: WARNING
+
+# Reaction 188
+reaction('N2O + OH <=> HO2 + N2', [1.300000e-02, 4.72, 36560.0])
+# \Author: YJZ !\Ref: MEBEL ET AL., IJCK, 1996, 28(9) !\Comment: WARNING
+
+# Reaction 189
+reaction('N2O + OH <=> HNO + NO', [1.200000e-04, 4.33, 25080.0])
+# \Author: YJZ !\Ref: MEBEL ET AL., IJCK, 1996, 28(9) !\Comment: WARNING
+
+# Reaction 190
+reaction('N2O + NO <=> N2 + NO2', [5.300000e+05, 2.23, 46281.0])
+# \Author: YJZ !\Ref: MEBEL ET AL., IJCK, 1996, 28(9) !\Comment: WARNING
+
+# Reaction 191
+pdep_arrhenius('HNO <=> H + NO',
+               [(0.1, 'atm'), 2.012100e+19, -3.021, 47792.0],
+               [(1.0, 'atm'), 1.825900e+20, -3.008, 47880.0],
+               [(10.0, 'atm'), 1.276200e+21, -2.959, 48100.0],
+               [(100.0, 'atm'), 5.644500e+21, -2.855, 48459.0],
+               [(1000.0, 'atm'), 9.711100e+21, -2.642, 48940.0])
+# Stagni et al., React. Chem. Eng., 2020, 5, 696
+
+# Reaction 192
+reaction('H + HNO <=> H2 + NO', [1.660000e+10, 1.18, -446.0])
+#  Klippenstein, S. J., Mulvihill, C. R., & Glarborg, P. (2023). Theoretical Kinetics Predictions for Reactions on the NH2O Potential Energy Surface. The Journal of Physical Chemistry A.
+
+# Reaction 193
+reaction('NH3 + NO <=> HNO + NH2', [1.458295e+03, 3.12, 54493.3078])
+# S. Xu, M.C. Lin, Int J Chem Kinet 41: 667677, 2009
+
+# Reaction 194
+reaction('HNO + O <=> NO + OH', [2.300000e+13, 0.0, 0.0])
+# Inomata S Washida N JPCA 103:5023-5031 1999
+
+# Reaction 195
+reaction('HNO + OH <=> H2O + NO', [1.200000e+09, 1.189, 334.0],
+         options='duplicate')
+# MT Nguyen S Zhang J Peeters TN TRuong MT Nguyen Chem Phys Lett 2004 388 94-99
+
+# Reaction 196
+pdep_arrhenius('HNO + OH <=> H2O + NO',
+               [(0.01, 'atm'), 5.820000e+10, 0.4, 3762.0],
+               [(0.1, 'atm'), 5.850000e+10, 0.4, 3763.0],
+               [(0.316, 'atm'), 5.920000e+10, 0.4, 3764.0],
+               [(1.0, 'atm'), 6.300000e+10, 0.39, 3782.0],
+               [(3.16, 'atm'), 9.530000e+10, 0.34, 3931.0],
+               [(10.0, 'atm'), 2.600000e+11, 0.23, 4413.0],
+               [(31.6, 'atm'), 3.830000e+11, 0.2, 5099.0],
+               [(100.0, 'atm'), 4.180000e+10, 0.51, 5532.0],
+               options='duplicate')
+# \AUTHOR: AS !\REF: Chen, X., Fuller, M. E., & Goldsmith, C. F. Reac Chem Eng, 4(2), 323-333 (2019). !\COMMENT:
+
+# Reaction 197
+reaction('HNO + O2 <=> HO2 + NO', [2.000000e+13, 0.0, 14000.0])
+# \AUTHOR: AS !\REF: Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000. !\COMMENT:
+
+# Reaction 198
+reaction('HNO + NO2 <=> HONO + NO', [4.400000e+04, 2.6, 4040.0])
+# Mebel AM Lin MC Morokuma K IJCK 30:729-736 1998
+
+# Reaction 199
+pdep_arrhenius('HNO + OH <=> H + HONO',
+               [(0.01, 'atm'), 1.060000e+03, 2.76, 4439.0],
+               [(0.1, 'atm'), 1.090000e+03, 2.75, 4450.0],
+               [(0.316, 'atm'), 1.180000e+03, 2.74, 4476.0],
+               [(1.0, 'atm'), 1.480000e+03, 2.72, 4554.0],
+               [(3.16, 'atm'), 2.710000e+03, 2.64, 4768.0],
+               [(10.0, 'atm'), 9.670000e+03, 2.49, 5253.0],
+               [(31.6, 'atm'), 5.310000e+04, 2.29, 6063.0],
+               [(100.0, 'atm'), 1.030000e+05, 2.24, 6951.0])
+# \AUTHOR: AS !\REF: Chen, X., Fuller, M. E., & Goldsmith, C. F. Reac Chem Eng, 4(2), 323-333 (2019). !\COMMENT:
+
+# Reaction 200
+reaction('2 HNO <=> H2O + N2O', [9.000000e+08, 0.0, 3100.0])
+#  NBS91 Tsang W JPCRD 20:221 1991
+
+# Reaction 201
+three_body_reaction('HON + M <=> H + NO + M', [5.100000e+19, -1.73, 16040.0])
+# O. Mathieu, E.L. Petersen / Combustion and Flame 162 (2015) 554570
+
+# Reaction 202
+reaction('HON + O <=> NO + OH', [7.000000e+13, 0.0, 0.0])
+# O. Mathieu, E.L. Petersen / Combustion and Flame 162 (2015) 554570
+
+# Reaction 203
+reaction('H + HON <=> H + HNO', [2.400000e+13, 0.0, 0.0])
+# O. Mathieu, E.L. Petersen / Combustion and Flame 162 (2015) 554570
+
+# Reaction 204
+reaction('HON + OH <=> H + HONO', [4.000000e+13, 0.0, 0.0])
+# O. Mathieu, E.L. Petersen / Combustion and Flame 162 (2015) 554570
+
+# Reaction 205
+reaction('HON + O2 <=> NO2 + OH', [1.000000e+12, 0.0, 4968.0])
+# O. Mathieu, E.L. Petersen / Combustion and Flame 162 (2015) 554570
+
+# Reaction 206
+three_body_reaction('H2NO + M <=> H + HNO + M', [2.800000e+24, -2.83, 64915.0],
+                    efficiencies='H2O:10.0')
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 207
+three_body_reaction('H2NO + M <=> HNOH + M', [1.100000e+29, -4.0, 44000.0],
+                    efficiencies='H2O:10.0')
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 208
+reaction('H + H2NO <=> H2 + HNO', [4.800000e+08, 1.5, 1559.8])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 209
+reaction('H2NO + O <=> HNO + OH', [3.300000e+08, 1.5, 486.8])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 210
+reaction('H2NO + OH <=> H2O + HNO', [2.400000e+06, 2.0, 1192.2])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 211
+reaction('H2NO + O2 <=> HNO + HO2', [1.730000e+05, 2.19, 18000.0])
+# Stagni & Cavallotti 2022 PCI
+
+# Reaction 212
+reaction('H2NO + HO2 <=> H2O2 + HNO', [1.082000e+05, 2.16, -3597.0])
+# x2 Stagni & Cavallotti 2022 PCI
+
+# Reaction 213
+reaction('H2NO + NO2 <=> HNO + HONO', [3.000000e+11, 0.0, 2000.0])
+# x0.5 Stagni & Cavallotti 2022 PCI
+
+# Reaction 214
+reaction('H2NO + NH2 <=> HNO + NH3', [9.000000e+05, 1.94, -580.0])
+# x0.5 Stagni & Cavallotti 2022 PCI
+
+# Reaction 215
+reaction('H2NO + NO <=> 2 HNO', [2.000000e+04, 2.0, 13000.0])
+# JIM MILLER ESTIMATED, USED BY P. Glarborg, J.A. Miller, B. Ruscic, S.J. Klippenstein, Prog. Energy Combust. Sci. 67 (2018) 31-68.
+
+# Reaction 216
+three_body_reaction('HNOH + M <=> H + HNO + M', [2.000000e+24, -2.84, 59013.9],
+                    efficiencies='H2O:10.0')
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 217
+reaction('H + HNOH <=> H2 + HNO', [4.800000e+08, 1.5, 377.53])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 218
+reaction('HNOH + O <=> HNO + OH', [7.000000e+13, 0.0, 0.0],
+         options='duplicate')
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 219
+reaction('HNOH + O <=> HNO + OH', [3.300000e+08, 1.5, -357.66],
+         options='duplicate')
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 220
+reaction('HNOH + OH <=> H2O + HNO', [2.400000e+06, 2.0, -1192.2])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 221
+reaction('HNOH + O2 <=> HNO + HO2', [3.000000e+12, 0.0, 25000.0])
+# JIM MILLER ESTIMATED, USED BY S.J. Klippenstein et al. / Combustion and Flame 158 (2011) 774789
+
+# Reaction 222
+reaction('HNOH + HO2 <=> H2O2 + HNO', [2.900000e+04, 2.69, -1599.535])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 223
+reaction('HNOH + NH2 <=> HNO + NH3', [1.800000e+06, 1.94, -1152.46])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 224
+reaction('HNOH + NO2 <=> HNO + HONO', [6.000000e+11, 0.0, 2000.0])
+# JIM MILLER ESTIMATED, USED BY S.J. Klippenstein et al. / Combustion and Flame 158 (2011) 774789
+
+# Reaction 225
+reaction('HNOH + NH2 <=> H2NN + H2O', [4.600000e+19, -1.94, 1927.39])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 226
+pdep_arrhenius('NO + OH <=> HONO',
+               [(0.01, 'atm'), 5.020000e+21, -4.24, 898.9],
+               [(0.1, 'atm'), 5.310000e+22, -4.24, 1184.0],
+               [(0.316, 'atm'), 1.380000e+23, -4.22, 1376.0],
+               [(1.0, 'atm'), 3.090000e+23, -4.17, 1621.0],
+               [(3.16, 'atm'), 5.450000e+23, -4.09, 1911.0],
+               [(10.0, 'atm'), 6.350000e+23, -3.97, 2222.0],
+               [(31.6, 'atm'), 3.680000e+23, -3.75, 2501.0],
+               [(100.0, 'atm'), 7.290000e+22, -3.41, 2660.0])
+# \AUTHOR: pw !\REF: Chen et al., Reaction Chemistry and Engineering,2019,4,323-333 !\COMMENT:
+
+# Reaction 227
+reaction('HONO + O <=> NO2 + OH', [1.200000e+13, 0.0, 5960.0])
+#  ! NBS91      Tsang W JPCRD 20:221 1991
+
+# Reaction 228
+reaction('HONO + OH <=> H2O + NO2', [1.700000e+12, 0.0, -520.0])
+#  ! Burkholder JB Mellouki A Talukdar R Ravishankara AR IJCK 24:711 1992
+
+# Reaction 229
+reaction('HONO + NO2 <=> HONO2 + NO', [2.000000e+11, 0.0, 32700.0])
+#  ! Park J Giles ND Moore J Lin MC JPCA 102:10099 1998
+
+# Reaction 230
+reaction('2 HONO <=> H2O + NO + NO2', [3.500000e-01, 3.64, 12140.0])
+#   Mebel AM Lin MC Melius CF JPCA 102:1803 1998
+
+# Reaction 231
+pdep_arrhenius('H + HONO <=> H2O + NO',
+               [(0.01, 'atm'), 3.910000e+09, 0.99, 4049.0],
+               [(0.1, 'atm'), 3.930000e+09, 0.99, 4049.0],
+               [(0.316, 'atm'), 3.970000e+09, 0.99, 4051.0],
+               [(1.0, 'atm'), 4.300000e+09, 0.98, 4070.0],
+               [(3.16, 'atm'), 7.040000e+09, 0.92, 4225.0],
+               [(10.0, 'atm'), 2.600000e+10, 0.76, 4736.0],
+               [(31.6, 'atm'), 7.910000e+10, 0.64, 5519.0],
+               [(100.0, 'atm'), 2.790000e+10, 0.8, 6146.0])
+# \AUTHOR: AS !\REF: Chen, X., Fuller, M. E., & Goldsmith, C. F. Reac Chem Eng, 4(2), 323-333 (2019). !\COMMENT:
+
+# Reaction 232
+pdep_arrhenius('NO + OH <=> HNO2',
+               [(0.01, 'atm'), 3.160000e+18, -3.74, 1405.0],
+               [(0.1, 'atm'), 3.030000e+18, -3.43, 2618.0],
+               [(0.316, 'atm'), 2.230000e+18, -3.24, 3248.0],
+               [(1.0, 'atm'), 1.430000e+18, -3.03, 3899.0],
+               [(3.16, 'atm'), 6.910000e+17, -2.79, 4535.0],
+               [(10.0, 'atm'), 2.040000e+17, -2.49, 5125.0],
+               [(31.6, 'atm'), 3.070000e+16, -2.12, 5648.0],
+               [(100.0, 'atm'), 1.950000e+15, -1.64, 6099.0])
+# \AUTHOR: AS !\REF: Chen, X., Fuller, M. E., & Goldsmith, C. F. Reac Chem Eng, 4(2), 323-333 (2019). !\COMMENT:
+
+# Reaction 233
+pdep_arrhenius('HNO2 <=> HONO',
+               [(0.01, 'atm'), 3.260000e+34, -7.97, 45490.0],
+               [(0.1, 'atm'), 2.770000e+33, -7.58, 45250.0],
+               [(0.316, 'atm'), 1.930000e+32, -7.18, 44940.0],
+               [(1.0, 'atm'), 1.560000e+30, -6.47, 44360.0],
+               [(3.16, 'atm'), 2.170000e+27, -5.49, 43670.0],
+               [(10.0, 'atm'), 4.680000e+24, -4.52, 43320.0],
+               [(31.6, 'atm'), 1.140000e+23, -3.81, 43640.0],
+               [(100.0, 'atm'), 2.030000e+22, -3.35, 44430.0])
+# \AUTHOR: AS !\REF: Chen, X., Fuller, M. E., & Goldsmith, C. F. Reac Chem Eng, 4(2), 323-333 (2019). !\COMMENT:
+
+# Reaction 234
+reaction('HNO2 + OH <=> H2O + NO2', [1.200000e+06, 2.0, -794.87])
+
+# Reaction 235
+pdep_arrhenius('H + HNO2 <=> H2O + NO',
+               [(0.01, 'atm'), 3.390000e+09, 1.07, 5568.0],
+               [(0.1, 'atm'), 3.390000e+09, 1.07, 5567.0],
+               [(0.316, 'atm'), 3.390000e+09, 1.07, 5567.0],
+               [(1.0, 'atm'), 3.380000e+09, 1.07, 5565.0],
+               [(3.16, 'atm'), 3.380000e+09, 1.07, 5560.0],
+               [(10.0, 'atm'), 3.400000e+09, 1.07, 5546.0],
+               [(31.6, 'atm'), 4.320000e+09, 1.04, 5591.0],
+               [(100.0, 'atm'), 1.270000e+10, 0.91, 5968.0])
+# \AUTHOR: AS !\REF: Chen, X., Fuller, M. E., & Goldsmith, C. F. Reac Chem Eng, 4(2), 323-333 (2019). !\COMMENT:
+
+# Reaction 236
+pdep_arrhenius('H + HNO2 <=> HNO + OH',
+               [(0.01, 'atm'), 3.610000e+07, 1.78, 5565.0],
+               [(0.1, 'atm'), 3.610000e+07, 1.78, 5566.0],
+               [(0.316, 'atm'), 3.620000e+07, 1.78, 5567.0],
+               [(1.0, 'atm'), 3.650000e+07, 1.78, 5570.0],
+               [(3.16, 'atm'), 3.740000e+07, 1.77, 5580.0],
+               [(10.0, 'atm'), 4.140000e+07, 1.76, 5617.0],
+               [(31.6, 'atm'), 6.230000e+07, 1.71, 5770.0],
+               [(100.0, 'atm'), 1.810000e+08, 1.59, 6233.0])
+# \AUTHOR: AS !\REF: Chen, X., Fuller, M. E., & Goldsmith, C. F. Reac Chem Eng, 4(2), 323-333 (2019). !\COMMENT:
+
+# Reaction 237
+falloff_reaction('NO2 + OH (+ M) <=> HONO2 (+ M)',
+                 kf=[1.630000e+13, 0.0, 0.0],
+                 kf0=[3.130000e+25, -3.0, 0.0],
+                 falloff=Troe(A=0.41, T3=1e-30, T1=1e+30, T2=1e+30))
+# \Author: YJZ !\Ref: TROE, JPCA, 2012, 116(24) !\Comment: WARNING
+
+# Reaction 238
+reaction('H + HONO2 <=> H2 + NO3', [5.600000e+08, 1.5, 16400.0])
+#  ! Boughton JW Kristyan S Lin MC Chem. Phys 214:219 1997
+
+# Reaction 239
+reaction('H + HONO2 <=> H2O + NO2', [6.100000e+01, 3.3, 6285.0])
+#  ! Boughton JW Kristyan S Lin MC Chem. Phys 214:219 1997
+
+# Reaction 240
+reaction('H + HONO2 <=> HONO + OH', [3.800000e+05, 2.3, 6976.0])
+#  ! Boughton JW Kristyan S Lin MC Chem. Phys 214:219 1997
+
+# Reaction 241
+reaction('HONO2 + OH <=> H2O + NO3', [1.000000e+10, 0.0, -1240.0])
+#  ! Lamb JJ Mozurkewich M Benson SW JPC 88:6441-6448 1984
+
+# Reaction 242
+falloff_reaction('NH2OH (+ M) <=> NH2 + OH (+ M)',
+                 kf=[1.400000e+20, -1.31, 64080.0],
+                 kf0=[5.400000e+37, -5.96, 66783.0],
+                 falloff=Troe(A=0.31, T3=1e-30, T1=1e+30, T2=1e+30))
+# SJ Klippenstein LB Harding B Ruscic R Sivaramakrishnan NK Srinivasan M-C Su JV Michael JPCA 113 (2009) 10241-10259.
+
+# Reaction 243
+reaction('H + NH2OH <=> H2 + HNOH', [4.800000e+08, 1.5, 6249.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 244
+reaction('H + NH2OH <=> H2 + H2NO', [2.400000e+08, 1.5, 5067.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 245
+reaction('NH2OH + O <=> HNOH + OH', [3.300000e+08, 1.5, 3865.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 246
+reaction('NH2OH + O <=> H2NO + OH', [1.700000e+08, 1.5, 3010.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 247
+reaction('NH2OH + OH <=> H2O + HNOH', [1.500000e+04, 2.61, -3537.0])
+# SJ Klippenstein LB Harding B Ruscic R Sivaramakrishnan NK Srinivasan M-C Su JV Michael JPCA 113 (2009) 10241-10259.
+
+# Reaction 248
+reaction('NH2OH + OH <=> H2NO + H2O', [1.500000e+05, 2.28, -1296.0])
+# SJ Klippenstein LB Harding B Ruscic R Sivaramakrishnan NK Srinivasan M-C Su JV Michael JPCA 113 (2009) 10241-10259.
+
+# Reaction 249
+reaction('HO2 + NH2OH <=> H2O2 + HNOH', [2.900000e+04, 2.69, 9557.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 250
+reaction('HO2 + NH2OH <=> H2NO + H2O2', [1.400000e+04, 2.69, 6418.0])
+# Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 2000
+
+# Reaction 251
+reaction('NH2 + NH2OH <=> HNOH + NH3', [1.100000e-01, 4.0, -97.0])
+# SJ Klippenstein LB Harding B Ruscic R Sivaramakrishnan NK Srinivasan M-C Su JV Michael JPCA 113 (2009) 10241-10259.
+
+# Reaction 252
+reaction('NH2 + NH2OH <=> H2NO + NH3', [9.500000e+00, 3.42, -1013.0])
+# SJ Klippenstein LB Harding B Ruscic R Sivaramakrishnan NK Srinivasan M-C Su JV Michael JPCA 113 (2009) 10241-10259.
+
+# Reaction 253
+reaction('NH + NH2OH <=> HNOH + NH2', [2.900000e-03, 4.4, 1564.0])
+# SJ Klippenstein LB Harding B Ruscic R Sivaramakrishnan NK Srinivasan M-C Su JV Michael JPCA 113 (2009) 10241-10259.
+
+# Reaction 254
+reaction('NH + NH2OH <=> H2NO + NH2', [1.500000e-03, 4.6, 2424.0])
+# SJ Klippenstein LB Harding B Ruscic R Sivaramakrishnan NK Srinivasan M-C Su JV Michael JPCA 113 (2009) 10241-10259.
+
+# Reaction 255
+pdep_arrhenius('H2NNO2 <=> t-HNN(O)OH',
+               [(0.001, 'atm'), 3.242000e+18, -3.52, 28786.0],
+               [(0.01, 'atm'), 1.008000e+20, -3.65, 30532.0],
+               [(0.1, 'atm'), 2.677000e+21, -3.76, 32244.0],
+               [(1.0, 'atm'), 2.497000e+22, -3.76, 33753.0],
+               [(10.0, 'atm'), 2.413000e+22, -3.51, 34795.0],
+               [(100.0, 'atm'), 2.219000e+20, -2.69, 34892.0],
+               [(1000.0, 'atm'), 1.787000e+16, -1.3, 34079.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 256
+pdep_arrhenius('H2NNO2 <=> c-HNN(O)OH',
+               [(0.001, 'atm'), 2.288000e+36, -9.13, 66578.0],
+               [(0.01, 'atm'), 3.496000e+35, -8.37, 65002.0],
+               [(0.1, 'atm'), 2.037000e+29, -6.14, 58651.0],
+               [(1.0, 'atm'), 6.453000e+30, -6.23, 52575.0],
+               [(10.0, 'atm'), 1.645000e+39, -8.22, 53562.0],
+               [(100.0, 'atm'), 1.979000e+42, -8.79, 55587.0],
+               [(1000.0, 'atm'), 8.608000e+39, -7.88, 56643.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 257
+pdep_arrhenius('H2NNO2 <=> NH2 + NO2',
+               [(0.001, 'atm'), 4.210000e+44, -10.7, 58550.0],
+               [(0.01, 'atm'), 1.335000e+40, -9.02, 56689.0],
+               [(0.1, 'atm'), 1.515000e+38, -8.12, 55242.0],
+               [(1.0, 'atm'), 2.378000e+39, -8.13, 55320.0],
+               [(10.0, 'atm'), 1.640000e+40, -8.03, 56160.0],
+               [(100.0, 'atm'), 2.644000e+39, -7.5, 56753.0],
+               [(1000.0, 'atm'), 2.733000e+36, -6.38, 56495.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 258
+pdep_arrhenius('H2NNO2 <=> H2O + N2O',
+               [(0.001, 'atm'), 2.524000e+52, -13.0, 59052.0],
+               [(0.01, 'atm'), 3.303000e+44, -10.2, 55899.0],
+               [(0.1, 'atm'), 2.507000e+42, -9.29, 54889.0],
+               [(1.0, 'atm'), 2.492000e+42, -9.02, 54947.0],
+               [(10.0, 'atm'), 5.293000e+42, -8.9, 55538.0],
+               [(100.0, 'atm'), 6.597000e+41, -8.46, 57105.0],
+               [(1000.0, 'atm'), 8.963000e+36, -6.91, 58327.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 259
+pdep_arrhenius('t-HNN(O)OH <=> c-HNN(O)OH',
+               [(0.1, 'atm'), 8.940000e+23, -5.07, 46582.0],
+               [(1.0, 'atm'), 1.906000e+28, -5.74, 42884.0],
+               [(10.0, 'atm'), 1.083000e+35, -7.13, 43183.0],
+               [(100.0, 'atm'), 9.922000e+38, -7.81, 44574.0],
+               [(1000.0, 'atm'), 1.194000e+39, -7.51, 45497.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 260
+pdep_arrhenius('t-HNN(O)OH <=> NH2 + NO2',
+               [(0.001, 'atm'), 3.211000e+20, -3.51, 42071.0],
+               [(0.01, 'atm'), 3.591000e+23, -4.18, 42448.0],
+               [(0.1, 'atm'), 2.675000e+27, -5.07, 42954.0],
+               [(1.0, 'atm'), 6.161000e+31, -6.04, 44050.0],
+               [(10.0, 'atm'), 6.677000e+34, -6.63, 45595.0],
+               [(100.0, 'atm'), 2.001000e+35, -6.5, 47205.0],
+               [(1000.0, 'atm'), 1.926000e+32, -5.39, 48150.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 261
+pdep_arrhenius('t-HNN(O)OH <=> H2O + N2O',
+               [(0.001, 'atm'), 6.750000e+24, -4.71, 41139.0],
+               [(0.01, 'atm'), 7.815000e+27, -5.37, 41637.0],
+               [(0.1, 'atm'), 3.192000e+31, -6.19, 42547.0],
+               [(1.0, 'atm'), 1.741000e+34, -6.76, 43473.0],
+               [(10.0, 'atm'), 3.153000e+35, -6.89, 44063.0],
+               [(100.0, 'atm'), 1.679000e+36, -6.84, 45112.0],
+               [(1000.0, 'atm'), 4.036000e+33, -5.87, 46034.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 262
+pdep_arrhenius('c-HNN(O)OH <=> NH2 + NO2',
+               [(0.001, 'atm'), 1.081000e+04, 0.45, 44733.0],
+               [(0.01, 'atm'), 2.658000e+16, -2.58, 52345.0],
+               [(0.1, 'atm'), 5.459000e+18, -2.95, 47164.0],
+               [(1.0, 'atm'), 3.536000e+25, -4.54, 43719.0],
+               [(10.0, 'atm'), 9.509000e+32, -6.25, 45143.0],
+               [(100.0, 'atm'), 1.327000e+36, -6.82, 48109.0],
+               [(1000.0, 'atm'), 3.210000e+34, -6.1, 50687.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 263
+pdep_arrhenius('c-HNN(O)OH <=> H2O + N2O',
+               [(0.001, 'atm'), 1.147000e+16, -2.67, 21110.0],
+               [(0.01, 'atm'), 5.130000e+17, -2.84, 22915.0],
+               [(0.1, 'atm'), 1.120000e+19, -2.92, 24613.0],
+               [(1.0, 'atm'), 6.844000e+19, -2.86, 26087.0],
+               [(10.0, 'atm'), 4.649000e+19, -2.54, 27090.0],
+               [(100.0, 'atm'), 3.002000e+17, -1.68, 27163.0],
+               [(1000.0, 'atm'), 1.182000e+14, -0.49, 26625.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 264
+falloff_reaction('H + N2O (+ M) <=> t-ONNH (+ M)',
+                 kf=[1.700000e+04, 3.05, 6530.0],
+                 kf0=[1.270000e+27, -3.48, 7030.0],
+                 efficiencies='H2:3.0 H2O:21.0 N2:1.5 O2:1.1',
+                 falloff=Troe(A=0.12, T3=1e-30, T1=1e+30))
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 265
+falloff_reaction('H + N2O (+ M) <=> c-ONNH (+ M)',
+                 kf=[2.370000e-02, 4.81, 4790.0],
+                 kf0=[1.230000e+25, -2.94, 6770.0],
+                 efficiencies='H2:3.0 H2O:21.0 N2:1.5 O2:1.1',
+                 falloff=Troe(A=0.1, T3=1e-30, T1=1e+30))
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 266
+falloff_reaction('H + N2O (+ M) <=> ONHN (+ M)',
+                 kf=[5.910000e-17, 9.29, 11900.0],
+                 kf0=[4.800000e+20, -1.93, 14400.0],
+                 efficiencies='H2:3.0 H2O:21.0 N2:1.5 O2:1.1',
+                 falloff=Troe(A=0.075, T3=1e-30, T1=1e+30))
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 267
+falloff_reaction('t-ONNH (+ M) <=> c-ONNH (+ M)',
+                 kf=[1.340000e+07, 3.36, 23000.0],
+                 kf0=[1.030000e+20, -0.801, 16900.0],
+                 efficiencies='H2:3.0 H2O:21.0 N2:1.5 O2:1.1',
+                 falloff=Troe(A=0.074, T3=1e-30, T1=1e+30))
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 268
+pdep_arrhenius('t-ONNH <=> N2 + OH',
+               [(0.001, 'atm'), 5.492000e+20, -4.92, 27957.0],
+               [(0.01, 'atm'), 7.191000e+19, -4.47, 28290.0],
+               [(0.1, 'atm'), 1.366000e+17, -3.44, 28122.0],
+               [(1.0, 'atm'), 1.870000e+14, -2.27, 28300.0],
+               [(10.0, 'atm'), 1.168000e+14, -1.76, 30057.0],
+               [(100.0, 'atm'), 6.529000e+16, -2.06, 33255.0],
+               [(1000.0, 'atm'), 1.177000e+18, -2.0, 35804.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 269
+pdep_arrhenius('c-ONNH <=> N2 + OH',
+               [(0.001, 'atm'), 2.724000e+07, -0.96, 17410.0],
+               [(0.01, 'atm'), 1.320000e+07, -0.71, 17789.0],
+               [(0.1, 'atm'), 2.651000e+05, -0.01, 17748.0],
+               [(1.0, 'atm'), 1.035000e+03, 1.0, 17830.0],
+               [(10.0, 'atm'), 4.688000e+02, 1.52, 19263.0],
+               [(100.0, 'atm'), 9.612000e+04, 1.32, 21935.0],
+               [(1000.0, 'atm'), 8.813000e+05, 1.43, 23724.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 270
+pdep_arrhenius('ONHN <=> N2 + OH',
+               [(0.001, 'atm'), 2.591000e+05, -0.51, 10529.0],
+               [(0.01, 'atm'), 1.158000e+06, -0.4, 11592.0],
+               [(0.1, 'atm'), 1.040000e+06, -0.06, 12507.0],
+               [(1.0, 'atm'), 6.617000e+05, 0.36, 13590.0],
+               [(10.0, 'atm'), 2.643000e+07, 0.33, 15729.0],
+               [(100.0, 'atm'), 3.663000e+11, -0.41, 19036.0],
+               [(1000.0, 'atm'), 4.278000e+14, -0.89, 21729.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 271
+pdep_arrhenius('OH + c-ONNH <=> H2NNO2',
+               [(0.001, 'atm'), 6.553000e+07, -1.75, 12568.0],
+               [(0.01, 'atm'), 9.286000e+12, -2.89, 16148.0],
+               [(0.1, 'atm'), 1.741000e+18, -4.09, 18328.0],
+               [(1.0, 'atm'), 1.056000e+15, -2.98, 8984.3],
+               [(10.0, 'atm'), 6.556000e+19, -4.01, 3294.9],
+               [(100.0, 'atm'), 1.338000e+28, -5.85, 3491.3],
+               [(1000.0, 'atm'), 5.595000e+29, -5.79, 5235.4])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 272
+pdep_arrhenius('OH + c-ONNH <=> t-HNN(O)OH',
+               [(0.001, 'atm'), 1.488000e+30, -7.88, 36355.0],
+               [(0.01, 'atm'), 1.556000e+31, -7.86, 37492.0],
+               [(0.1, 'atm'), 1.982000e+17, -3.91, 20340.0],
+               [(1.0, 'atm'), 9.555000e+09, -1.69, 7400.0],
+               [(10.0, 'atm'), 4.065000e+15, -2.94, 2091.8],
+               [(100.0, 'atm'), 1.689000e+24, -4.8, 2306.7],
+               [(1000.0, 'atm'), 1.234000e+27, -5.0, 3790.3])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 273
+pdep_arrhenius('OH + c-ONNH <=> c-HNN(O)OH',
+               [(1.0, 'atm'), 1.362000e+06, -0.76, 8237.6],
+               [(10.0, 'atm'), 4.287000e+13, -2.42, 1856.7],
+               [(100.0, 'atm'), 2.784000e+24, -4.87, 2368.7],
+               [(1000.0, 'atm'), 6.310000e+27, -5.23, 4345.7])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 274
+pdep_arrhenius('OH + c-ONNH <=> NH2 + NO2',
+               [(0.001, 'atm'), 1.503000e+14, -0.65, 626.3],
+               [(0.01, 'atm'), 1.503000e+14, -0.65, 626.3],
+               [(0.1, 'atm'), 1.503000e+14, -0.65, 626.3],
+               [(1.0, 'atm'), 1.503000e+14, -0.65, 626.3],
+               [(10.0, 'atm'), 1.508000e+14, -0.65, 626.38],
+               [(100.0, 'atm'), 2.282000e+14, -0.7, 784.21],
+               [(1000.0, 'atm'), 2.896000e+15, -0.98, 2546.2])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 275
+pdep_arrhenius('OH + c-ONNH <=> OH + t-ONNH',
+               [(0.001, 'atm'), 8.207000e+12, -0.3, 1159.1],
+               [(0.01, 'atm'), 8.207000e+12, -0.3, 1159.2],
+               [(0.1, 'atm'), 8.212000e+12, -0.3, 1159.4],
+               [(1.0, 'atm'), 8.255000e+12, -0.3, 1162.1],
+               [(10.0, 'atm'), 8.725000e+12, -0.31, 1189.5],
+               [(100.0, 'atm'), 1.678000e+13, -0.38, 1501.8],
+               [(1000.0, 'atm'), 1.841000e+14, -0.65, 3175.2])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 276
+pdep_arrhenius('OH + c-ONNH <=> H2O + N2O',
+               [(0.001, 'atm'), 5.957000e+14, -0.91, 668.48],
+               [(0.01, 'atm'), 5.956000e+14, -0.91, 668.48],
+               [(0.1, 'atm'), 5.957000e+14, -0.91, 668.46],
+               [(1.0, 'atm'), 5.960000e+14, -0.91, 668.23],
+               [(10.0, 'atm'), 5.993000e+14, -0.91, 665.78],
+               [(100.0, 'atm'), 7.478000e+14, -0.94, 710.78],
+               [(1000.0, 'atm'), 6.756000e+15, -1.18, 2088.5],
+               options='duplicate')
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 277
+pdep_arrhenius('OH + t-ONNH <=> H2NNO2',
+               [(0.001, 'atm'), 2.983000e+24, -6.22, 12272.0],
+               [(0.01, 'atm'), 1.462000e+22, -5.3, 10109.0],
+               [(0.1, 'atm'), 1.395000e+21, -4.77, 6968.1],
+               [(1.0, 'atm'), 2.260000e+23, -5.11, 3594.3],
+               [(10.0, 'atm'), 8.184000e+28, -6.26, 3437.1],
+               [(100.0, 'atm'), 8.516000e+31, -6.68, 5301.1],
+               [(1000.0, 'atm'), 6.821000e+29, -5.71, 7282.1])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 278
+pdep_arrhenius('OH + t-ONNH <=> t-HNN(O)OH',
+               [(0.001, 'atm'), 1.423000e+21, -5.39, 12576.0],
+               [(0.01, 'atm'), 1.346000e+20, -4.83, 11019.0],
+               [(0.1, 'atm'), 9.962000e+16, -3.74, 5875.4],
+               [(1.0, 'atm'), 3.008000e+19, -4.15, 2538.7],
+               [(10.0, 'atm'), 7.810000e+24, -5.25, 2309.6],
+               [(100.0, 'atm'), 1.264000e+28, -5.63, 3640.5],
+               [(1000.0, 'atm'), 2.570000e+27, -4.97, 5060.1])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 279
+pdep_arrhenius('OH + t-ONNH <=> c-HNN(O)OH',
+               [(0.001, 'atm'), 3.687000e-56, 15.1, -44419.0],
+               [(0.01, 'atm'), 1.086000e+23, -5.5, 34725.0],
+               [(0.1, 'atm'), 6.926000e+15, -3.34, 17962.0],
+               [(1.0, 'atm'), 4.913000e+10, -1.69, 2195.3],
+               [(10.0, 'atm'), 9.493000e+21, -4.41, 1741.9],
+               [(100.0, 'atm'), 7.222000e+27, -5.53, 3388.6],
+               [(1000.0, 'atm'), 4.628000e+27, -5.01, 4131.8])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 280
+pdep_arrhenius('OH + t-ONNH <=> NH2 + NO2',
+               [(0.001, 'atm'), 2.247000e+16, -1.44, 1233.9],
+               [(0.01, 'atm'), 2.247000e+16, -1.44, 1233.9],
+               [(0.1, 'atm'), 2.249000e+16, -1.44, 1234.3],
+               [(1.0, 'atm'), 2.273000e+16, -1.44, 1238.7],
+               [(10.0, 'atm'), 3.517000e+16, -1.5, 1408.2],
+               [(100.0, 'atm'), 1.432000e+18, -1.92, 3172.1],
+               [(1000.0, 'atm'), 8.170000e+18, -2.06, 6655.5])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 281
+pdep_arrhenius('OH + t-ONNH <=> H2O + N2O',
+               [(0.001, 'atm'), 9.169000e+13, -0.55, 338.27],
+               [(0.01, 'atm'), 9.168000e+13, -0.55, 338.26],
+               [(0.1, 'atm'), 9.167000e+13, -0.55, 338.14],
+               [(1.0, 'atm'), 9.145000e+13, -0.55, 336.72],
+               [(10.0, 'atm'), 9.302000e+13, -0.55, 338.04],
+               [(100.0, 'atm'), 2.207000e+14, -0.65, 720.23],
+               [(1000.0, 'atm'), 2.239000e+14, -0.62, 1738.5],
+               options='duplicate')
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 282
+reaction('O2 + t-ONNH <=> HO2 + N2O', [3.664000e-02, 4.341, 11952.48])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 283
+reaction('O2 + t-ONNH <=> HNO2 + NO', [2.868000e+03, 2.444, 31043.2])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 284
+reaction('O2 + t-ONNH <=> O2 + c-ONNH', [1.050000e+04, 2.09, 37212.57])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 285
+reaction('O2 + c-ONNH <=> HO2 + N2O', [9.874000e+00, 3.498, 14772.3])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 286
+reaction('O2 + c-ONNH <=> HNO2 + NO', [5.845000e+04, 2.189, 31165.57])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 287
+reaction('O2 + ONHN <=> HNO + NO2', [3.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 288
+reaction('O2 + ONHN <=> HO2 + N2O', [3.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 289
+reaction('H + t-ONNH <=> NH2 + NO', [4.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 290
+reaction('t-ONNH + H <=> N2 + OH + H', [1.500000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 291
+reaction('H + t-ONNH <=> H2O + N2', [6.000000e+12, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 292
+reaction('H + c-ONNH <=> H + t-ONNH', [1.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 293
+reaction('H + c-ONNH <=> NH2 + NO', [1.800000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 294
+reaction('c-ONNH + H <=> N2 + OH + H', [6.000000e+11, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 295
+reaction('H + c-ONNH <=> H2O + N2', [9.000000e+11, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 296
+reaction('H + ONHN <=> NH2 + NO', [6.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 297
+reaction('ONHN + H <=> N2 + OH + H', [6.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 298
+reaction('H + ONHN <=> H2O + N2', [6.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 299
+reaction('OH + t-ONNH <=> HNOH + NO', [3.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 300
+reaction('OH + c-ONNH <=> HNOH + NO', [3.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 301
+reaction('OH + ONHN <=> HNOH + NO', [3.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 302
+reaction('OH + t-ONNH <=> H2O + N2O', [3.000000e+13, 0.0, 0.0],
+         options='duplicate')
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 303
+reaction('OH + c-ONNH <=> H2O + N2O', [3.000000e+13, 0.0, 0.0],
+         options='duplicate')
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 304
+reaction('OH + ONHN <=> H2O + N2O', [3.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 305
+reaction('O + t-ONNH <=> HNO + NO', [6.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 306
+reaction('O + c-ONNH <=> HNO + NO', [6.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 307
+reaction('O + ONHN <=> HNO + NO', [6.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 308
+reaction('O + t-ONNH <=> N2O + OH', [6.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 309
+reaction('O + c-ONNH <=> N2O + OH', [6.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 310
+reaction('O + ONHN <=> N2O + OH', [6.000000e+13, 0.0, 0.0])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 311
+pdep_arrhenius('t-ONNH <=> ONHN',
+               [(1.0, 'atm'), 3.750000e-15, 3.686, 16505.63],
+               [(10.0, 'atm'), 7.037000e-01, 0.403, 30406.42],
+               [(100.0, 'atm'), 7.635000e+00, 0.907, 33467.63],
+               [(1000.0, 'atm'), 7.842000e+03, 1.009, 38211.85])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.
+
+# Reaction 312
+pdep_arrhenius('c-ONNH <=> ONHN',
+               [(1.0, 'atm'), 6.190000e-27, 6.975, 2480.55],
+               [(10.0, 'atm'), 3.930000e-06, 1.913, 23095.34],
+               [(100.0, 'atm'), 1.031000e-03, 1.987, 26555.78],
+               [(1000.0, 'atm'), 9.237000e+00, 1.802, 31599.09])
+# Meng, Q., Lei, L., Lee, J., & Burke, M. P. (2023). On the role of HNNO in NOx formation. Proceedings of the Combustion Institute.

@@ -1,0 +1,915 @@
+!
+! ************************************************************************
+! ************************************************************************
+! ******************* Master mechanism C/H/O/N       ********************
+! ************************************************************************
+! ************************************************************************
+!
+!
+! GLA/MIL98:  P. Glarborg, M.U. Alzueta, K. Dam-Johansen, and J.A. Miller; 
+!              inetic Modeling of Hydrocarbon/Nitric Oxide Interactions 
+!             in a Flow Reactor , Combust. Flame 115, 1-27 (1998)
+!
+! GLA/MIL99:  P. Glarborg, A.B. Bendtsen, and J.A. Miller;  itromethane 
+!             Dissociation.  Implications for the CH3+NO2 Reaction , 
+!             Int. J. Chem. Kinet. 31, 591-602 (1999)
+!
+! SKJ/CHR02:  M.S. Skj h-Rasmussen, P. Glarborg, M.  tberg, M.B. Larsen, 
+!             S.W. S ensen, J.E. Johnsson, A.D. Jensen, and T.S. Christensen; 
+!               Study of Benzene Formation in a Laminar Flow Reactor , 
+!             Proc. Combust. Inst. 29, 1329-1336 (2002)
+!
+! SKR/GLA04:   . Skreiberg, P. Kilpinen and P. Glarborg;  mmonia Chemistry 
+!             under Fuel-Rich Conditions in a Flow Reactor , Combust. Flame
+!             136, 501-508 (2004)
+!
+! DAG/ALZ08:  P. Dagaut, P. Glarborg and M.U. Alzueta;  he oxidation of 
+!             hydrogen cyanide and related chemistry , Prog. Energy 
+!             Combust. Sci. 34, 1-46 (2008)
+!
+! GLA/BEN08:  P. Glarborg and L.L.B. Bentzen;  hemical effects of a high 
+!             CO2 concentration in oxy-fuel combustion of methane , 
+!             Energy Fuels, 22, 291-296 (2008) 
+!
+! RAS/GLA08a: C.L. Rasmussen, J. Hansen, P. Marshall, and P. Glarborg; 
+!              xperimental Measurements and Kinetic Modeling of CO/H2/O2/NOx 
+!             Conversion at High Pressure , Int. J. Chem. Kin. 40, 454-480 (2008)
+!
+! RAS/GLA08b: C.L. Rasmussen and P. Glarborg;  easurements and Kinetic Modeling 
+!             of CH4/O2 and CH4/C2H6/O2 Conversion at High Pressure , 
+!             Int. J. Chem. Kinet., in press (2008)
+!
+! RAS/GLA08c: C.L. Rasmussen, K.H. Andersen, K. Dam-Johansen, and P. Glarborg; 
+!              ethanol oxidation in a flow reactor: implications for the 
+!             branching ratio of the CH3OH+OH reaction , Int. J. Chem. Kinet.
+!             40, 423-441 (2008)
+!
+! RAS/GLA08d: C.L. Rasmussen and P. Glarborg;  ensitizing Effects of NOx on 
+!             CH4 Oxidation at High Pressure , Combust. Flame, in press (2008)
+!
+! GIM/GLA08:  J. Gimenez, C.L. Rasmussen, M.U. Alzueta, Y. Gao, P. Marshall 
+!             and P. Glarborg;  xperimental and Kinetic Modeling Study of 
+!             C2H4 Oxidation at High Pressure , Proc. Combust. Inst., accepted (2008)
+!
+!
+ ELEMENTS
+    O  H  N  AR
+ END  
+!
+ SPECIES    
+H  O  OH  H2  O2  HO2  H2O  H2O2            
+!
+NO NO2 NO3 N2O HNO HON HONO HNO2 H2NO HNOH HONO2  
+!
+NH3 NH2 NH N N2H4 N2H3 N2H2 H2NN NNH NH2OH
+AR N2
+ END
+
+!
+ REACTIONS
+!
+! *****************************************************************************
+!    H2/O2 subset                                                             *
+! *****************************************************************************
+!
+   H+O2=O+OH                            3.6E15  -0.410   16600 ! RAS/GLA08a HES98
+   H+H+M=H2+M                           7.0E17  -1.000       0 ! RAS/GLA08a COH/WES83
+     N2/0/ H2O/0/ H2/0/                                        !
+   H+H+N2=H2+N2                         5.4E18  -1.300       0 ! RAS/GLA08a COH/WES83
+   H+H+H2=H2+H2                         1.0E17  -0.600       0 ! RAS/GLA08a COH/WES83
+   H+H+H2O=H2+H2O                       1.0E19  -1.000       0 ! RAS/GLA08a COH/WES83
+   H+O+M=OH+M                           6.2E16  -0.600       0 ! RAS/GLA08a MIL/BOW89
+     H2O/5/                                                    ! 
+   H+O2(+M)=HO2(+M)                     1.5E12   0.600       0 ! RAS/GLA08a MUE/DRY98
+     LOW  / 3.5E16 -0.41 -1116 /                               !
+     TROE / 0.5 1.0E-30 1.0E30 /                               !
+     N2/0/ AR/0/ H2O/11/ H2/2/ O2/0.78/                        !
+   H+O2(+AR)=HO2(+AR)                   1.5E12   0.600       0 ! RAS/GLA08a MUE/DRY98 
+     LOW  / 9.04E19 -1.500 490 /                               !
+     TROE / 0.5 1.0E-30 1.0E30 /                               !
+   H+O2(+N2)=HO2(+N2)                   1.5E12   0.600       0 ! RAS/GLA08a LI/DRY04
+     LOW  / 6.37E20 -1.720 520 /                               !
+     TROE / 0.8 1.0E-30 1.0E30 /                               !
+   O+O+M=O2+M                           1.9E13   0.000   -1788 ! RAS/GLA08a NBS86
+     N2/1.5/ O2/1.5/ H2O/10/                                   !
+   O+H2=OH+H                            3.8E12   0.000    7948 ! RAS/GLA08a CEC05
+     DUPLICATE                                                 !
+   O+H2=OH+H                            8.8E14   0.000   19175 ! RAS/GLA08a CEC05
+     DUPLICATE                                                 !
+   OH+OH=O+H2O                          4.3E03   2.700   -1822 ! RAS/GLA08a SRI/MIC06
+   OH+H+M=H2O+M                         4.5E22  -2.000       0 ! RAS/GLA08a CON/WES04
+     AR/0.38/ H2/0.73/ H2O/12/ !HE/0.38/                       !   
+   OH+H2=H+H2O                          2.1E08   1.520    3449 ! RAS/GLA08a MIC92
+   H2+O2=HO2+H                          7.4E05   2.433   53502 ! RAS/GLA08a MIC/WAG00 
+   HO2+H=OH+OH                          8.4E13   0.000     400 ! RAS/GLA08a RAS/GLA08a
+   HO2+H=H2O+O                          1.4E12   0.000       0 ! RAS/GLA08a CEC05
+   HO2+O=OH+O2                          1.6E13   0.000    -445 ! RAS/GLA08a CEC05
+   HO2+OH=H2O+O2                        3.6E21  -2.100    9000 ! RAS/GLA08a RAS/GLA08a
+     DUPLICATE                                                 !
+   HO2+OH=H2O+O2                        2.0E15  -0.600       0 ! 
+     DUPLICATE                                                 !
+   HO2+OH=H2O+O2                       -2.2E96 -24.000   49000 !
+     DUPLICATE                                                 !
+   HO2+HO2=H2O2+O2                      1.9E11   0.000   -1408 ! RAS/GLA08a KAP/TROE02
+     DUPLICATE                                                 !
+   HO2+HO2=H2O2+O2                      1.0E14   0.000   11034 !
+     DUPLICATE                                                 !
+   H2O2(+M)=OH+OH(+M)                   4.0E11   0.000   37137 ! RAS/GLA08a KAP/TRO02
+     LOW  /2.291E16 0.0 43638/                                 !
+     TROE /0.5 1E-30 1E30 1E30/                                !  (Fc=0.5)
+     H2O/12/ H2/2.5/ AR/0.64/                                  !
+   H2O2+H=H2O+OH                        1.0E13   0.000    3580 ! RAS/GLA08a CEC05
+   H2O2+H=HO2+H2                        1.7E12   0.000    3760 ! RAS/GLA08a CEC05
+   H2O2+O=HO2+OH                        9.6E06   2.000    3970 ! RAS/GLA08a NBS86
+   H2O2+OH=H2O+HO2                      1.9E12   0.000     427 ! RAS/GLA08a HIP/TRO95
+     DUPLICATE                                                 !
+   H2O2+OH=H2O+HO2                      1.6E18   0.000   29410 ! RAS/GLA08a HIP/TRO95
+     DUPLICATE                                                 !
+!
+! ************************************************************************
+!    N subset (oxid.)                                                    *
+! ************************************************************************
+!
+   HNO+H=NO+H2                          4.4E11   0.720     650 ! SKR/GLA04 SOT/PAG92
+   HNO+O=NO+OH                          2.3E13   0.000       0 ! SKR/GLA04 INO/WAS99
+   HNO+OH=NO+H2O                        3.6E13   0.000       0 ! SKR/GLA04 BAU73
+   HNO+O2=HO2+NO                        2.0E13   0.000   16000 ! SKR/GLA04 DEA/BOZ00
+   HNO+HNO=N2O+H2O                      9.0E08   0.000    3100 ! SKR/GLA04 NBS91
+   HNO+NO2=HONO+NO                      4.4E04   2.640    4040 ! RAS/GLA08 MEB/MOR98 
+!
+   NO+H(+M)=HNO(+M)                     1.5E15  -0.410       0 ! RAS/GLA08 NBS91
+     LOW /2.4E14 0.206 -1550/                                  ! RAS/GLA08 RIL/FON03   
+     TROE /0.82 1E-30 1E30 1E30/                               ! RAS/GLA08 Fc=0.82 (NBS91)
+     N2/1.6/                                                   ! RAS/GLA08 RIL/FON03
+   NO+O(+M)=NO2(+M)                     1.3E15  -0.750       0 ! RAS/GLA08 ALL/DRY97,NBS91
+     LOW  /4.72E24 -2.87 1550/                                 ! RAS/GLA08 ALL/DRY97 (Fc=0.95-1E-04*T)
+!X!TROE /0.780 1E-30 1E30 1E30/                                ! RAS/GLA08a (100bar)
+!X!TROE /0.800 1E-30 1E30 1E30/                                ! RAS/GLA08a ( 80bar)
+!H!TROE /0.820 1E-30 1E30 1E30/                                ! RAS/GLA08a ( 50bar)
+!X!TROE /0.850 1E-30 1E30 1E30/                                ! RAS/GLA08a ( 20bar)
+!X!TROE /0.870 1E-30 1E30 1E30/                                ! RAS/GLA08a ( 10bar)
+     TROE /0.880 1E03 1E04 1E30/                               ! RAS/GLA08a (  1bar)
+!L!  TROE /0.880 1E03 1E04 1E30/                               ! RAS/GLA08a (  1bar)  
+     AR/0/                                                     !
+   NO+O(+AR)=NO2(+AR)                   1.3E15  -0.750       0 ! RAS/GLA08aLL/DRY97,NBS91
+     LOW  /7.56E19 -1.41 0/                                    ! RAS/GLA08 YAR/SUT91 (Fc=0.95-1E-04*T)
+!H!TROE /0.810 1E-30 1E30 1E30/                                ! RAS/GLA08a ( 80bar)
+   TROE /0.750 1E03 1E05 1E30/                                 ! RAS/GLA08a (  1bar)
+!L!TROE /0.750 1E03 1E05 1E30/                                 ! RAS/GLA08a (  1bar)  
+   NO+OH(+M)=HONO(+M)                   1.1E14  -0.300       0 ! RAS/GLA08 FUL/TRO98
+     LOW  /3.392E23 -2.5 0/                                    !
+     TROE /0.75 1E-30 1E30 1E30/                               ! RAS/GLA08 FUL/TRO98 [M=He,T=400K]
+   NO+HO2=NO2+OH                        2.1E12   0.000    -497 ! RAS/GLA08 CEC05
+!
+   NO2+H=NO+OH                          1.3E14   0.000     362 ! RAS/GLA08 KO/FON91
+   NO2+O=NO+O2                          1.1E14  -0.520       0 ! RAS/GLA08 BEM/CLY74
+   NO2+O(+M)=NO3(+M)                    3.5E12   0.240       0 ! RAS/GLA08 HAH/TRO00
+     LOW  /2.5E20 -1.50 0/                                     ! RAS/GLA08 (M=N2)
+     TROE /0.71 1E-30 1700 1E30/                               ! RAS/GLA08 Fc=0.71*exp(-T/1700)
+   NO2+OH(+M)=HONO2(+M)                 3.0E13   0.000       0 ! RAS/GLA08 TRO01
+     LOW  /2.938E25 -3.0 0/                                    !
+     TROE /0.4 1E-30 1E30 1E30/                                ! RAS/GLA08 Fc=0.4
+   NO2+HO2=HONO+O2                      1.9E00   3.320    3044 ! RAS/GLA08a
+   NO2+HO2=HNO2+O2                      1.9E01   3.260    4983 ! RAS/GLA08a
+   NO2+H2=HONO+H                        1.3E04   2.760   29770 ! RAS/GLA08 PAR/LIN98
+   NO2+H2=HNO2+H                        2.4E00   3.730   32400 ! RAS/GLA08a
+   NO2+NO2=NO+NO+O2                     4.5E12   0.000   27599 ! RAS/GLA08 PAR/LIN98
+   NO2+NO2=NO3+NO                       9.6E09   0.730   20900 ! GLA/MIL98 NBS91
+!
+   HONO+H=HNO+OH                        5.6E10   0.860    5000 ! SKR/GLA04 HSU/MEL97
+   HONO+H=NO+H2O                        8.1E06   1.890    3850 ! SKR/GLA04 HSU/MEL97
+   HONO+O=NO2+OH                        1.2E13   0.000    5960 ! SKR/GLA04 NBS91
+   HONO+OH=NO2+H2O                      1.7E12   0.000    -520 ! RAS/GLA08 BUR/RAV92
+   HONO+NO2=HONO2+NO                    2.0E11   0.000   32700 ! RAS/GLA08 PAR/LIN98
+   HONO+HONO=NO+NO2+H2O                 3.5E-01  3.640   12140 ! RAS/GLA08 MEB/MEL98
+!
+   HNO2(+M)=HONO(+M)                    2.5E14   0.000   32300 ! RAS/GLA08a
+     LOW  /3.1E18 0.0 31500/                                   !
+     TROE /1.149 1E-30 3125 1E30/                              !
+   HNO2+O=NO2+OH                        1.7E08   1.500    2000 ! RAS/GLA08 DEA/BOZ00
+   HNO2+OH=NO2+H2O                      4.0E13   0.000       0 ! RAS/GLA08a
+!
+   NO3+H=NO2+OH                         6.0E13   0.000       0 ! GLA/MIL98 BEC/SCH92
+   NO3+O=NO2+O2                         1.0E13   0.000       0 ! GLA/MIL98 ATK/TRO92
+   NO3+OH=NO2+HO2                       1.4E13   0.000       0 ! GLA/MIL98 ATK/TRO92
+   NO3+HO2=NO2+O2+OH                    1.5E12   0.000       0 ! GLA/MIL98 BEC/SCH92
+   NO3+NO2=NO+NO2+O2                    5.0E10   0.000    2940 ! GLA/MIL98 DEM/RAV90
+!
+   HONO2+H=H2+NO3                       5.6E08   1.500   16400 ! RAS/GLA08 BOU/LIN97
+   HONO2+H=H2O+NO2                      6.1E01   3.300    6285 ! RAS/GLA08 BOU/LIN97
+   HONO2+H=OH+HONO                      3.8E05   2.300    6976 ! RAS/GLA08 BOU/LIN97
+   HONO2+OH=H2O+NO3                     1.0E10   0.000   -1240 ! RAS/GLA08 LAM/BEN84
+!
+   N2O(+M)=N2+O(+M)                     1.3E12   0.000   62570 ! SKR/GLA04 JOH/GLA92,ROH/HAN96
+     LOW/4.0E14 0 56600/
+     N2/1.7/ O2/1.4/ H2O/12/   !
+   N2O+H=N2+OH                          3.3E10   0.000    4729 ! SKR/GLA04 MAR/FON87
+     DUP
+   N2O+H=N2+OH                          4.4E14   0.000   19254 !
+     DUP
+   N2O+O=NO+NO                          9.2E13   0.000   27679 ! SKR/GLA04 MEA/AND00
+   N2O+O=N2+O2                          3.7E12   0.000   15936 ! SKR/GLA04 MEA/AND00
+   N2O+OH=N2+HO2                        1.3E-2   4.720   36560 ! SKR/GLA04 MEB/MOR96
+   N2O+OH=HNO+NO                        1.2E-4   4.330   25080 ! SKR/GLA04 MEB/MOR96
+   N2O+NO=NO2+N2                        5.3E05   2.230   46280 ! SKR/GLA04 MEB/MOR96
+!
+!
+! ************************************************************************
+!    N subset (red.)                                                     *
+! ************************************************************************
+!
+   NH3+M=NH2+H+M                        2.2E16   0.000   93470 ! SKR/GLA04 DAV/HAN90
+   NH3+H=NH2+H2                         6.4E05   2.390   10171 ! SKR/GLA04 MIC/SUT86
+   NH3+O=NH2+OH                         9.4E06   1.940    6460 ! SKR/GLA04 SUT/KLE90
+   NH3+OH=NH2+H2O                       2.0E06   2.040     566 ! SKR/GLA04 SAL/HAN84
+   NH3+HO2=NH2+H2O2                     3.0E11   0.000   22000 ! SKR/GLA04 JAM est
+   NH2+H=NH+H2                          7.2E05   2.320     799 ! SKR/GLA04 LIN/PAG95
+   NH2+O=HNO+H                          6.6E13   0.000       0 !           INO/WAS99,DRA/WAG84,ADA/PHI94 
+   NH2+O=NH+OH                          7.0E12   0.000       0 !           INO/WAS99,DRA/WAG84,ADA/PHI94 
+   DUP
+   NH2+O=NH+OH                          8.6E-1   4.010    1673 !           DUA/PAG95 
+   DUP   
+   NH2+OH=NH+H2O                        4.0E06   2.000    1000 ! SKR/GLA04 JAM est
+   NH2+HO2=H2NO+OH                      5.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NH2+HO2=NH3+O2                       9.2E05   1.940   -1152 ! SKR/GLA04 DEA/BOZ00 
+   NH2+O2=H2NO+O                        2.5E11   0.480   29586 ! SKR/GLA04 DEA/BOZ00 
+   NH2+O2=HNO+OH                        6.2E07   1.230   35100 ! SKR/GLA04 DEA/BOZ00 
+   NH2+NH2=NH3+NH                       5.0E13   0.000   10000 ! SKR/GLA04 DAV/HAN90
+   NH2+NH=N2H2+H                        5.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NH2+NH=NH3+N                         9.2E05   1.940    2444 ! SKR/GLA04 DEA/BOZ00
+   NH2+N =N2+H+H                        7.0E13   0.000       0 ! SKR/GLA04 WHY/PHI83
+   NH2+HNO=NH3+NO                       3.6E06   1.630   -1250 ! SKR/GLA04 MEB/MOR96
+   NH2+NO=N2+H2O                        2.8E20  -2.654    1258 ! SKR/GLA04 MIL/GLA99
+   NH2+NO=NNH+OH                        2.3E10   0.425    -814 ! SKR/GLA04 MIL/GLA99
+   NH2+HONO=NH3+NO2                     7.1E01   3.020   -4940 ! SKR/GLA04 MEB/MOR96
+   NH2+NO2=N2O+H2O                      1.6E16  -1.440     268 ! SKR/GLA04 PAR/LIN97
+   NH2+NO2=H2NO+NO                      6.5E16  -1.440     268 ! SKR/GLA04 PAR/LIN97
+   NH+H=N+H2                            3.0E13   0.000       0 ! SKR/GLA04 DAV/HAN90,rv
+   NH+O=NO+H                            9.2E13   0.000       0 ! SKR/GLA04 CEC94
+   NH+OH=HNO+H                          2.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NH+OH=N+H2O                          5.0E11   0.500    2000 ! SKR/GLA04 JAM est
+   NH+O2=HNO+O                          4.6E05   2.000    6500 ! SKR/GLA04 MIL/MEL92
+   NH+O2=NO+OH                          1.3E06   1.500     100 ! SKR/GLA04 MIL/MEL92
+   NH+NH=N2+H+H                         2.5E13   0.000       0 ! SKR/GLA04 JAM est
+   NH+N=N2+H                            3.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NH+NO=N2O+H                          2.9E14  -0.400       0 ! SKR/GLA04 MIL/MEL92
+     DUP
+   NH+NO=N2O+H                         -2.2E13  -0.230       0 !
+     DUP
+   NH+NO=N2+OH                          2.2E13  -0.230       0 ! SKR/GLA04 MIL/MEL92
+   NH+HONO=NH2+NO2                      1.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NH+NO2=N2O+OH                        1.0E13   0.000       0 ! SKR/GLA04 HAR/PHI86
+   N+OH=NO+H                            3.8E13   0.000       0 ! SKR/GLA04 FLO/HAN77,HOW/SMI80
+   N+O2=NO+O                            6.4E09   1.000    6280 ! SKR/GLA04 BAU/DRY73
+   N+NO=N2+O                            2.1E13   0.000       0 !           CEC05
+!   
+   NNH=N2+H                             6.5E07   0.000       0 ! SKR/GLA04 MIL/GLA99
+   NNH+H=N2+H2                          1.0E14   0.000       0 ! SKR/GLA04 JAM est
+   NNH+O=N2O+H                          1.0E14   0.000       0 ! SKR/GLA04 JAM est
+   NNH+O=N2+OH                          8.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NNH+O=NH+NO                          5.0E13   0.000       0 ! SKR/GLA04 MIL/MEL92
+   NNH+OH=N2+H2O                        5.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NNH+O2=N2+HO2                        2.0E14   0.000       0 ! SKR/GLA04 MIL/GLA99
+   NNH+O2=N2+H+O2                       5.0E13   0.000       0 ! SKR/GLA04 MIL/GLA99
+   NNH+NH =N2+NH2                       5.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NNH+NH2=N2+NH3                       5.0E13   0.000       0 ! SKR/GLA04 JAM est
+   NNH+NO=N2+HNO                        5.0E13   0.000       0 ! SKR/GLA04 JAM est
+!
+   NH2+NH2=N2H4                         5.6E48 -11.300   11882 ! SKR/GLA04 DEA/BOZ00 1ATM N2(600-2500K)!
+   N2H4+H=N2H3+H2                       7.0E12   0.000    2500 ! SKR/GLA04 VAG95
+   N2H4+O=NH2OH+NH                      2.9E11   0.000   -1270 !           VAG96,VAG01
+   N2H4+O=N2H3+OH                       1.5E11   0.000   -1270 !           VAG96,VAG01
+   N2H4+OH=N2H3+H2O                     1.3E13   0.000    -318 !           VAG01
+   N2H4+NH2=N2H3+NH3                    3.9E12   0.000    1500 ! SKR/GLA04 GEH/WAG71,JAM est
+   N2H3=N2H2+H                          3.6E47 -10.380   69009 ! SKR/GLA04 DEA/BOZ00 1ATM N2 600-2500K
+   NH2+NH2=N2H3+H                       1.2E12  -0.030   10084 ! SKR/GLA04 DEA/BOZ00 1 ATM N2 !
+   N2H3+H=N2H2+H2                       2.4E08   1.500     -10 ! SKR/GLA04 DEA/BOZ00 
+   N2H3+O=N2H2+OH                       1.7E08   1.500    -646 ! SKR/GLA04 DEA/BOZ00 
+   N2H3+O=NH2+HNO                       3.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00
+   N2H3+O=>NH2+NO+H                     3.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00 
+   N2H3+OH=N2H2+H2O                     1.2E06   2.000   -1192 ! SKR/GLA04 DEA/BOZ00
+   N2H3+OH=H2NN+H2O                     3.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00
+   N2H3+OH=NH3+HNO                      1.0E12   0.000   15000 ! SKR/GLA04 JAM est
+   N2H3+HO2=N2H2+H2O2                   1.4E04   2.690   -1600 ! SKR/GLA04 DEA/BOZ00 
+   N2H3+HO2=N2H4+O2                     9.2E05   1.940    2126 ! SKR/GLA04 DEA/BOZ00
+   N2H3+NH2=N2H2+NH3                    9.2E05   1.940   -1152 ! SKR/GLA04 DEA/BOZ00 
+   N2H3+NH2=H2NN+NH3                    3.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00 
+   N2H3+NH=N2H2+NH2                     2.0E13   0.000       0 ! SKR/GLA04 JAM est
+   N2H2+M=NNH+H+M                       1.9E27  -3.050   66107 ! SKR/GLA04 DEA/BOZ00 M=N2
+     H2O/7/
+   N2H2+H=NNH+H2                        8.5E04   2.630     230 ! SKR/GLA04 LIN/PAG96
+   N2H2+O=NNH+OH                        3.3E08   1.500     497 ! SKR/GLA04 DEA/BOZ00 
+   N2H2+O=NH2+NO                        1.0E13   0.000       0 ! SKR/GLA04 JAM est
+   N2H2+OH=NNH+H2O                      5.9E01   3.400    1360 ! SKR/GLA04 LIN/PAG96
+   N2H2+NH2=NNH+NH3                     8.8E-2   4.050    1610 ! SKR/GLA04 LIN/PAG96
+   N2H2+NH=NNH+NH2                      2.4E06   2.000   -1192 ! SKR/GLA04 DEA/BOZ00 
+   N2H2+NO=N2O+NH2                      4.0E12   0.000   11922 ! SKR/GLA04 DEA/BOZ00
+   NH2+NH2=H2NN+H2                      1.2E21  -3.080    3368 ! SKR/GLA04 DEA/BOZ00 1 ATM N2 
+   H2NN=NNH+H                           3.4E26  -4.830   46228 ! SKR/GLA04 DEA/BOZ00 1 ATM 
+   H2NN+H=NNH+H2                        4.8E08   1.500    -894 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+H=N2H2+H                        7.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+O=NNH+OH                        3.3E08   1.500    -894 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+O=NH2+NO                        7.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+OH=NNH+H2O                      2.4E06   2.000   -1192 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+OH=>NH2+NO+H                    2.0E12   0.000       0 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+HO2=>NH2+NO+OH                  9.0E12   0.000       0 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+HO2=NNH+H2O2                    2.9E04   2.690   -1600 ! SKR/GLA04 DEA/BOZ00 
+   H2NN+O2=NH2+NO2                      1.5E12   0.000    5961 ! SKR/GLA04 DEA/BOZ00
+   H2NN+NH2=NNH+NH3                     1.8E06   1.940   -1152 ! SKR/GLA04 DEA/BOZ00 
+!
+   H2NO+M=HNO+H+M                       2.8E24  -2.830   64915 ! SKR/GLA04 DEA/BOZ00
+     H2O/10/
+   H2NO+M=HNOH+M                        1.1E29  -4.000   44000 ! SKR/GLA04 DEA/BOZ00
+     H2O/10/
+   H2NO+H=HNO+H2                        3.0E07   2.000    2000 ! SKR/GLA04 JAM est
+   H2NO+H=NH2+OH                        5.0E13   0.000       0 ! SKR/GLA04 JAM est
+   H2NO+O=HNO+OH                        3.0E07   2.000    2000 ! SKR/GLA04 JAM est
+   H2NO+OH=HNO+H2O                      1.0E14   0.000       0 !           SUN/CUR01
+   H2NO+HO2=HNO+H2O2                    2.9E04   2.690   -1600 ! SKR/GLA04 DEA/BOZ00
+   H2NO+O2=HNO+HO2                      3.0E12   0.000   25000 ! SKR/GLA04 JAM est
+   H2NO+NH2=HNO+NH3                     3.0E12   0.000    1000 ! SKR/GLA04 JAM est
+   H2NO+NO=HNO+HNO                      2.0E04   2.000   13000 ! SKR/GLA04 JAM est
+   H2NO+NO2=HONO+HNO                    6.0E11   0.000    2000 ! SKR/GLA04 JAM est
+!
+   HNOH+M=HNO+H+M                       2.0E24  -2.840   58934 ! SKR/GLA04 DEA/BOZ00
+     H2O/10/
+   HNOH+H=NH2+OH                        4.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00
+   HNOH+H=HNO+H2                        4.8E08   1.500     378 ! SKR/GLA04 DEA/BOZ00
+   HNOH+O=HNO+OH                        7.0E13   0.000       0 ! SKR/GLA04 DEA/BOZ00
+     DUP
+   HNOH+O=HNO+OH                        3.3E08   1.500    -358 ! SKR/GLA04 DEA/BOZ00
+     DUP
+   HNOH+OH=HNO+H2O                      2.4E06   2.000   -1192 ! SKR/GLA04 DEA/BOZ00
+   HNOH+HO2=HNO+H2O2                    2.9E04   2.690   -1600 ! SKR/GLA04 DEA/BOZ00
+!  HNOH+HO2=NH2OH+O2                    2.9E04   2.690   -1600 ! SKR/GLA04 DEA/BOZ00
+   HNOH+O2=HNO+HO2                      3.0E12   0.000   25000 ! SKR/GLA04 JAM est
+   HNOH+NH2=N2H3+OH                     1.0E01   3.460    -467 ! SKR/GLA04 DEA/BOZ00 
+   HNOH+NH2=H2NN+H2O                    8.8E16  -1.080    1113 ! SKR/GLA04 DEA/BOZ00 
+   HNOH+NH2=NH3+HNO                     1.8E06   1.940   -1152 ! SKR/GLA04 DEA/BOZ00
+   HNOH+NO2=HONO+HNO                    6.0E11   0.000    2000 ! SKR/GLA04 JAM est
+
+ END
+!
+!*******************************************************************************
+!*******************************************************************************
+!******************************   BIBLIOGRAPHY   *******************************
+!*******************************************************************************
+!*******************************************************************************
+!
+ADA/BAS81  Adachi H Basco N James DGL IJCK 13:1251-1276
+ADA/PHI94  Adamson JD Farhat SK Morter CL Glass GP Curl RF Philips LF JPC 98:5665
+ALL/DRY97  Allen MT Yetter RA Dryer FL CF 109:449
+ATA/WOL92  B Atakan D Kocis J Wolfrum PCI 24:691
+ATK97      Atkinson R JPC Ref. Data 26:215-290
+ATK/TRO92  Atkinson R Baulch DL Cox RA Hampson Jr RF Kerr JA Troe J JPCRD 21:1125-1168
+*ATK/TRO02  
+ATK/BAU06  Atkinson R Baulch DL Cox RA Crowley JN Hampson RF Hynes RG Jenkin ME Rossi 
+           MJ Troe JACP 6:3625-4055
+BAC/MAC05  Bacskay GB Mackie JC JPCA 109:2019-2025
+BAL/LAN69  Baldwin RR Walker RW Langford DH TFS 65:806
+BAL/WAL84  Baldwin RR Keen A Walker RW JCSFT 80:435 
+BAG/WAL87  Baggott JE Frey HM Lightfoot PD Walsh R JPC 91:3386-3393
+BAR/HOY91  Bartels M Edelbuttal J Hoyermann K PCI 23:131
+BAR/WEI91  Barnhard KI Santiago A He M Asmar F Weiner BR CPL 178:150-156
+BAT87      Batt L Int. Rev. Phys. Chem. 6:53-90
+BAU/DRY73  Baulch DL Drysdale DD Horne DG PCI 14:107-118
+BAU/MEU85  Bauer W Becker KH Meuser R BBPC 89:340
+BAU/OLD84  Baughum SL Oldenborg RC ACS SS (ed TM Sloane) 249:257-266
+BAU/WAG95  Bauerle S Klatt M Wagner HGg BBPC 99:870
+BEC/BAY92  Becker KH Konig R Meuser R Wiesen P Bayes KD J Photochem Photobiol A 64:1-14
+BEC/SCH92  Becker E Rahman MM Schindler RN BBPC 96:776
+BEC/WIE93  Becker KH Engelhardt B Geiger H Kurtenbach R Wiesen P CPL 210:135-140
+BEC/WIE95  Becker KH Kurtenbach R Schmidt F Wiesen P CPL 235:230-234 (C2H2+NCO)
+BEC/WIE95  Becker KH Kurtenbach R Wiesen P JPC 99:5986-5991 (C2H4+NCO)
+BEC/WIE97  Becker K Kurtenbach R Schmidt F Wiesen P BBPC 101:128-133   
+BEC/WIE00  Becker K Kurtenbach R Schmidt F Wiesen P CF 120:570-577
+BEM/CLY74  Bemand PP Clyne MAA Watson RT JCSFT2 70:564-576
+BEN96a     Benson SW IJCK 28:665-672
+BLI/SEA03  Blitz MA McKee KW Pilling MJ Seakins PW CPL 372:295-299
+BOG/HAN78  Bogan DJ Hand CW JPC 82:2067
+BOH/WAG84  Bohland T Temps F Wagner HGg BBPC 88:1222
+BOH/WAG85  Bohland T Dobe S Temps F Wagner HGg BBPC 89:1110
+BOH/WAG88  Bohland T Temps F Wagner HGg PCI 21:841
+BOU/LIN97  Boughton JW Kristyan S Lin MC Chem. Phys 214:219
+BOZ98      Bozzelli J private communication
+BOZ/DEA93  Bozzelli JW Dean AM JPC 97:4427
+BUR/RAV92  Burkholder JB Mellouki A Talukdar R Ravishankara AR IJCK 24:711
+BURCAT     Burcat's Therm. DB, http://garfield.chem.elte.hu/Burcat/burcat.html
+           "Third Millennium Ideal Gas and Condensed Phase Thermochemical Database
+           for Combustion with updates from Active Thermochemical Tables" ANL-05/20
+           and TAE 960 Technion-IIT, Aerospace Engineering, and Argonne National
+           Laboratory, Chemistry Division, September 2005. 
+CAL/COO89  Callear AB Cooper IA CPL 155:146
+CAM/CRO02  Cameron M Sivakumaran V Dillon TJ Crowley JN PCCP 2002 4:3628
+CAR/CRO98  Carl SA Crowley JN JPCA 102:8130-8142
+CAR/DEA05  Carstensen H-H Dean AM PCI 30:995-1003
+CAR/DEV98  Caralp F Rayez M-T Forst W Gomez N Delcroix B Fittschen C Devolder P JCSFT 94:3321-3330
+CAR/PEE04  Carl SA Elsamra RMI Kulkami RM Nguyen HMT Peeters J JPCA 108:3695-3698
+CAR/VIS99  Caralp F Devolder P Fittschen C Gomez N Hippler H M eau R Rayez MT Striebel F 
+           Viskolcz B PCCP 1:2935-2944
+CAR/WAG95  Carstensen HH Wagner HGg BBPC 99:1539
+CEC92      Baulch DL Cobos CJ Cox RA Esser C Frank P Just Th Kerr JA Pilling MJ Troe J
+           Walker RW Warnatz J JPCRD 21:403
+CEC94      Baulch DL Cobos CJ Cox RA Frank P Hayman G Just Th Kerr JA
+           Murrells T Pilling MJ Troe J Walker RW Warnatz J JPCRD 23:847-1033
+CEC05      Baulch DL Bowman CT Cobos CJ Cox RA Just Th Kerr JA Pilling MJ Stocker D
+           Troe J Tsang W Walker RW Warnatz J JPCRD 34:757-1397
+COB96      Cobos CJ React Kinet Catal Lett 57:43-47
+COB/TRO90  Cobos CJ Troe J ZPC(NF) 167:129-149
+COH/WES83  Cohen N Westberg KR JPCRD 12:531
+CON/WES04  Conaire MO Curran HJ Simmie JM Pitz WJ Westbrook CK IJCK 36:603
+DAE/BRA95  Da e V Ray A Vassalli I Poulet G Le Bras G IJCK 27:1121-1133
+DAG/SIM96  Dagaut P Voisin D Cathonnet M McGuinness M Simmie JM CF 106:62-88
+DAM/FRI07  Dammeier J Colberg M Friedrichs G PCCP 9:4177-4188
+DAV/HAN90  Davidson DF Kohse-Hoinghaus K Chang AY Hanson RK IJCK 22:513
+DAV/HAN91  Davidson DF Hanson RK PCI 23:267
+DAV/THR75  Davidson JA Thrush BA JCS-FT I 71:2413
+DAV/PIL91  Davies JW Green NJB Pilling MJ JCSFT 87:2317-2324
+*DAV/WAN99   CH2CHCH2+H(+M)=C3H6(+M)              2.0E14   0.000       0 !           
+DEA/BOZ00  Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 
+DEC/MAC03  Decker BK MacDonald RG JPCA 107:9137-9146
+DEM/RAV90  DeMore WB Sander SP Golden DM Molina MJ Hampson RF Kurylo MJ 
+           Howard CJ Ravishankara AR JPL P 90-1:1
+DEM/MOL97  DeMore WB Sander SP Golden DM Hampson RF Kurylo MJ Howard CJ 
+           Ravishankara AR Kolb CE Molina MJ JPL Pub. 97-4
+DES/TAT01  DeSain JD Jusinski LE Ho AD Taatjes CA CPL 347:79
+DOM/WAG92  Dombrowsky Ch Wagner HGg BBPC 96:1048-1055
+DOR/MAR91  Dorthe G Caubet P Vias Th Barrere B Marchais J JPC 95:5109-5116
+DOU/HAY96  Doughty A Barnes FJ Bromly JH Haynes BS PCI 26
+DRA/WAG84  Dransfeld P Hack W Kurzke H Temps F Wagner HGg PCI 20:655
+DUA/PAG95  Duan X Page M JCP 102:6121-6127
+EIT/FRE98  Eiteneer B Yu CL Goldenberg M Frenklach M JPCA 102:5196
+EWI/ZEL87  Ewig F Rh a D Zellner R Ber. Bunsenges. Phys. Chem. 91:708-717
+FAH/LAU91  Fahr A Laufer A Klein R Braun W JPC 95:3218-3224
+FEI/BUR08  Feierabend KJ Zhu L Talukdar RK Burkholder JB JPCA 112:73-82
+FEN/HER06  Feng WH Hershberger JF JPCA 110:12184
+FEN/LIG93  Fenter FF Catoire V Lesclaux R Lightfoot PD JPC 97:3530-3538
+FEN/PAN97  Feng WL Wang Y Zhang SW Pang XY CPL 266:43-46
+FER/TRO06  Fernandes RX Luther K Troe J JPCA 110:4442-4449
+FIC/TEM01  Fikri M Meyer S Roggenbuck J Temps F Far Disc 119:223-242
+FIS/CUR00  Fischer SL Dryer FL Curran HJ IJCK 32(12):713
+FIT/DEV99  Fittschen C Frenzel A Imrik K Devolder P IJCK 31:860-866
+FLO/HAN77  Flower WL Hanson RK Kruger CH CST 15:115
+FRI/DAV02  Friedrichs G Herbon JT Davidson DF Hanson RK CPPC 4:5778-5788
+FRI/HAN04  Friedrichs G Herbon JT Davidson DF Hanson RK IJCK 36:157-169
+*FRI/WAG98   C2O+M=C+CO+M                         2.0E15   0.000   44200 !            est
+FRO/SMI90  Frost MJ Smith IWM JCSFT 86:1751-1756
+FUL/TRO98  Fulle D Hamann HF Hippler H Troe J JCP 108:5391
+GAO/MAC03  Gao Y MacDonald G JPCA 107:4625-4635 
+GEH/WAG71  Gehring MV Hoyermann K Wagner HGg Wolfrum J BBPC 75:1287
+GEP/HAL04  Geppert WD Eskola AJ Timonen RS Halonen L JPCA 108:4232-4238
+GLA/ALZ03  Glarborg P Alzueta MU Kjaergaard K Dam-Johansen K CF 115:629
+GLA/MIL99  Glarborg P Bendtsen AB Miller JA IJCK 31:591-602
+GLA/KRI94  Glarborg P Kristensen PG Jensen SH Dam-Johansen K CF 98:241-258 
+GLA/MIL86  Glarborg P Miller JA Kee RJ CF 65:177
+GLA/MIL98  Glarborg P Alzueta MU Dam-Johansen K Miller JA CF 115:1
+GLA/MIL99  Glarborg P Bendtsen AB Miller JA IJCK 31:591-602 (CH3NO2)
+GLA/TRO73  Gl zer K Troe J Helv. Chim. Acta 56:577-585
+GLA/TRO74  Gl zer K Troe J Ber. Bunsen-Ges. Phys. Chem. 78:182
+GRI2.11    GRI-Mech v2.11 
+GRI3.0     GRI-Mech v3.0 (Frenklach M et al. 2004, I-net)
+GRU/WAG94  Grussdorf J Nolte J Temps F Wagner HGg Ber. Bun. Phys. Chem. 98:546-553
+GUP/HAR06  Gupte KS Kiefer JH Tranter RS Klippenstein SJ Harding LB PCI 31:167-174
+HAC/WAG88  Hack W Wagner HGg Wilms A BBPC 92:620-627
+HAC/WAG89  Hack W Koch M Wagener R Wagner HGg BBPC 93:165
+HAH/MIL01  Hahn DK Klippenstein SJ Miller JA Far Dis 119:79-100
+HAH/TRO00  Hahn J Luther K Troe J PCCP 2:5098
+HAR/CHI82  Harding LB Schatz GC Chiles RA JCP 76:5172-5173
+HAR/KLI05  Harding LB Georgievskii Y Klippenstein SJ JPCA 109:4646-4656
+HAR/PHI86  Harrison JA Whyte AR Phillips LF CPL 129:346
+HAY/KIN96  Hayes F Lawrance WD Staker WS King KD JPC 100:11314
+HE/LIN88   He Y Sanders WA Lin MC JPC 92:5474
+HE/LIN92   He Y Lin MC Wu CK Melius CF PCI 24:711
+HEL/DRY98  Held TJ Dryer FL IJCK 30:805-830
+HEN/WAG95  Hennig G Wagner HGg BBPC 99:989-994
+HER88      Herron JT JPCRD 17:967
+HER/SPE92  Herbert L Smith IWM Spencer-Smith RD IJCK 24:791-802
+HES98      Hessler JP JPCA 102:4517
+*HID/HIG92  Hidaka Y Nakamura T Tinaka H Jinno A Kawano H Higashihara T
+HIP/TRO95  Hippler H Neunaber H Troe J JCP 103:3510-3516
+HIP/VIS01  Hippler H Striebel F Viskolcz B PCCP 3:2450-2458
+HIP/STR04  Hippler H Krasteva N Striebel F PCCP 6:3383-3388
+HUA/WAN05  Hua H Ruscic B Wang B CP 311:335-341
+HOW/SMI80  Howard MJ Smith IWM CPL 69:40
+HRA/MIC98  Hranisavljevic J Kumaran SS Michael JV PCI 27:159-166
+HSU/MEL97  Hsu CC Lin MC Mebel AM Melius CF JPCA 101:60
+HUS/KIR71  Husain D Kirsch LJ Trans Faraday Soc 67:2025
+ING/BOZ03  Ing W-C Sheng CY Bozzelli JW FPT 83:111-145
+INO/WAS99  Inomata S Washida N JPCA 103:5023-5031
+JAS/HAR07  Jasper AW Klippenstein SJ Harding LB JPCA 111:8689-8707
+JAS/RUS07  Jasper AW Klippenstein SJ Harding LB Ruscic B JPCA 111:3932-3950
+JOH/GLA92  Johnsson JE Glarborg P Dam-Johansen K PCI 24:917
+JOS/WAN05  Joshi A You X Barckholtz TA Wang H JPCA 109:8016-8027
+KAP/TRO02  Kappel C Luther K Troe J PCCP 4:4392-4398
+KAR/LIF88  Karni M Oref I Barzilai-Gilboa S Lifshitz A JPC 92:6924
+KEI/PIL88  Keiffer M Miscampbell AJ Pilling MJ JCSFT2 84:505
+KLE/YAR90  Klemm RB Sutherland JW Wickramaaratchi MA Yarwood G JPC 94:3354-3357
+KLI/MIL02  Klippenstein SJ Miller JA Harding LB PCI 29:1209-1217
+KO/FON91   Ko T Fontijn A JPC 95:3984-3987
+KOC/WAG90  Koch M Temps FWagener R Wagner HGg BBPC 94:645-650 (CH2(s)+CO2)
+KRA/MIC04  Krasnoperov LN Michael JV JPCA 108:8317-8323
+KRU/ROT97  Kruse T Roth P JPCA 101:2138-2146
+KRU/ROT99  Kruse T Roth P IJCK 31:11-21
+KUW/PET07  Kuwata KT Dibble TS Sliz E Petersen EB JPCA 111:5032-5042
+LAM/BEN84  Lamb JJ Mozurkewich M Benson SW JPC 88:6441-6448
+LAS/WAN99  Laskin A Wang H CPL 303:43-49
+LAS/LAW00  Laskin A Wang H Law CK IJCK 32:589
+LI/DRY04   Li J Zhao Z Kazakov A Dryer FL IJCK 36:566
+LIF/BEN83  cC2H4O+H=cC2H3O+H2                   2.0E13   0.000    8310 ! GIM/GLA08 
+MEB/MOR96  Mebel AM Diau EWG Lin MC Morokuma K JPC 100:7517-7525
+LIN/PAG95  Linder DP Duan X Page X JPC 99:11458-11463
+LIN/PAG96  Linder DP Duan X Page M JCP 104:6298
+LIU/KUR90  Liu R Huie RE Kurylo MJ CPL 167:519-523
+LUD/TEM06  Ludwig W Brandt B Friedrichs G Temps F JPCA 110:3330-3337
+MAH/FON88  Mahmud K Marshall P Fontijn A JCP 88:2393-2397
+MAR/FON87  Marshall P Fontijn A Melius CF JCP 86:5540
+MAR99      Marinov NM IJCK 31:183
+MAR/MER00  Mart ez E Albaladejo J Jim ez E Notario A de Mera D
+MAR/SEN96  Marinov NM Pitz WJ Westbrook CK Castaldi MJ Senkan SM CST 116:211
+MCC/KAU85  McCaulley JA Anderson SM Jeffries JB CP Lett. 115:180
+MEA/AND00  Meagher NE Anderson WR JPCA 104:6013-6031
+MEB/LIN99  Mebel AM Lin MC JPCA 103:2088-2096
+MEB/MEL98  Mebel AM Lin MC Melius CF JPCA 102:1803
+MEB/MOR96  Mebel AM Lin MC Morokuma K IJCK 28:693
+MEB/MOR98  Mebel AM Lin MC Morokuma K IJCK 30:729-736
+MEL/SID03  Mellouki A Bras GL Sidebottom H Chem Rev 103:5077-5096
+MER/HAN89  Mertens JD Chang AY Hanson RK Bowman CT IJCK 21:1049
+MES/CAR81  Messing I Filseth SV Sadowski CM Carrington T JCP 74:3874
+MIC92      Michael JV PECS 18:327
+MIC/SUT86  Michael JV Sutherland JW Klemm RB JPC 90:497
+MIC/WAG00  Michael JV Sutherland JW Harding LB Wagner AF PCI 28:1471-1478
+MIL/GLA98  Miller JA Melius CF Glarborg P IJCK 30:223-228
+MIL/BOW89  Miller JA Bowman CT PECS 15:287
+MIL/GLA99  Miller JA Melius CF Glarborg P IJCK 31:757-765
+MIL/GLA03  Miller JA Klippenstein SJ Glarborg P CF 135:357-362  
+MIL/KLI01  Miller JA Klippenstein IJCK 33:654
+MIL/KLI04  Miller JA Klippenstein PCCP 6:1192-1202
+MIL/MEL92  Miller JA Melius CF PCI 24:719
+MIL/WAL97  Miller JA Walch SP IJCK 29:253
+MON/SHA95  Monks PS Nesbitt FL Payne WA Scanlon M Stief LJ Shallcross DE JPC 99:17151-17159
+MOO/WAR77  Moortgat GK Slemr F Warneck P IJCK 9:249
+MOS/LIN98  Moskaleva LV Lin MC JPCA 102:4687-4693
+MOS/LIN00  Moskaleva LV Lin MC PCI 28:2393-2401
+MUE/DRY98  Mueller MA Yetter RA Dryer FL PCI 27:177
+MUE/DRY99  Mueller MA Yetter RA Dryer FL IJCK 31:705
+NBS86      Tsang W Hampson RF JPCRD 15:1087
+NBS87      Tsang W JPCRD 16:471
+NBS91      Tsang W JPCRD 20:221
+NBS92      Tsang W JPCRD 21:753-791 (N) 
+NES/STI89  Nesbitt FL Payne WA Stiff LJ JPC 93:5158
+NIE/SID91  Nielsen OJ Sidebottom HW Donlon M Treacy J IJCK 23:1095-1109
+NOL/WAG93  Nolte J Grussdorf J Temps F Wagner HGg Z. Naturforsch. A 48:1234-1238
+OHM/WAS90  Ohmori K Miyoshi A Matsui H Washida N JPC 94:3253
+OLI/SOL04  Olivella S Sole A JPCA 108:11651-11663
+OLK/SMI01  Olkhov RV Li Q Osborne MC Smith IWM PCCP 3:4522-4528
+OPA/LEO96  Opansky BJ Leone SR JPC 100:4888-4892
+PAN/TAN08  Pang JL Xie HB Zhang SW Ding YH Tang AQ JPCA 112:5251-5257
+PAR/HER93  Park J Hershberger JF JPC 99:3488-3493
+PAR/LIN97  Park J Lin MC JPCA 101:2643-2647
+PAR/LIN98  Park J Giles ND Moore J Lin MC JPCA 102:10099
+PAU/MIL96  Pauwels J-F Volponi JV Miller JA CST 110:249
+PEE/CEU96  Peeters J van Look H Ceursters B JPCA 100:15124-15129
+PET/MOO93  Petty JT Harrison JA Moore cb JPC 97:11194
+PET/OSA04  Petrie S Osamura Y JPCA 108:3623-3631
+POP/MIL00  Pope CJ Miller JA PCI 28:1519
+PRE/FLY00  Press JM Fockenberg C Flynn GW JPCA 104:6755-6763
+REI/SMI84  Reid IAB Robinson C Smith DB PCI 20:1833-1843
+RIL/FON03  Riley PS Cosic B Fontijn A IJCK 35:374  
+RIM/HER99  Rim KT Hershberger JF JPCA 103:3721-3725
+RIM/HER98  Rim KT Hershberger F JPCA 102:5898
+ROH/HAN96  Rohrig M Petersen EL Davidson DF Hanson RK IJCK 28:599-608
+SAI/MUR84  Saito K Kakumoto T Murakami I JPC 88:1182-1187
+*SAL/HAN84   NH3+OH=NH2+H2O                       2.0E06   2.040     566 ! SKR/GLA04 
+*SAL/THR77  Salter LF Thrush BA JCSFT 1:1098 *2025-2030*
+SCH/WOL94  Schuck A Volpp H-R Wolfrum J CF 99:491
+SEE/GUT94  Seetula JA Kalinovski IJ Slagle IR Gutman D Chem. Phys. Lett. 224:533
+SEI/WAG89  Seidler V Temps F Wagner HGg Wolf M JPC 93:1070
+SEN/MIL05  Senosiain JP Klippenstein SJ Miller JA JPCA 109:6045-6055
+SEN/MIL06  Senosiain JP Klippenstein SJ Miller JA JPCA 110:5772-5781 (CH2CHO, CH3CO) 
+SEN/MIL06  Senosiain JP Klippenstein SJ Miller JA JPCA 110:6960-6970 
+SHE/BOZ00  Sheng CY Bozzelli IJCK 32:623-641
+SHE/CHA02  Sheng CY Bozzelli JW Dean AM Chang AY JPCA 106:7276-7293
+*SCH/FRA00  Scherer Just Frank PCI 28: 
+SLA/GUT91  Slagle IR Gmurczyk GW Batt L Gutman D PCI 23:115-121
+SLA/MIL88  Slagle IR Sarzynski D Gutman D Miller JA Melius CF JCSFT2 84:491
+SLE/WAR77  Slemr F Warneck P IJCK 9:267
+SON/FRI03  Song S Golden DM Hanson RK Bowman CT Senosiain JP Musgrave CB Friedrichs G IJCK 35:304-309
+SOT/PAG92  Soto MR Page M JCP 97:7287
+SRI/MIC05  Srinivasan NK Su M-C Sutherland JW Michael JV JPCA 109:7902-7914
+SRI/MIC06  Srinivasan NK Michael JV IJCK 38:211-219
+SRI/MIC07  Srinivasan NK Su M-C Michael JV JPCA 111:3951-3958
+STE/GOL88  Stewart PH Rothem T Golden DM PCI 22:943-952
+STI/KLE95  Stief LJ Nesbitt FL Payne WA Kuo SC Tao W Klemm RB JCP 102:5309-5316
+STO/SLA00  Stoliarov SI Knyazev VD Slagle IR JPCA 104:9687-9697
+STR/TAA04  Stribel F Jusinski LE Fahr A Halpern JB Klippenstein SJ Taatjes CA PCCP 6:2216-2223
+SOM/HIP97  Sommer T Kruse T Roth P Hippler H JPCA 101:3720-3725
+SUM/NGU98  Sumathi R Nguyen MT JPCA 102:8013-8020
+SUN/CUR01  Sun F DeSain JD Scott G Hung PY Thompson RI Glass GP Curl RF JPCA 105:6121-6128
+SUT/KLE90  Sutherland JW Patterson PM Klemm RB JPC 94:2471
+SUT/MIC01  Sutherland JW Su M-C Michael JV IJCK 33:669-684
+TAL/RAV97  Talukdar RK Herndon SC Burkholder JB Roberts JM Ravishankara AR JCSFT 93:2787-2796 
+TAY/MAR96  Taylor PH Rahman MS Arif M Dellinger B Marshall P PCI 26:497
+TEM/WAG92  Temps F Wagner HGg Wolf M ZPC (Munich) 176:27
+THI/TAA97  Thiesemann H Taatjes CA CPL 270:580-586
+THW/HER04  Thweat WD Erickson MA Hershberger JF JPCA 108:74-79
+TRA/BRE05  Tranter RS Raman A Sivaramakrishnan R Brezinsky K IJCK 37:306-331
+TRO01      Troe J IJCK 33:878
+TRO05      Troe J JPCA 109:8320-8328
+TSA91      Tsang W JPCRD 20:221-273 (C3H6)
+TYN/WAL01  Tyndall GS Cox RA Granier C Lesclaux R Moortgat GK Pilling MJ Ravishankara AR 
+           Wallington TJ J. Geophys. Res. 106:12157-12182
+VAG95      Vaghjiani GL IJCK 27:777
+VAG96      Vaghjiani GL JPC 104:5479-5489
+VAG01      Vaghjiani GL IJCK 33:354-362 (N2H4+OH)
+VAG01      Vaghjiani GL JPCA 105:4682-4690 (N2H4+O)
+VAS/HAN05  Vasudevan V Davidson DF Hanson RK IJCK 37:98-109
+WAG/SAD82  Wagal SS Carrington T Filseth SV Sadowski CM CP 69:61
+WAN01      Wang H IJCK 33:698-706 (C2H4+M, H3CCCH+O2)          
+WAN/GU99   Wang B Hou H Gu Y JPCA 103:8021-8029
+WAN/LIN91  Wang NS Yang DL Lin MC IJCK 23:151
+WAN/WIN87a Wantuck PJ Oldenborg RC Baughcum SL Winn KR JPC 91:4653-4655
+WAN/WIN88  Wantuck PJ Oldenborg RC Baughcum SL Winn KR PCI 22:973-981
+WAS/SAT83  Washida N Hatakeyama S Takagi H Kyogoku T Sato S JCP 78:4533-4540
+WHY/PHI83  Whyte AR Phillips LF CPL 102:451
+WIL/NEL95  Williams BA Papas P Nelson HH JPC 99:13471
+WIL/BAL98  Wilson C Balint-Kurti GG JPCA 102:1625-1631
+WIL/BAY67  Williamson DG Bayes KD JACS 89:3390
+WIL/FLE07  Williams BA Fleming JW PCI 31:1109-1117
+WOL/CRO00  Wollenhaupt M Crowley JN JPCA 104:6429-6438
+WOO/BOW94  Wooldridge ST Mertens JD Hanson RK Bowman CT PCI 25:983-991
+WOO/BOW95  Wooldridge ST Hanson RK Bowman CT IJCK 27:1075-1087 (HCN+OH)
+WOO/BOW95  Wooldridge ST Hanson RK Bowman CT IJCK 28:361-372 (HNCO+OH)
+XIA/ZHA06  Xiao C-X Yan N Zou M Hou S-C Kou Y Liu W Zhang S J Mol Cat A Chem 252:202-211
+XU/LIN03   Xu ZF Lin MC IJCK 35:184
+XU/LIN04   Xu ZF Lin MC IJCK 36:205
+XU/LIN07   XU K Xu ZF Lin MC Mol Phys 105:2763-2776
+YAM/LAY99  Yamada T Bozzelli JW Lay T JPCA 103:7646-7655
+YAM/SUZ99  Yamaguchi Y Teng YH Shimomura S Tabata K Suzuki E JPCA 103(41):8272
+YAR/SUT91  Yarwood G Sutherland JW Wickramaaratchi MA Klemm RB JPC 95:8771
+YOU/KLI07  You X Wang H Goos E Sung C-J Klippenstein SJ JCPA 111:4031-4042
+YU/FRA05   Yu H-G Muckerman JT Francisco JS JPCA 109:5230-5236
+ZHA/LEE00  Zhang RQ Han KL Zhu RS Lee CS Lee ST CPL 321:101-105
+ZHA/LI05   Zhang Y Zhang S Li QS CP 308:109-116
+ZHU/LIN01  Zhu RS Lin MC JPCA 105:6243-6248
+ZHU/LIN04  Zhu RS Lin MC JPCA 104:10807-10811
+ZHU/LIN05  Zhu RS Lin MC IJCK 37:593-598
+
+
+************************************************************************************************
+
+!ACK/TRO90 Ackermann L Hippler H Reihs C Troe J JPC 94:5247
+!ADU/FON93 Adusei GY Fontijn A JPC 97:1406 (CH2CHCHCH2+O)
+!ADU/FON93 Adusei GY Fontijn A PCI 25:801-808 (HCL+H)
+!ALK/HOM89: A Alkemade, KH Homann BBPC 93:434-439
+!ALZ/GLA98 Alzueta MU Oliva M Glarborg P IJCK 30:683
+!ALZ/GLA00 Alzueta MU Glarborg P Dam-Johansen K IJCK 32:498-522
+!ALZ/GLA01 Alzueta MU Bilbao R Glarborg CF 127:2234-2251
+!ARE/MUL93 Arends IWCE Louw R Mulder P JPC 97:7914
+!ATK/TRO92 Atkinson R Baulch DL Cox RA Hampson Jr RF Kerr JA Troe J
+!          JPCRD 21:1125-1168
+!ATK/TRO97 Atkinson R Baulch DL Cox RA Hampson Jr RF Kerr JA Rossi MJ 
+!          Troe J JPCRD 26:521-1011
+!BAJ/FON96 Bajaj PN Fontijn A CF 105:239.
+!BAL/WAL69 Baldwin RR Walker RW Langford DH 65:806
+!BAL/WAL74 Baldwin RR Fuller AR Longthorne D Walker RW JCSFT 70:1257
+!BAR/HOY91 M Bartels,J Edelbuttal, K Hoyermann PCI 23:131
+!BAU/LIF71 Bauer SH Jeffers P Lifshitz A Jadava BP PI Shock Tube S 13:417
+!BAU/MON81 Baulch DL Duxbury J Grant SJ Montague DC JPCRD 10, Suppl
+!BEC/BAY92 Becker KH Konig R Meuser R Wiesen P Bayes KD
+!          J Photochem Photobiol A Chem 64:1-14
+!BEC/SCH92 E Becker, MM Rahman, RN Schindler BBPC 96:776
+!BEN/GLA00 Bendtsen AB Glarborg P Dam-Johansen K CST 151:31
+!BER/LOI01 Bergeat A Calvo T Caralp F Fillion J_H Dorthe G Loison J-C Far Disc 119:67-77
+!BHA/WES98 Bhargava, Westmoreland CF 1998
+!BLI/PIL00 Blitz MA McKee KW Pilling M PCI 28:2491-2497
+!BOZ/DEA90 Bozzelli JW Dean AM JPC 94:3313
+!BRA/PIL70 Braun W Bass AM Pilling M JCP 52:5131
+!BRU/MOU88 Bruinsma O-SL Tromp PJJ de Sauvage Nolting HJJ Moulijn JA Fuel 67:334
+!BUR/RAV92 Burkholder JB Mellouki A Talukdar R Ravishankara AR IJCK 24:711-725
+!BUT/HOY94 Buth R Hoyermann K Seeba J PCI 25:841
+!CAN/WAL85 Canosa-Mas CE Frey HM Walsh RJ Chem Soc Faraday Trans 2 81:283
+!CAR/WAG95 CH2(S)+H2O
+!CAR/WES02 Carriere T Westmoreland PR Kazakov A Stein YS Dryer FL PCI 29:?
+!CEC92     DL Baulch,CJ Cobos,RA Cox,C Esser,P Frank,Th Just,JA Kerr,MJ Pilling,
+!          J Troe,RW Walker,J Warnatz JPCRD 21:403
+!CLA/PRI70 Clark W D Price SJ Can J Chem 48:1059
+!COB/TRO85 Cobos CJ Hippler H Troe J JPC 89:1778-1783
+!COH/WES83 Cohen N Westberg KR JPCRD 12:531
+!COL/HOW84 Cole JA Bittner JD Longwell JP Howard JB CF 56:51 (1984)
+!DAG/CAT98 Dagaut P Cathonnet M CST 140:225
+!DAV/LAW99 Davis SG Law CK Wang H CF 119:375
+!DEA90     Dean A M  JPC 94:1432-1439
+!DEA/BOZ00 Dean AM Bozzelli JW (Gardiner WC) Gas Phase Combustion Chemistry, Springer 
+!DEM/RAV87 Demore WB Golden DM Hampson RF Howard CJ Kurylo MJ Molina MJ 
+!          Ravishankara AR Sander SP JPL P 87-41:1
+!DEM/RAV90 Demore WB Sander SP Golden DM Molina MJ Hampson RF Kurylo MJ
+!          Howard CJ Ravishankara AR JPL P 90-1:1
+!DEM/MOL97 DeMore WB Sander SP Golden DM Hampson RF Kurylo MJ Howard CJ 
+!          Ravishankara AR Kolb CE Molina M J JPL Publ 97-4 
+!DES/TAT01 DeSain JD Jusinski LE Ho AD Taatjes CA CPL 347:79
+!EIT/FRE98 Eiteneer B Yu CL Goldenberg M Frenklach M JPCA 102:5196
+!EMD/BRE92 Emdee JL Brezinsky K Glassman I JPC 96:2151
+!FAH/LAU91 A Fahr, A Laufer, R Klein, W Braun JPC 95:3218-3224
+!FAH/STE88 Fahr A Stein SE JPC 92:4951
+!FAH/STE89 Fahr A Stein SE PCI 22:1023
+!FAH/BRA91 Fahr A Laufer A Klein R Braun W JPC95:3218-3224
+!FEN/KEL50 CP Fenimore JR Kelso JACS 72:5045
+!FRA/JUS80 Frank P Just Th CF 38:231
+!FRA/JUS88 Frank P Bhaskaran KA Just Th PCI 21:885
+!FRA/WAH94 Frank P Herzler J Just Th Wahl C PCI 25:833
+!FRE/STE85 Frenklach M Clary DW Gardiner WC Jr Stein SE PCI 20:887
+!FRI/DAV02 Friedrichs G Herbon JT Davidson DF Hanson RK CPPC 4:5778-5788
+!FRI/HAN02 Friedrichs G Davidson DF Hanson RK IJCK 34:374
+!FUL/HIP97 Fulle D Hamann HF Hippler H Jansch CP BBPC 101:1433-1442
+!FUL/HIP99 Fulle D Hamann HF Hippler H PCCP 1:2695 
+!GLA/MIL94 P Glarborg,K Dam-Johansen,JA Miller,RJ Kee,ME Coltrin IJCK 26:421
+!GLA/DAM95 P Glarborg,PG Kristensen,D Kubel,J Hansen,KDam-Johansen CST 110:461
+!GLA/BOZ96 Glarborg P Kubel D Dam-Johansen K Chiang H-M Bozzelli J IJCK 28:773-790
+!GLA/MIL96 NH2+NO2
+!GLA/MIL98 Glarborg P Alzueta MU Dam-Johansen K CF 115:1
+!GLA/OST98 H+NO+M
+!GLA/BEN98 nitromethane paper
+!GOU/MAR93 Goumri A Laakso D Roucha JD-R Francis D Marshall P JPC 97:5295-5297
+!GOU/MAR95 Goumri A Roucha JD-R Marshall P JPC 99:10834
+!GOU/MAR99 Goumri A Roucha JD-R Laakso D Smith CE Marshall P JPCA 103:11328 (S)
+!GOU/MAR99 A Goumri, JDR Rocha, A Misra, P Marshall, JPCA 103:9252 (K)
+!GRI/KOL01: J Griffin DR Worsnop, RC Brown CE Kolb DR Herschbach JPCA 105:1643
+!GRU/WAG95 CH2CO+OH
+!HAR/BLI88 Harris SJ Weiner AM Blint RJ CF 72:91
+!HAR/WAG88 Harding LB Wagner AF PCI 21:721
+!HEL/PLA93a M Helmer JMC Plane J Geophys Res 98:207-222
+!HEL/PLA93b M Helmer JMC Plane JCP 99:7696
+!HER/WAG74 Herbrechtsmeier P Wagner HGg Z Phys Chem (Neue Folge) 93:143
+!          IJCK 24:761
+!HID/KAW95 Hidaka Y Higashihara T Oki T Kawano H IJCK 27:321-330
+!HID/KAW96 Hidaka Y Higashihara T Ninomiya N Masaoka H Nakamura T Kawano H IJCK 28:137
+!HIG/MUR80 Higashihara T Saito K Murakami I Bull CS Jpn 53:15
+!HIP/TRO91 Hippler H Reihs C Troe J PCI 23:37-43
+!HOR/BEC83 Horie O Bauer W Meuser R Scmidt VH Becker KH CPL 100:251
+!HOR/FRA98 Horn C Roy K Frank P Just Th PCI 27:321
+!HOR/WES98 Hori M Matsunaga Marinov N Pitz W Westbrook C PVI 27:389
+!HOW80     CJ Howard JACS 102:6937
+!HRA/MIC98 Hranisavljevic J Kumaran SS Michael JV PCI 27:159-166
+!HUS89     Husain D JCS Far Trans 2 85:85-130
+!INO/WAS99 S Inomata, N Washida JPCA 103:5023
+!IRD/WAG93 Irdam EI Kiefer JH Harding LB Wagner AF IJCK 25:285
+!JAC/COH67 Jacobs TA Giedt RR Cohen N JCP 47:54-57
+!JEN/MAC79: DE Jensen,GA Jones, CH Mace, Ber Bunsenges Phys Chem (?)
+!KER/WU88  Kern RD Singh HJ Wu CH IJCK 20:731
+!KHE/LES77 PV Khe,JC Soulignac,R Lesclaux JPC 81:210
+!KIE/WEI85 Kiefer JH Mizerka LJ Patel MR Wei H-C JPC 89:2013
+!KIM/DRY95 TJ Kim, RA Yetter, FL Dryer PCI 25:759
+!KNI/ZET90 Knispel R Koch R Siese M Zetzsch C BBPC 94:1375
+!KNY/SLA96 Knyazev VD Slagle IR JPC 100:16899-16911
+!KUM/MIC97 Kumaran SS Michael JV Proc 21 Int Symp Shock Waves
+!KUM/MIC98 SS Kumaran,JJ Carroll,JV Michael PCI 27:125
+!LAM/BEN86 Lamb JJ Benson SW J Geoph Res 91:8683-8689
+!LAN83     CH2CO+CH2(S)
+!LAN/CUR90 Lander DR Unfried KG Glass GP Curl RF JPC 94:7759
+!LAS99     C2H4+C2H
+!LAS/WAN99 Laskin A Wang H CPL 303:43
+!LEI/WAG89 Leidreiter HI Wagner HGg Z Phys Chem (Neue Folge) 165:1
+!LIG/LES91 PD Lightfoot, P Roussel, F Caralp, R Lesclaux JCSFT 87:3213-3220
+!LIN/LIN86 Lin C-Y Lin MC Aust J Chem 39:723
+!LIN96     HNO+NH2
+!LIU/JON88 Liu A Mulac WA Jonah CD JPC 92:131.
+!LOV/MOD90 CH2CO+CH2(S)
+!MAH/FON90 Mahmud K Kim J Fontijn A JPC 94:2994
+!MAR95     C2H4+H+M
+!MAR96     C2H2+H+M
+!MAR/SEN96 Marinov NM Pitz WJ Westbrook CK Castaldi MJ Senkan SM CST 116:211
+!MAR/TSA97 Marinov NM Castaldi MJ Melius CF Tsang W CST 128:295-342
+!MAR/HER83 Martinez RI Herron JT 15:1127
+!MAS/BOW90 Masten DA Hanson RK Bowman CT JPC 94:7119
+!MEL/EVL92 Melius C F Miller JA Evleth EM PCI 24:621-628
+!MIC92     Michael JV PECS 18:327
+!MIC/SU99  Michael JV Kumaran SS Su MCM JPCA 103:5942
+!MEB/MOR97 Mebel AM Lin MC Yu T Morokuma K JPCA 101:3189
+!MEB/MEL98 AM Mebel,MC Lin,CF Melius JPCA 102:1803
+!MIL/MEL88 C2H2+OH
+!MIL/ROB00 Miller JA Klippenstein SJ Robertson SH PCI 28:1479
+!MUE/DRY98 MA Mueller,RA Yetter,FL Dryer PCI 27:177
+!MUE/DRY99 MA Mueller,RA Yetter,FL Dryer IJCK 31:705
+!MUE/DRY00 MA Mueller,RA Yetter,FL Dryer IJCK 32:317-329
+!NBS86     W Tsang, RF Hampson, JPCRD 15:1087
+!NBS87     Tsang W JPCRD 16:471
+!NBS91     W Tsang JPCRD 20:609
+!OHM/WAS90 K Ohmori,A Miyoshi,H Matsui,N Washida JPC 94:3253
+!PAR/LIN97 NH2+NO2
+!PAR/LIN98 J Park,ND Giles,J Moore,MC Lin JPCA 102:10099
+!PEN/MAR99 Peng J HU X Marshall P JPCA 103:5307-5311
+!PER84     Perry RA CF 58:221
+!PER/MIL96 RA Perry, JA Miller, IJCK 28:217
+!PLA/BAR89 JMC Plane, B Rajasekhar, L Bartolotti, JCP 91:6177
+!PLA/BAR90 JMC Plane, B Rajasekhar, L Bartolotti, JPC 94:4161
+!PLA/TRO84 Plach HJ Troe J IJCK 16:1531
+!PRE/FLY00 Press JM Fockenberg C Flynn GW JPCA 104:6755-6763
+!RAV/THO85 Ravishankara AR Wine PH Wells JR Thompson RL IJCK 17:1281
+!RIC/HOW99 Richter H Grieco WJ Howard JB CF 119:1-22
+!RIL/FON01 PS Riley B Cosic A Fontijn submitted 2003
+!RIM/HER98 Rim, Hershberger CH+NO2
+!ROY/FRA97 Roy K Frank P Proc 21 Symp Shock Waves paper 1560
+!SAL/HAN84 NH3+OH
+!SCH/STE92 K Schofield M Steinberg JPC 96:715-726 
+!SHA/HOW96 Shandross R A Longwell JP Howard JB PCI 26:711-719
+!SHI/MAT96 Shiina H Oya M Yamashita K Miyoshi A Matsui H JPCA 100:2136
+!SHI/MAT98 Shiina H Miyoshi A Matsui H JPCA 102:3556
+!SIE/ZET95 Siese M Zetzsch C ZPC (Munich) 188:75-89
+!SIL/KOL84 JA Silver, AC Stanton, MS Zahniser, CE Kolb JPC 88:3123-3129
+!SIL86     JA Silver JCP 84:4718-4720
+!SIL/KOL86 JA Silver CE Kolb JPC 90:3267-3269
+!SIN/CVE78 Singleton DL Cvetanovic RJ Can J Chem 56:2934 
+!SIN/CVE88 Singleton DL Cvetanovic RJ JPCRD 17:1377
+!SKI/BUR72 Skinner GB Lifshitz A Scheller K Burcat A JCP 56:3853
+!SLA/MIL88 IR Slagle,D Sarzynski,D Gutman,JA Miller,CF Melius JCSFT2 84:491
+!SLE/WAR77 F Slemr, P Warneck IJCK 9:267
+!SOT/PAG92 MR Soto, M Page JCP 97:7287
+!STE/GLA87 Stephens JW Hall JL Solka H Yan W-B Curl RF Glass GP JPC 91:5740
+!SUT/MIC01 Sutherland JW Su M-C Michael JV IJCK 33:669-684
+!TAL/HOW86 CL Talcott JW Ager III CJ Howard JCP 84:6161-6169
+!TAN/DAG94 Tan Y Dagaut P Cathonnet M Boettner JC CST 102:21
+!TEM/WOL92 Temps F Wagner HGg Wolf M Z Phys Chem (Munich) 176:27-39
+!TRO78     Troe J Ann Rev PC 29:223
+!TSU/DUP94 Tsuchiya K Yokoyama K Matsui H Oya M Dupre G JPC 98;8419
+!TSU/MAT97 Tsuchiya K Kamiya K Matsui H IJCK 29:57
+!TYN/RAV91 Tyndall GS Ravishankara AR IJCK 23:483
+!VAG/RAV90 GL Vaghjiani, AR Ravishankara IJCK 22:351
+!YAR/SUT91 G Yarwood,JW Sutherland,MA Wickramaaratchi,RB Klemm JPC 95:8771
+!YU/FRE91  CL Yu, C Wang, M Frenklach, 24 ESS-Fall, paper 61
+!YU/FRE95  Yu CL Wang C Frenklach M JPC 99:14377
+!YU/MEL94  Yu T Lin M C Melius CF IJCK 26:1095-1104
+!VEN/PEE90 van de Ven P Peeters J Bull Soc Chim Belg 99:509-516
+!VEY/LES81 Veyret B Lesclaux R JPC 85:1918
+!WAN/FRE97 Wang H Frenklach M CF 110:173
+!WAN/BRE98 Wang H Brezinsky K JPCA 102:1530
+!WAR84     Warnatz J Combustion Chemistry, ed WC Gardiner Jr Springer-Verlag,NY (1984)
+!WES/LON89 Westmoreland PR Dean AM Howard JB Longwell JP JPC 93:8171-8180
+!WOI/ROT95 Woiki D Roth P IJCK 27:59-71
+!ZHA/BAC90 Zhang H-X Back MH IJCK 22:21
+!ZHO/BOZ98 Zhong X Bozzelli JW JPCA 102:3537
+!ZHU/LIN01 Zhu R Lin MC JPCA 105:6243-6248
+
+
+
+
+ ! BEC/WIE95: KH Becker, R Kurtenbach, P Wiesen, JPC 99,5986,1995
+ ! BIG/CAR93:P Biggs,CE Casona-Mas,J-M Fracheboud,AD Parr,DE Shallcross,
+ !           RP Wayne,F Caralp, JCSFT 89,4163,1993
+ ! BLU/WAG73: B Blumenberg, HGg Wagner, BBPC 77,253,1973
+ ! BOG/HAN78: DJ Bogan, CW Hand, JPC 82,2067,1978
+ ! BOT/COH91: JF Bott, N Cohen, IJCK 23,1075,1991
+ ! BOZ/DEA90: JW Bozzelli, AM Dean, JPC 94,3313,1990
+ ! BRY/SAR93: MGBryukow,AAKachanov,RTimonen,JSeetula,JVandooren,
+              OMSarsikov, CPL 208,392,1993
+ ! BUR/RAV92:JBBurkholder,AMellouki,RTalukdar,ARRavishankara,IJCK24,711
+ ! COB/TRO85: CJ Cobos, H Hippler, J Troe, JPC 89,342,1985
+ ! DAR/MOO95: DC Darwin, CB Moore, JPC 99,13467,1995
+ ! DAV/HAN91: DF Davidson, AJ Dean, MD DiRosa, RK Hanson, IJCK23,1035,1991
+ ! DAV/HAN91B: DF Davidson, RK Hanson, 23SIC267,1991
+ ! DAV/HAN91C: DFDavidson,MDDiRosa,AYChang,RK Hanson, 18ISSH,1991
+ ! DUR/TUL89: JL Durant, FP Tully, CPL 154,568,1989
+ ! GEH/WAG69: MVGehring,KHoyermann,HGgWagner,JWolfrum, BBPC 73,956,1969
+ ! GLA94: PGlarborg, PGKristensen, SHJensen, KDam-Johansen, CF98,241,1994
+ ! GLA94B: P Glarborg, JE Johnsson, K Dam-Johansen, CF99,523,1994
+ ! 94sncrB: P Glarborg, JA Miller, CF 99,475, 1994
+ ! GLA/MIL95: P Glarborg, K Dam-Johansen, JA Miller, IJCK 27,1207,1995
+ ! GLA/TRO74: K Glaenzer, J Troe, BBPC 78,182,1974
+ ! GRO/JUS85: HHGrotheer,GRickert,UMeier,ThJust, BBPC89,187,1985
+ ! GRO/JUS89: HHGrotheer,GRickert,DWalter,ThJust, 22SIC963,1989
+ ! FUL/TRO98: DFulle,HFHamann,HHippler,JTroe JCP 108,5391,1998
+ ! HE/LIN89: Y He, E Kolby, P Shumaker, MC Lin, IJCK 21, 1015, 1989
+ ! HE/LIN92B: Y He, MC Lin, IJCK 24,743,1992
+ ! HER88: JT Herron, JPCRF 17,967,1988
+ ! HWA/RAB99: SMHwang,SORyu,KJDWitt,MJRabinowitz JCPA 103,5949,1999
+ ! HIP/TRO92: H Hippler, J Troe, J Willner, JCP 93,1755,1992
+ ! HIP/TRO95: H Hippler, H Neunaber, J Troe, JCP 103,3510,1995
+ ! HIP/TRO95: H Hippler, H Neunaber, J Troe, JCP 103,3510,1995
+ ! LIF83: A Lifshitz, H Ben-Hamou JPC 87, 1782, 1983
+ ! MAR/STI89:GMarston,FLNesbitt,DFNava,WAPayne,LJStief,JPC93,5769,1993
+ ! MES/CAR81: IMessing,SVFilseth,CMSadowski,TCarrington, JCP74,3874,1981
+ ! MIC99: JV Michael,SSKumaran,MCSu JPCA 103,5942,1999
+ ! MIL82: JA Miller, RE Mitchell, MD Smooke, RJ Kee, 19SIC181, 1982
+ ! MIL83: JA Miller, MD Smooke, RM Green, RJ Kee, CST34,149,1983
+ ! MIL/BOW92: JA Miller, CT Bowman, IJCK
+ ! MIL/95cono: JA Miller, P Glarborg, SSCP, in press
+ ! MIL/MEL92: JA Miller, CF Melius, CF 91,21,1992
+ ! MIL/MEL92B: JA Miller, CF Melius, IJCK 24,421,1992
+ ! MIL/MEL92C: JA Miller, CF Melius, 24SIC719,1992
+ ! MIL94: JA Miller, JF Durant, CF Melius, unpublished results
+ ! NBS87: W Tsang, JPCRD 16,471,1987
+ ! NES/STI99: FLNesbitt,JFGleason,LJStief JPC-A 103,3039,1999
+ ! PAY/STI96: WAPayne,PSMonks,FLNesbitt,LJStief JCP 104,9808,1996
+ ! PEE95: J Peeters, W Boullart, K Devriendt, JPC 99,3583,1995
+ ! PHI79: LF Philips, CF 35,233,1979
+ ! RAB/SUT91: MJRabinovich,JWSutherland,PMPatterson,RBKlemm, JPC 95,674,1991
+ ! ROH/HAN97: MRohrig,ELPetersen,DFDavidson,RKHanson IJCK29,483,1997
+ ! ROH/WAG94: M Rohrig, HGg Wagner, 25SIC973,1994
+ ! ROH/WAG95: M Rohrig, HJRomming, HGg Wagner, BBPC,99,105,1995
+ ! SLA77: MW Slack, CF 28,241,1977
+ ! STE/GLA87:JWStephens,JLHall,HSolka,WBYan,RFCurl,GPGlass,JPC91,5740,1987
+ ! SUT86: JW Sutherland, PM Patterson, RB Klemm, JPC 94,2471,1990
+ ! TIM/GUT87: RS Timonen, E Ratajczak, D Gutman, AF Wagner, JPC 91,5325,1987
+ ! VAG96: Vaghjiani, JCP 104,5479,1996
+ ! WAG/GUT90: AF Wagner, IR Slagle, D Sarzynski, D Gutman JPC 94,1853,1990
+ ! WIL69: KA Wilde, CF 13,173,1969
+

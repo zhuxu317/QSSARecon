@@ -1,0 +1,7 @@
+In file included from /usr/local/lib/python3.7/dist-packages/numpy/core/include/numpy/ndarraytypes.h:1969,
+                 from /usr/local/lib/python3.7/dist-packages/numpy/core/include/numpy/ndarrayobject.h:12,
+                 from /usr/local/lib/python3.7/dist-packages/numpy/core/include/numpy/arrayobject.h:4,
+                 from /home/zhuxu21/.local/lib/python3.7/site-packages/pyjac/pywrap/pyjacob_wrapper.c:610:
+/usr/local/lib/python3.7/dist-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h:17:2: warning: #warning "Using deprecated NumPy API, disable it with " "#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION" [-Wcpp]
+ #warning "Using deprecated NumPy API, disable it with " \
+  ^~~~~~~

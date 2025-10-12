@@ -1,0 +1,22 @@
+  
+=====  ISAT-CK Version: 7.0        initialization starting  ====== 
+  
+Date (MM/DD/YEAR): 11/ 5/2024 Time: 20: 6:47.
+  
+ modeci =            9
+  
+ cickin: Initializing Chemkin II 
+ Calling Chemkin (cklen) with iflag
+
+  CKLIB:  Chemical Kinetics Library
+          CHEMKIN-II Version 4.5, January 1995
+          DOUBLE PRECISION
+  
+ cickin: Chemkin initialization successful.
+  
+ cickin: first  thermo coeff correc =   2.583773333686423E-002
+ cickin: second thermo coeff correc =   6.661338147750939E-012
+  
+ Number of elements  =            5
+ Number of species   =           32
+ Number of reactions =          177

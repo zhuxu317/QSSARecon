@@ -1,0 +1,13 @@
+# Ignore output folders
+figs/
+cases/
+
+# Ignore image and pdf files
+*.pdf
+*.png
+
+# Optional: ignore other temporary or cache files
+__pycache__/
+*.log
+*.tmp
+*.out
