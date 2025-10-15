@@ -21,7 +21,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import matplotlib.font_manager as fm
-import seaborn as sns
+import seaborn as snsmae
 import shutil
 import cantera as ct
 import pandas as pd
@@ -209,6 +209,7 @@ def run_CEQ(gas, fig_dir, main_species_names, initial_fractions, fuel, oxyd, T, 
         MF = gas.mixture_fraction(fuel, oxyd)
         df['MF'] = MF
     HRR = -1 * np.dot(gas.net_rates_of_progress, gas.delta_enthalpy) / gas.density
+    
 
     df['CEM'] = TLOG
     df['HRR'] = HRR
@@ -308,6 +309,7 @@ def create_reaction_path_diagram(gas, fig_dir, element, cantera_row, pred_canter
     all_fractions = dict(zip(all_species_names, all_species_values))
     species_composition = ", ".join([f"{sp}:{mf}" for sp, mf in all_fractions.items()])
     gas.TPX = cantera_row['T'], cantera_row['P'], species_composition
+
     diagram = ct.ReactionPathDiagram(gas, element)
     diagram.show_details = True
     diagram.title = 'Reaction path diagram following {0}'.format(element)

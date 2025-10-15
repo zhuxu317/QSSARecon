@@ -7,23 +7,24 @@ all:
 #----------RUN-1D-overall----------
 CASES_DIR ?= cases
 # --- NP ---
-CASE_NAME ?= NH3_premixed_matrix_1bar #NH3_PCI_Matrix, NH3_PCI_KAUST_5bar, NH3_NP_exp, NH3_NP_sim, NH3_DNS, NH3_KAUST_NP_1bar
+CASE_NAME ?= H2_DNS #NH3_PCI_Matrix, NH3_PCI_KAUST_5bar, NH3_NP_exp, NH3_NP_sim, NH3_DNS, NH3_KAUST_NP_1bar
 # --- PM ---
-PM_CASE_NAME ?= NH3_premixed_matrix_1bar
+PM_CASE_NAME ?= H2_DNS
 PM_CASES_DIR ?= cases
 
 INERT     ?= AR
 SORET ?= 1
 LOGLEVEL ?= 0
 ELEMS ?= 5
-PROPS_FILE ?= sim_props.yaml
+PROPS_FILE ?= premix_props.yaml
 # PROPS_FILE ?= sim_props.yaml   # default if you keep a single props.yaml
 EXTRA_FLAGS ?=
 
 
 
 # ---------Single Cases-----
-MECHS ?= mechanism/Mei_39s256r/Mei_39s256r.yaml 
+# MECHS ?= mechanism/Mei_39s256r/Mei_39s256r.yaml 
+MECHS ?= mechanism/H2_pNOX_15_94_TC.yaml
 # #--------Multiple Cases-----
 # MECHS  =mechanism/Han_35s177r/Han_35s177r.yaml \
 # 		mechanism/Mei_39s256r/Mei_39s256r.yaml \
@@ -68,7 +69,7 @@ run_1D_counter_flow_PPM_CSP:
 	@i=1; \
 	for mech in $(MECHS); do \
 	  echo "  [$$i] mech=$$mech"; \
-        /home/zhuxu21/.conda/envs/viz_env/bin/python3 src/run_1D_counter_flow_PPM_CSP.py \
+        /home/zhuxu21/.conda/envs/viz311/bin/python3 src/run_1D_counter_flow_PPM_CSP.py \
 	    --cases_dir $(PM_CASES_DIR) \
 	    --case_name $(PM_CASE_NAME) \
 	    --mech_file $$mech \
@@ -88,7 +89,7 @@ run_1D_counter_flow_PM_CSP:
 	@i=1; \
 	for mech in $(MECHS); do \
 	  echo "  [$$i] mech=$$mech, props=$(PROPS_FILE)"; \
-	  /home/zhuxu21/.conda/envs/viz_env/bin/python3 src/run_1D_counter_flow_PM_CSP.py \
+	  /home/zhuxu21/.conda/envs/viz311/bin/python3 src/run_1D_counter_flow_PM_CSP.py \
 	    --cases_dir $(PM_CASES_DIR) \
 	    --case_name $(PM_CASE_NAME) \
 	    --mech_file $$mech \
@@ -110,7 +111,7 @@ recon-QSSA-CSP:
 	for mech in $(MECHS); do \
 	  elem=$$(echo $(ELEMS) | cut -d' ' -f$$i); \
 	  echo "  [$$i] mech=$$mech, element_num=$$elem, props=$(PROPS_FILE) EXTRA_SPECIES='$(EXTRA_SPECIES)'"; \
-	  /home/zhuxu21/.conda/envs/viz_env/bin/python3 src/recon_QSSA_CSP.py \
+	  /home/zhuxu21/.conda/envs/viz311/bin/python3 src/recon_QSSA_CSP.py \
 	    --cases_dir $(CASES_DIR) \
 	    --case_name $(CASE_NAME) \
 	    --mech_file $$mech \
