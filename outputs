@@ -1,0 +1,54 @@
+case_name: NH3_KAUST_DEF
+
+# Where SIM results would be (unused for EXP), and where to WRITE recon results
+
+defaults:
+  output_root: cases/NH3_KAUST_DEF_1bar/exp_data/average_csv_export
+  exp_root: cases/NH3_KAUST_DEF_1bar/exp_data/average_csv_export
+
+  recon_output_root: Exp_QSSA
+  # Thermo / flow
+  P_atm: 1
+  Tfuel: 290
+  Toxyd: 290
+  width: 0.01
+  Text: 290
+  oxidizer: "O2:1, N2:3.727, AR:0.0446"
+
+  # NEW: species to hold fixed / reconstruct first
+  main_species:
+    - NH3
+    - H2
+    - O2
+    - H2O
+    - N2
+    - "OH"
+    
+  # Chemistry / bookkeeping
+  inert_specie: AR
+  element_num: 5
+
+  # QSSA control
+  Exp_data: False          # ← tell the code to read from case_dir/Exp/...
+  ifMoleFraction: False    # ← look for X_* columns in EXP CSVs
+  dt: 1.0e-2
+  time_end: 1.0
+  perturb: 0
+
+  # Fuels for mixture fraction/HRR calc
+  fuel: "NH3:0.8, H2:0.2"
+  oxidizer: "O2:1, N2:3.727, AR:0.0446"
+
+configs:
+  - id: D_mass_z1
+    file_name: "D_mass_z1.csv"
+  # - id: D_mass_z2
+  #   file_name: "D_mass_z2.csv"
+  # - id: D_mass_z4
+  #   file_name: "D_mass_z4.csv"
+  # - id: D_mass_z6
+  #   file_name: "D_mass_z6.csv"
+  # - id: D_mass_z10
+  #   file_name: "D_mass_z10.csv"
+  # - id: D_mass_z15
+  #   file_name: "D_mass_z15.csv"

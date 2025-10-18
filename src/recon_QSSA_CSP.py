@@ -174,7 +174,6 @@ def run_CEQ_core(
 
 def run_CEQ(gas, fig_dir, main_species_names, initial_fractions, fuel, oxyd, T, P, dt, time_end, full_data, element_num, mech_file, moleFraction, ifPremixed):
     gas = run_CEQ_core(gas, main_species_names, initial_fractions, T, P, dt, time_end, moleFraction)
-
     species_names = gas.species_names
     temp, pressure = gas.T, gas.P
     mole_fractions = gas.X
@@ -213,7 +212,7 @@ def run_CEQ(gas, fig_dir, main_species_names, initial_fractions, fuel, oxyd, T, 
 
     df['CEM'] = TLOG
     df['HRR'] = HRR
-    for k in ('t_res','P','x','grid','T','Normalized X','Normalized Y'):
+    for k in ('t_res','P','x','grid','T','Normalized X','Normalized Y', "mixture_fraction"):
         if k in full_data:
             df[k] = full_data[k]
 
@@ -412,7 +411,6 @@ def process_experiments_RCCE(
         perturb = [val * rand * random.uniform(-1, 1) for val in input_species_values]
         perturbed = [max(v + dv, 0.0) for v, dv in zip(input_species_values, perturb)]
         initial_mf = dict(zip(main_species_names, perturbed))
-
         run_CEQ(
             gas, fig_dir, main_species_names, initial_mf,
             props['fuel'], props['oxidizer'], input_T, input_P,
@@ -558,8 +556,7 @@ def main():
     else:
         props_list = load_props_list(case_dir_arg)
 
-    # Use the YAML’s directory as the “case_dir” for resolving relative roots
-    yaml_case_dir = props_list[0].get("__case_dir__", case_dir_arg)
+    # yaml_case_dir = props_list[0].get("__case_dir__", case_dir_arg)
     if not props_list:
         raise RuntimeError(f"No props loaded from: {getattr(args, 'props_file', None) or case_dir}")
 
@@ -577,9 +574,9 @@ def main():
 
     # ---------------- Roots (from YAML) ----------------
     sim_dir            = props_list[0].get("output_root")          # READ
+    exp_dir            = props_list[0].get("exp_root")          # READ
     recon_folder_name  = props_list[0].get("recon_output_root")    # WRITE (folder name or path)
 
-    print("sim_dir=", sim_dir)
     parent_dir = os.path.dirname(sim_dir) if os.path.isabs(sim_dir) else os.path.dirname(os.path.abspath(sim_dir))
     print("recon_dir (yaml)=", recon_folder_name)
 
@@ -626,8 +623,8 @@ def main():
         base_file_name = p['file_name']
         is_exp = bool(p.get('Exp_data', False))
         if is_exp:
-            data_dir = p.get('path', os.path.join(case_dir, 'Exp'))
-            file_name = os.path.join(data_dir, base_file_name)
+            file_name = os.path.join(exp_dir, base_file_name)
+            print("file_nam=", file_name)
         else:
             file_name = os.path.join(sim_dir, mech_name, base_file_name)
 

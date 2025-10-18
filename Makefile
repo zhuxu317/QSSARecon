@@ -7,16 +7,16 @@ all:
 #----------RUN-1D-overall----------
 CASES_DIR ?= cases
 # --- NP ---
-CASE_NAME ?= H2_DNS #NH3_PCI_Matrix, NH3_PCI_KAUST_5bar, NH3_NP_exp, NH3_NP_sim, NH3_DNS, NH3_KAUST_NP_1bar
+CASE_NAME ?= NH3_KAUST_DEF_1bar #NH3_PCI_Matrix, NH3_PCI_KAUST_5bar, NH3_NP_exp, NH3_NP_sim, NH3_DNS, NH3_KAUST_NP_1bar
 # --- PM ---
-PM_CASE_NAME ?= H2_DNS
+PM_CASE_NAME ?= NH3_KAUST_DEF_1bar
 PM_CASES_DIR ?= cases
 
 INERT     ?= AR
 SORET ?= 1
 LOGLEVEL ?= 0
 ELEMS ?= 5
-PROPS_FILE ?= premix_props.yaml
+PROPS_FILE ?= exp_props.yaml
 # PROPS_FILE ?= sim_props.yaml   # default if you keep a single props.yaml
 EXTRA_FLAGS ?=
 
@@ -24,14 +24,14 @@ EXTRA_FLAGS ?=
 
 # ---------Single Cases-----
 # MECHS ?= mechanism/Mei_39s256r/Mei_39s256r.yaml 
-MECHS ?= mechanism/H2_pNOX_15_94_TC.yaml
+# MECHS ?= mechanism/H2_pNOX_15_94_TC.yaml
 # #--------Multiple Cases-----
-# MECHS  =mechanism/Han_35s177r/Han_35s177r.yaml \
-# 		mechanism/Mei_39s256r/Mei_39s256r.yaml \
-# 		mechanism/Otomo_32s213r/Otomo_32s213r.yaml \
-# 		mechanism/Marshall_33s221r/Marshall_33s221r.yaml \
-# 		mechanism/NUIG_39s306r/NUIG_39s306r.yaml \
-# 		mechanism/KAUST_32s243r/KAUST_32s243r.yaml \
+MECHS  =mechanism/Han_35s177r/Han_35s177r.yaml \
+		mechanism/Mei_39s256r/Mei_39s256r.yaml \
+		mechanism/Otomo_32s213r/Otomo_32s213r.yaml \
+		mechanism/Marshall_33s221r/Marshall_33s221r.yaml \
+		mechanism/NUIG_39s306r/NUIG_39s306r.yaml \
+		mechanism/KAUST_32s243r/KAUST_32s243r.yaml \
 # ELEMS  :=  5 7 8 7 8 7 
 
 # NUIG_39s306r 8 
