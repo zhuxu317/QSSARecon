@@ -212,7 +212,7 @@ def run_CEQ(gas, fig_dir, main_species_names, initial_fractions, fuel, oxyd, T, 
 
     df['CEM'] = TLOG
     df['HRR'] = HRR
-    for k in ('t_res','P','x','grid','T','Normalized X','Normalized Y', "mixture_fraction"):
+    for k in ('t_res','P','x','grid','T','Normalized X','Normalized Y', "mixture_fraction", "r_mm", "phi"):
         if k in full_data:
             df[k] = full_data[k]
 

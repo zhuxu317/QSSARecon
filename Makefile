@@ -23,15 +23,15 @@ EXTRA_FLAGS ?=
 
 
 # ---------Single Cases-----
-# MECHS ?= mechanism/Mei_39s256r/Mei_39s256r.yaml 
+MECHS ?= mechanism/KAUST_32s243r/KAUST_32s243r.yaml 
 # MECHS ?= mechanism/H2_pNOX_15_94_TC.yaml
 # #--------Multiple Cases-----
-MECHS  =mechanism/Han_35s177r/Han_35s177r.yaml \
-		mechanism/Mei_39s256r/Mei_39s256r.yaml \
-		mechanism/Otomo_32s213r/Otomo_32s213r.yaml \
-		mechanism/Marshall_33s221r/Marshall_33s221r.yaml \
-		mechanism/NUIG_39s306r/NUIG_39s306r.yaml \
-		mechanism/KAUST_32s243r/KAUST_32s243r.yaml \
+# MECHS  =mechanism/Han_35s177r/Han_35s177r.yaml \
+# 		mechanism/Mei_39s256r/Mei_39s256r.yaml \
+# 		mechanism/Otomo_32s213r/Otomo_32s213r.yaml \
+# 		mechanism/Marshall_33s221r/Marshall_33s221r.yaml \
+# 		mechanism/NUIG_39s306r/NUIG_39s306r.yaml \
+# 		mechanism/KAUST_32s243r/KAUST_32s243r.yaml \
 # ELEMS  :=  5 7 8 7 8 7 
 
 # NUIG_39s306r 8 
