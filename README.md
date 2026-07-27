@@ -87,9 +87,3 @@ the parent project's high-throughput reconstruction workflow.
 The source code and supplied results are released under the [MIT License](LICENSE).
 The NUIG kinetic mechanism retains its separate authorship and citation; see
 [`mechanism/README.md`](mechanism/README.md).
-
-## Download QR code
-
-<img src="assets/github_qr.png" alt="QR code for the GitHub repository" width="280">
-
-The QR code encodes: <https://github.com/zhuxu317/QSSARecon>
