@@ -1,0 +1,12 @@
+# Generated simulation and reconstruction data
+outputs/
+
+# Keep the example outputs under version control; the parent repository ignores
+# CSV and PNG files globally.
+!results/
+!results/*.csv
+!results/*.png
+
+# Python bytecode
+__pycache__/
+*.py[cod]

@@ -1,0 +1,39 @@
+# Minimal, self-contained version of
+# cases/NH3_KAUST_DEF_NP_1bar/sim_props.yaml.
+case_name: NH3_KAUST_DEF_NP_1bar
+mechanism_file: mechanism/NUIG_39s306r.yaml
+output_dir: results
+
+defaults:
+  # Preserve the original case definition: 0.9869 atm = 99,997.6 Pa.
+  P_atm: 0.9869
+  Tfuel: 293.5
+  Toxyd: 295.6
+  width: 0.01
+  Text: 293.5
+  oxidizer: "O2:0.21, N2:0.79"
+  inert_specie: N2
+  transport_model: mixture-averaged
+
+configs:
+  - id: "01"
+    run_id: ppf_phi3_left_phi09_right
+    fuel: "NH3:0.21818, H2:0.24545, O2:0.09545, N2:0.44091"
+    fuel_v: 0.5
+    oxyd_v: 0.5
+    file_name: ppf_phi3_left_phi09_right.csv
+
+# Two QSSA reconstructions of NH2 from the Cantera flame profile.
+# In each variant the listed species are prescribed; all other species start
+# from zero and are integrated at the local flame temperature and pressure.
+qssa:
+  target_species: NH2
+  time_end_s: 0.1
+  max_step_s: 0.01
+  rtol: 1.0e-8
+  atol: 1.0e-14
+  variants:
+    baseline:
+      fixed_species: [NH3, H2, O2, H2O, N2]
+    baseline_plus_OH:
+      fixed_species: [NH3, H2, O2, H2O, N2, OH]
