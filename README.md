@@ -82,7 +82,14 @@ The scripts are intentionally serial and transparent.  This makes the
 numerical definition easy to inspect; it is not intended as a replacement for
 the parent project's high-throughput reconstruction workflow.
 
-## Before publishing
+## License
 
-Choose a licence for the code before publishing.  The bundled mechanism's
-authorship and citation are documented in `mechanism/README.md`.
+The source code and supplied results are released under the [MIT License](LICENSE).
+The NUIG kinetic mechanism retains its separate authorship and citation; see
+[`mechanism/README.md`](mechanism/README.md).
+
+## Download QR code
+
+<img src="assets/github_qr.png" alt="QR code for the GitHub repository" width="280">
+
+The QR code encodes: <https://github.com/zhuxu317/QSSARecon>

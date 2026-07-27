@@ -6,6 +6,8 @@ outputs/
 !results/
 !results/*.csv
 !results/*.png
+!assets/
+!assets/*.png
 
 # Python bytecode
 __pycache__/
